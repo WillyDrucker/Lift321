@@ -1,97 +1,380 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Lift 3-2-1
 
-# Getting Started
+A modern fitness tracking app built with React Native + TypeScript, designed from the ground up with exceptional architecture and development practices.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+**Status**: Foundation Complete - Ready for Feature Development
 
-## Step 1: Start Metro
+## What is Lift 3-2-1?
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+Lift 3-2-1 is a brand new React Native application built on lessons learned from the original Will's 3-2-1 vanilla JavaScript web app. This is NOT a migration or conversion - it's a complete rebuild using modern best practices for mobile development.
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+## Philosophy
 
-```sh
-# Using npm
+- **SUPER STUPID SIMPLE (SSS)**: User experience must be effortless and guided
+- **REMOVE, DON'T ADD**: When faced with complexity, simplify or remove
+- **Mobile-first design**: Touch-optimized, immediate UI responses
+- **Global from the start**: Design tokens, semantic naming, strict TypeScript
+
+## Technology Stack
+
+- **React Native 0.82.1**: Native iOS/Android apps
+- **TypeScript (Strict Mode)**: Type-safe development with full strictness enabled
+- **Supabase**: Backend-as-a-service (brand new project)
+- **React Navigation**: Type-safe navigation
+- **Context API + Hooks**: State management
+- **StyleSheet + Design Tokens**: Global theme system (no magic numbers)
+
+## Project Structure
+
+```
+Lift321/
+├── src/
+│   ├── features/              # Feature-based architecture
+│   │   ├── auth/              # Authentication feature
+│   │   │   ├── screens/       # Login, SignUp screens
+│   │   │   ├── components/    # Auth-specific components
+│   │   │   ├── context/       # AuthContext + useAuth hook
+│   │   │   ├── services/      # authService (business logic)
+│   │   │   └── types/         # Auth type definitions
+│   │   ├── workouts/          # Workout logging feature
+│   │   ├── plans/             # Training programs feature
+│   │   └── history/           # Workout history feature
+│   │
+│   ├── components/            # Shared components (global use)
+│   ├── theme/                 # Design token system (GLOBAL)
+│   │   ├── colors.ts          # Semantic color palette
+│   │   ├── spacing.ts         # 16px base rhythm
+│   │   ├── typography.ts      # Font styles
+│   │   └── tokens.ts          # Main theme export
+│   │
+│   ├── navigation/            # React Navigation setup
+│   │   ├── types.ts           # Type-safe route definitions
+│   │   └── AppNavigator.tsx   # Main navigator
+│   │
+│   ├── contexts/              # Global contexts
+│   ├── services/              # Global services
+│   │   └── supabase/          # Supabase client + types
+│   ├── hooks/                 # Shared custom hooks
+│   ├── types/                 # Global TypeScript types
+│   ├── utils/                 # Utility functions
+│   └── assets/                # Images, fonts, etc.
+│
+├── APD/                       # Architecture & Planning Docs
+│   └── CLAUDE_DEV_STANDARDS.md  # Comprehensive coding standards
+│
+├── .env                       # Environment variables (Supabase config)
+├── tsconfig.json              # TypeScript configuration
+└── babel.config.js            # Babel configuration (absolute imports)
+```
+
+## What's Complete ✅
+
+### Foundation & Architecture
+- ✅ React Native 0.82.1 initialized with TypeScript
+- ✅ All dependencies installed (891 packages, 0 vulnerabilities)
+- ✅ TypeScript strict mode configured
+- ✅ Absolute imports configured (`@/`, `@components/`, `@features/`, etc.)
+- ✅ Complete folder structure (feature-based architecture)
+
+### Design Token System (GLOBAL FROM START)
+- ✅ `theme/colors.ts` - Semantic color palette (`actionSuccess`, not `greenButton`)
+- ✅ `theme/spacing.ts` - 16px base rhythm system
+- ✅ `theme/typography.ts` - Font sizes, weights, pre-built text styles
+- ✅ `theme/tokens.ts` - Main theme export
+
+### Supabase Integration
+- ✅ Supabase client configured (`services/supabase/client.ts`)
+- ✅ AsyncStorage persistence for sessions
+- ✅ Database types placeholder (`database.types.ts`)
+
+### Navigation
+- ✅ Type-safe route definitions (`navigation/types.ts`)
+- ✅ Global navigation types configured
+
+### Context Architecture
+- ✅ AuthContext template with proper pattern (Context + custom hook + memoization)
+
+### Documentation
+- ✅ **CLAUDE_DEV_STANDARDS.md** - Comprehensive coding standards
+- ✅ **README.md** - This file
+
+## What's NOT Complete (Intentionally) ⏳
+
+This is a **foundation/scaffolding project**. The following are intentionally NOT implemented:
+
+### UI & Components
+- ⏳ Shared components (Button, Card, Input, Selector)
+- ⏳ Screen implementations (Login, WorkoutList, etc.)
+- ⏳ App layout and navigation flow
+
+### Business Logic
+- ⏳ AuthContext implementation (signIn, signUp, signOut)
+- ⏳ Workout context and state management
+- ⏳ Plans context and state management
+- ⏳ Service layer implementations
+
+### Backend
+- ⏳ Supabase project setup (database schema, tables, RLS policies)
+- ⏳ Generated database types
+- ⏳ Authentication configuration
+
+## Getting Started
+
+### Prerequisites
+
+1. **React Native Environment Setup**
+   - Follow the [React Native Environment Setup guide](https://reactnative.dev/docs/set-up-your-environment)
+   - Install Xcode (macOS) or Android Studio
+   - Install CocoaPods (iOS development)
+
+2. **Supabase Project Setup**
+   - Create a new project at https://supabase.com
+   - Design your database schema (tables for users, workouts, plans, sessions, exercises, sets)
+   - Copy your project URL and anon key
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   cd C:\Dev
+   git clone <your-repo-url> Lift321
+   cd Lift321
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment variables**
+
+   Update `.env` with your Supabase credentials:
+   ```bash
+   SUPABASE_URL=https://your-project-id.supabase.co
+   SUPABASE_ANON_KEY=your-anon-key-here
+   ```
+
+4. **Generate Supabase types** (after creating database schema)
+   ```bash
+   npx supabase gen types typescript --project-id "your-project-id" > src/services/supabase/database.types.ts
+   ```
+
+5. **Install iOS dependencies** (macOS only)
+   ```bash
+   cd ios
+   bundle install
+   bundle exec pod install
+   cd ..
+   ```
+
+### Running the App
+
+#### Start Metro Bundler
+```bash
 npm start
-
-# OR using Yarn
-yarn start
 ```
 
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
-```
-
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
+#### Run on iOS
+```bash
 npm run ios
-
-# OR using Yarn
-yarn ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+#### Run on Android
+```bash
+npm run android
+```
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+## Key Development Patterns
 
-## Step 3: Modify your app
+### 1. Design Tokens - ALWAYS
 
-Now that you have successfully run the app, let's make changes!
+```typescript
+// ✅ GOOD - Using design tokens
+import { theme } from '@theme';
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+const styles = StyleSheet.create({
+  container: {
+    padding: theme.spacing.m,  // 16px from global token
+    backgroundColor: theme.colors.backgroundCard,
+  },
+  title: {
+    ...theme.textStyles.h1,
+    color: theme.colors.textPrimary,
+  },
+});
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+// ❌ BAD - Magic numbers and hard-coded colors
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,  // What is this? Why 16?
+    backgroundColor: '#333333',  // Literal color
+  },
+});
+```
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+### 2. Context + Custom Hook Pattern
 
-## Congratulations! :tada:
+```typescript
+// Never use useContext directly - always through custom hook
+import { useAuth } from '@features/auth/context/AuthContext';
 
-You've successfully run and modified your React Native App. :partying_face:
+const MyComponent = () => {
+  const { user, signIn } = useAuth();  // ✅ Type-safe, auto-complete
+  // ...
+};
+```
 
-### Now what?
+### 3. Service Layer Separation
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+```typescript
+// Never query Supabase directly from components
+// ❌ BAD - Direct query in component
+const MyComponent = () => {
+  const { data } = await supabase.from('workouts').select();
+};
 
-# Troubleshooting
+// ✅ GOOD - Use service layer
+// features/workouts/services/workoutService.ts
+export const workoutService = {
+  async getWorkouts(): Promise<Workout[]> {
+    const { data, error } = await supabase.from('workouts').select();
+    if (error) throw error;
+    return data;
+  },
+};
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+// features/workouts/context/WorkoutContext.tsx
+const fetchWorkouts = useCallback(async () => {
+  const workouts = await workoutService.getWorkouts();
+  setWorkouts(workouts);
+}, []);
+```
 
-# Learn More
+### 4. Absolute Imports
 
-To learn more about React Native, take a look at the following resources:
+```typescript
+// ✅ GOOD - Absolute imports
+import { Button } from '@components/Button';
+import { theme } from '@theme';
+import { useAuth } from '@features/auth/context/AuthContext';
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+// ❌ BAD - Relative imports
+import { Button } from '../../../components/Button';
+import { theme } from '../../theme';
+```
+
+### 5. TypeScript Strict Mode
+
+```typescript
+// ✅ GOOD - Explicit types
+type ButtonProps = {
+  title: string;
+  onPress: () => void;
+  disabled?: boolean;
+};
+
+const Button: React.FC<ButtonProps> = ({ title, onPress, disabled }) => { };
+
+// ❌ BAD - Implicit any
+const Button = (props) => { };  // props is 'any'
+```
+
+## File Header Format
+
+All files should use this header format:
+
+```typescript
+// ==========================================================================
+// COMPONENT/FILE NAME
+//
+// Brief description of purpose and role.
+// Additional context about architecture or patterns.
+//
+// Dependencies: List key imports
+// Used by: Where this is used
+// ==========================================================================
+
+import React from 'react';
+// ... imports
+
+// === TYPES ===
+type Props = { };
+
+// === COMPONENT ===
+export const MyComponent: React.FC<Props> = () => {
+  // === STATE ===
+
+  // === HOOKS ===
+
+  // === EVENT HANDLERS ===
+
+  // === RENDER ===
+  return ( );
+};
+
+// === STYLES ===
+const styles = StyleSheet.create({ });
+```
+
+## Next Steps for Development
+
+1. **Set up Supabase backend**
+   - Create database schema
+   - Generate TypeScript types
+   - Configure Row Level Security (RLS) policies
+
+2. **Build shared components**
+   - Button (primary, secondary, danger variants)
+   - Card (workout card, plan card)
+   - Input (email, password, number)
+   - Selector (exercise selector matching Will's 3-2-1 pattern)
+
+3. **Implement authentication**
+   - Complete AuthContext methods (signIn, signUp, signOut)
+   - Build Login and SignUp screens
+   - Add session persistence checks
+
+4. **Build core features**
+   - Workout logging (create, edit, complete workouts)
+   - Training plans (view, select, track progress)
+   - Workout history (view past sessions, statistics)
+
+5. **Configure navigation**
+   - Create AppNavigator with auth flow
+   - Implement protected routes
+   - Add tab navigation for main features
+
+## Documentation
+
+- **CLAUDE_DEV_STANDARDS.md** - Comprehensive coding standards and patterns
+- **README.md** - This file (project overview and setup)
+
+For detailed coding standards, component structure patterns, and architectural guidelines, see `APD/CLAUDE_DEV_STANDARDS.md`.
+
+## Important Notes
+
+- This is a **brand new Supabase project** (not using Will's 3-2-1 Supabase)
+- This is **NOT a code migration** - it's a fresh rebuild
+- Will's 3-2-1 is used only as a reference for patterns and concepts
+- Commit policy: Branch shown in VS Code bottom-left corner
+- Never commit unless explicitly requested
+
+## Troubleshooting
+
+If you encounter issues:
+
+1. **Metro bundler issues**: `npm start -- --reset-cache`
+2. **iOS build issues**: `cd ios && bundle exec pod install && cd ..`
+3. **Android build issues**: `cd android && ./gradlew clean && cd ..`
+4. **TypeScript errors**: Check `tsconfig.json` and ensure all dependencies are installed
+
+## Learn More
+
+- [React Native Documentation](https://reactnative.dev/docs/getting-started)
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
+- [Supabase Documentation](https://supabase.com/docs)
+- [React Navigation Documentation](https://reactnavigation.org/docs/getting-started)
+
+---
+
+Built with lessons learned from Will's 3-2-1, architected for excellence from the start.

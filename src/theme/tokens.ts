@@ -1,0 +1,29 @@
+// ==========================================================================
+// DESIGN TOKENS - Main Export
+//
+// Combines all design tokens into a single theme object.
+// This is the primary import for all components.
+//
+// Usage: import { theme } from '@theme'
+// Example: backgroundColor: theme.colors.backgroundCard
+//
+// Philosophy: Single source of truth for all design decisions
+// Dependencies: colors, spacing, typography modules
+// Used by: All components throughout the app
+// ==========================================================================
+
+import {colors} from './colors';
+import {spacing} from './spacing';
+import {typography, textStyles} from './typography';
+
+export const theme = {
+  colors,
+  spacing,
+  typography,
+  textStyles,
+} as const;
+
+export type Theme = typeof theme;
+
+// Re-export individual modules for convenience
+export {colors, spacing, typography, textStyles};
