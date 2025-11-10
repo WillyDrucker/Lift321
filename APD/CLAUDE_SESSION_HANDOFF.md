@@ -13,42 +13,47 @@ This file contains only critical architectural patterns and current session stat
 
 ---
 
-## Current Version: 1.0.0
+## Current Version: 1.0.2
 
-**Branch**: main
-**Status**: Foundation Complete - Supabase Configured - Ready for Component Development
-**Last Updated**: 2025-11-09
+**Branch**: Claude-v1.0.2
+**Status**: Login Screen Complete - Design Tokens Fully Implemented
+**Last Updated**: 2025-11-10
 
 ---
 
 ## Session State
 
 ### Current Work
-- Foundation phase complete
-- All documentation consolidated (CLAUDE.md merged into README.md)
-- GitHub repository created and synced: https://github.com/WillyDrucker/Lift321
-- Supabase project created and credentials configured in .env
-- Metro bundler tested and running successfully (http://localhost:8081)
-- User decided to skip database schema design for now
-- Ready to build first components
+- LoginScreen fully implemented with Bebas Neue font, gym background, drop shadows
+- Complete design token system implemented (typography, shadows, buttons, colors, spacing)
+- All files refactored to CLAUDE_DEV_STANDARDS
+- Gradle upgraded to 9.2.0 for Android Studio compatibility
+- Android emulator working and tested
+- Ready for next screen/feature development
 
 ### Completed This Session
-- Combined CLAUDE.md into README.md (single source of truth)
-- Pushed all code to GitHub (main and Claude-v1.0.0 branches)
-- Configured Supabase credentials in .env file
-- Verified Metro bundler runs successfully
-- Discussed testing options (Android Studio vs physical device)
+- Fixed Gradle 9.x compatibility issues (upgraded to 9.2.0, Foojay plugin 1.0.0)
+- Created complete LoginScreen with brand design
+- Added Bebas Neue custom font for brand elements
+- Implemented multi-layer shadow system for buttons and logo (works on both platforms)
+- Created new theme modules: shadows.ts, buttons.ts, updated typography.ts
+- Tokenized all magic numbers and hard-coded values
+- Applied CLAUDE_DEV_STANDARDS formatting to all modified files
+- Tested app successfully in Android emulator
 
 ### Next Session Should
 1. Read README.md first (core context and project documentation)
 2. Read CLAUDE_DEV_STANDARDS.md (coding standards)
-3. Build first shared components: Button, Input, Card
-4. Components can be built and tested later when emulator is set up
+3. Build signup/login form screens (next in auth flow)
+4. OR build shared components (Button, Input) needed for forms
+5. Consider navigation setup (React Navigation) for screen transitions
 
 ### User Decisions Made
-- Skip database schema design for now (will design when needed)
-- Skip emulator setup for now (will set up Android Studio or use physical device later)
-- Focus on building UI components first
+- Use Bebas Neue for brand text ("LIFT") and Roboto for UI text
+- Pure green (#00FF00) on dark gray (#1E1E1E) color scheme
+- Multi-layer shadow approach for Android compatibility
+- Gym background image (gym-background.png)
+- 16px spacing system throughout
 
 ---
 
@@ -59,26 +64,85 @@ This file contains only critical architectural patterns and current session stat
 
 ```typescript
 // ✅ CORRECT - Using design tokens
-import { theme } from '@theme';
+import {theme} from '@/theme';
 const styles = StyleSheet.create({
-  container: {
-    padding: theme.spacing.m,
-    backgroundColor: theme.colors.backgroundCard,
+  button: {
+    height: theme.buttons.height.medium,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.buttons.borderRadius.medium,
+    ...theme.textShadows.default,
   },
 });
 
 // ❌ WRONG - Magic numbers and hard-coded colors
 const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    backgroundColor: '#333333',
+  button: {
+    height: 50,
+    backgroundColor: '#00FF00',
+    borderRadius: 8,
   },
 });
 ```
 
-**Token Values**: Current values are PLACEHOLDERS. They will evolve during UI development. We're NOT recreating Will's 3-2-1 specific values - only the system/pattern.
+**Token Modules**:
+- `theme.colors` - All semantic colors (primary, backgroundPrimary, textSecondary, etc.)
+- `theme.spacing` - Spacing scale (xs, s, m, l, xl, xxl) based on 16px rhythm
+- `theme.typography` - Font families (brand, primary, system), sizes, weights
+- `theme.textShadows` - Text shadow presets (default, subtle, strong)
+- `theme.viewShadows` - iOS view shadows (small, medium, large)
+- `theme.elevation` - Android elevation values
+- `theme.buttons` - Button sizing, padding, border radius, margins
 
-### 2. Context + Custom Hook Pattern (REQUIRED)
+**Custom Fonts**:
+- Bebas Neue (brand font) linked via `react-native.config.js` and `npx react-native-asset`
+- Use `theme.typography.fontFamily.brand` for brand elements
+- Use `theme.typography.fontFamily.primary` for UI text (Roboto)
+
+### 2. Multi-Layer Shadow Pattern (ANDROID FIX)
+Android doesn't render view shadows reliably. Use multi-layer Views for consistent shadows.
+
+```typescript
+// Pattern for button shadows
+<View style={styles.buttonWrapper}>
+  <View style={styles.shadowLayer3} />
+  <View style={styles.shadowLayer2} />
+  <View style={styles.shadowLayer1} />
+  <Pressable style={styles.button}>
+    <Text>Button Text</Text>
+  </Pressable>
+</View>
+
+// Shadow styles (3 layers with progressive offset/opacity)
+shadowLayer1: {
+  position: 'absolute',
+  top: 1,
+  left: 1,
+  right: -1,
+  height: theme.buttons.height.medium,
+  backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  borderRadius: theme.buttons.borderRadius.medium,
+},
+shadowLayer2: {
+  position: 'absolute',
+  top: 2,
+  left: 1,
+  right: -1,
+  height: theme.buttons.height.medium,
+  backgroundColor: 'rgba(0, 0, 0, 0.15)',
+  borderRadius: theme.buttons.borderRadius.medium,
+},
+shadowLayer3: {
+  position: 'absolute',
+  top: 3,
+  left: 2,
+  right: -2,
+  height: theme.buttons.height.medium,
+  backgroundColor: 'rgba(0, 0, 0, 0.2)',
+  borderRadius: theme.buttons.borderRadius.medium,
+},
+```
+
+### 3. Context + Custom Hook Pattern (REQUIRED)
 Never expose Context directly. Always through custom hook with memoization.
 
 ```typescript
@@ -86,14 +150,14 @@ Never expose Context directly. Always through custom hook with memoization.
 const MyContext = createContext<MyContextValue | undefined>(undefined);
 
 // === PROVIDER ===
-export const MyProvider: React.FC<PropsWithChildren> = ({ children }) => {
+export const MyProvider: React.FC<PropsWithChildren> = ({children}) => {
   const [state, setState] = useState<StateType>(initialState);
 
   const myMethod = useCallback(async (param: string) => {
     // Implementation
   }, []);
 
-  const value = useMemo(() => ({ state, myMethod }), [state, myMethod]);
+  const value = useMemo(() => ({state, myMethod}), [state, myMethod]);
 
   return <MyContext.Provider value={value}>{children}</MyContext.Provider>;
 };
@@ -106,7 +170,7 @@ export const useMyContext = () => {
 };
 ```
 
-### 3. Service Layer Pattern (REQUIRED)
+### 4. Service Layer Pattern (REQUIRED)
 Never query Supabase directly from components. Always through service layer.
 
 **Structure**:
@@ -124,7 +188,7 @@ features/
 // Service layer - Business logic
 export const authService = {
   async signIn(email: string, password: string): Promise<User> {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const {data, error} = await supabase.auth.signInWithPassword({email, password});
     if (error) throw error;
     return data.user;
   },
@@ -137,22 +201,22 @@ const signIn = useCallback(async (email: string, password: string) => {
 }, []);
 ```
 
-### 4. Absolute Imports (REQUIRED)
+### 5. Absolute Imports (REQUIRED)
 All imports use `@/` path aliases. NO relative imports.
 
 **Configuration**: Set up in both `tsconfig.json` and `babel.config.js`.
 
 ```typescript
 // ✅ CORRECT
-import { Button } from '@components/Button';
-import { theme } from '@theme';
-import { useAuth } from '@features/auth/context/AuthContext';
+import {Button} from '@/components/Button';
+import {theme} from '@/theme';
+import {useAuth} from '@/features/auth/context/AuthContext';
 
 // ❌ WRONG
-import { Button } from '../../../components/Button';
+import {Button} from '../../../components/Button';
 ```
 
-### 5. TypeScript Strict Mode (ENFORCED)
+### 6. TypeScript Strict Mode (ENFORCED)
 No `any` types unless absolutely necessary. All types explicit.
 
 ```typescript
@@ -162,13 +226,13 @@ type ButtonProps = {
   onPress: () => void;
   disabled?: boolean;
 };
-const Button: React.FC<ButtonProps> = ({ title, onPress, disabled }) => { };
+const Button: React.FC<ButtonProps> = ({title, onPress, disabled}) => {};
 
 // ❌ WRONG
-const Button = (props) => { };  // Implicit 'any'
+const Button = (props) => {};  // Implicit 'any'
 ```
 
-### 6. File Header Format
+### 7. File Header Format
 ```typescript
 // ==========================================================================
 // COMPONENT NAME
@@ -180,7 +244,7 @@ const Button = (props) => { };  // Implicit 'any'
 // ==========================================================================
 ```
 
-### 7. Component Structure
+### 8. Component Structure
 Organize with section comments:
 ```typescript
 // === TYPES ===
@@ -190,19 +254,34 @@ Organize with section comments:
 // === EVENT HANDLERS ===
 // === RENDER ===
 // === STYLES ===
+
+// For styles section, define constants above StyleSheet.create
+const LOGO_SIZE = 40;
+const HEADER_INDENT = theme.spacing.xl;
+
+const styles = StyleSheet.create({
+  // ... styles
+});
 ```
 
 ---
 
 ## Known Issues
 
-None currently. Foundation phase complete with no known issues.
+### Android Shadows
+- Native `elevation` and `shadowColor` properties don't render reliably on all Android backgrounds
+- **Solution**: Use multi-layer View approach (see pattern above)
+- Text shadows work fine with native `textShadow*` properties
+
+### Metro Cache
+- After adding new assets (images, fonts), may need to restart Metro with `--reset-cache`
+- Command: `npm start -- --reset-cache`
 
 ---
 
 ## In-Progress Work
 
-None. Ready to begin component development.
+None. LoginScreen complete and ready for next feature.
 
 ---
 
@@ -212,9 +291,10 @@ None. Ready to begin component development.
 - **Lift 3-2-1**: Brand new (at C:\Dev\Lift321) - Active development
 - **Supabase**: Configured in .env (credentials added, database schema pending)
 - **GitHub**: https://github.com/WillyDrucker/Lift321 (all code synced)
-- **Design tokens**: Values are placeholders, will evolve with UI
-- **Branch**: main (current working branch)
-- **Testing**: Metro bundler works, emulator setup deferred
+- **Design tokens**: Fully implemented with real values (no longer placeholders)
+- **Branch**: Claude-v1.0.2 (current working branch)
+- **Testing**: Android emulator working, app runs successfully
+- **Fonts**: Bebas Neue linked for brand text, Roboto for UI
 
 ---
 
@@ -225,12 +305,54 @@ None. Ready to begin component development.
 - ✅ Metro bundler running (http://localhost:8081)
 - ✅ GitHub repository synced
 - ✅ All dependencies installed (891 packages)
+- ✅ Android emulator set up and working
+- ✅ Gradle 9.2.0 (latest stable)
+- ✅ Custom fonts linked (Bebas Neue)
+- ✅ Complete design token system
 
 ### Not Yet Set Up
-- ⏳ Android emulator or physical device testing
+- ⏳ React Navigation (screen transitions)
 - ⏳ Database schema and tables
 - ⏳ Supabase Auth configuration
 - ⏳ TypeScript types from database
+
+---
+
+## Quick Reference: Using Design Tokens
+
+### Shadows
+```typescript
+// Text shadows
+<Text style={{...theme.textShadows.default}}>Text</Text>
+
+// Button shadows (multi-layer)
+<View style={styles.buttonWrapper}>
+  <View style={styles.shadowLayer3} />
+  <View style={styles.shadowLayer2} />
+  <View style={styles.shadowLayer1} />
+  <Pressable style={styles.button}>...</Pressable>
+</View>
+```
+
+### Typography
+```typescript
+fontSize: theme.typography.fontSize.xl,
+fontFamily: theme.typography.fontFamily.brand, // Bebas Neue
+fontWeight: theme.typography.fontWeight.bold,
+```
+
+### Colors
+```typescript
+backgroundColor: theme.colors.backgroundPrimary,
+color: theme.colors.textSecondary,
+```
+
+### Buttons
+```typescript
+height: theme.buttons.height.medium,
+borderRadius: theme.buttons.borderRadius.medium,
+marginBottom: theme.buttons.marginBottom.default,
+```
 
 ---
 
@@ -241,7 +363,7 @@ None. Ready to begin component development.
 3. Define props type with `type` (not `interface`)
 4. Use `React.FC<PropsType>` pattern
 5. Organize with section comments
-6. Use design tokens for ALL styling
+6. Use design tokens for ALL styling (NO magic numbers)
 7. Place in appropriate location:
    - Shared: `src/components/`
    - Feature-specific: `src/features/[feature]/components/`
@@ -262,27 +384,28 @@ None. Ready to begin component development.
 
 ## Recommended Next Steps
 
-1. **Build Button Component** (src/components/Button.tsx)
-   - Variants: primary, secondary, danger
-   - States: disabled, loading
-   - Use theme tokens for all styling
+1. **Set Up React Navigation**
+   - Install @react-navigation/native and dependencies
+   - Create navigation stack
+   - Link LoginScreen to signup/login forms
 
-2. **Build Input Component** (src/components/Input.tsx)
-   - Types: text, email, password, number
+2. **Build Signup/Login Form Screens**
+   - SignupScreen with email/password inputs
+   - LoginFormScreen with email/password inputs
+   - Use design tokens for all styling
+   - Implement form validation
+
+3. **Build Shared Input Component** (if needed for forms)
+   - Types: text, email, password
    - States: focused, error, disabled
    - Use theme tokens for all styling
 
-3. **Build Card Component** (src/components/Card.tsx)
-   - Container for lists (workouts, exercises)
-   - Use theme tokens for all styling
-
-4. **Test Components** (when emulator ready)
-   - Create simple test screen
-   - Import and render components
-   - Verify styling and interactions
+4. **OR Continue with Shared Components**
+   - Button component (variants: primary, secondary, danger)
+   - Card component (for workout lists later)
 
 ---
 
-**Version**: 1.0.0
-**Last Updated**: 2025-11-09
-**Status**: Ready for Component Development
+**Version**: 1.0.2
+**Last Updated**: 2025-11-10
+**Status**: LoginScreen Complete - Ready for Navigation/Forms

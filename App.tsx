@@ -1,45 +1,29 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+// ==========================================================================
+// APP - Main Entry Point
+//
+// Root component for the Lift 3-2-1 React Native application.
+// Provides SafeAreaProvider context and renders initial screen.
+//
+// Dependencies: SafeAreaProvider, LoginScreen
+// Used by: index.js
+// ==========================================================================
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import React from 'react';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {LoginScreen} from '@/features/auth/screens/LoginScreen';
 
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+// === TYPES ===
 
+type AppProps = Record<string, never>;
+
+// === COMPONENT ===
+
+const App: React.FC<AppProps> = () => {
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
+      <LoginScreen />
     </SafeAreaProvider>
   );
-}
-
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
+};
 
 export default App;
