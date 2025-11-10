@@ -12,7 +12,8 @@
 export const layout = {
   // === HEADER LAYOUT ===
   header: {
-    topSpacing: 100, // Distance from top of screen
+    topSpacing: 100, // Distance from top of screen (login screens)
+    appTopSpacing: 16, // Distance from top for in-app headers (main screens)
     indent: 32, // Left/right padding (same as theme.spacing.xl)
   },
 

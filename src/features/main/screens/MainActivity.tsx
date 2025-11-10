@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingLeft: theme.layout.header.indent,
     paddingRight: theme.layout.header.indent,
-    marginTop: theme.layout.header.topSpacing,
+    marginTop: theme.layout.header.appTopSpacing,
   },
 
   hamburgerButton: {
