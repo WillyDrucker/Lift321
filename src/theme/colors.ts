@@ -126,6 +126,34 @@ export const colors = {
   // Red (#ff4444) - Skipped exercise set indicator
   // Use for: Skipped sets, missed exercises, incomplete workouts
 
+  // === NAVIGATION COLORS ===
+
+  navActive: '#00FF00',
+  // Pure Green (#00FF00) - Active navigation item
+  // Use for: Active nav icons and labels, current screen indicator
+
+  navInactive: '#666666',
+  // Medium Gray (#666666) - Inactive navigation items
+  // Use for: Inactive nav icons and labels, unselected screens
+
+  // === TAB COLORS ===
+
+  tabActive: '#00FF00',
+  // Pure Green (#00FF00) - Active tab
+  // Use for: Selected day tab, active filter, current selection
+
+  tabInactive: '#424242',
+  // Neutral Gray (#424242) - Inactive tab
+  // Use for: Unselected day tabs, inactive filters, default tabs
+
+  tabActiveText: '#000000',
+  // Black (#000000) - Text on active tab
+  // Use for: Text on green active tabs for maximum contrast
+
+  tabInactiveText: '#B0B0B0',
+  // Light Gray (#B0B0B0) - Text on inactive tab
+  // Use for: Text on unselected tabs, muted labels
+
   // === UTILITY COLORS ===
 
   shadowBlack: '#000000',

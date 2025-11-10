@@ -37,6 +37,32 @@ export const layout = {
   bottom: {
     buttonSpacing: 100, // Distance from bottom for button containers
   },
+
+  // === BOTTOM NAVIGATION BAR ===
+  bottomNav: {
+    height: 70, // Bottom navigation bar height
+    iconSize: 24, // Navigation icon size
+    paddingVertical: 10, // Top/bottom padding inside nav bar
+    paddingHorizontal: 16, // Left/right padding inside nav bar
+  },
+
+  // === DAY SELECTOR TABS ===
+  dayTabs: {
+    height: 45, // Individual day tab height
+    spacing: 8, // Space between day tabs
+    paddingHorizontal: 16, // Left/right padding for tab container
+    buttonMinWidth: 45, // Minimum width for each day button
+    marginBottom: 16, // Space below day tabs container
+  },
+
+  // === WORKOUT CARD ===
+  workoutCard: {
+    padding: 20, // Inner padding of workout card
+    marginHorizontal: 16, // Left/right margin of card
+    marginBottom: 16, // Space below card
+    borderRadius: 12, // Corner radius for card
+    exerciseSpacing: 12, // Space between exercise items
+  },
 } as const;
 
 export type LayoutToken = keyof typeof layout;
