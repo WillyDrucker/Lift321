@@ -71,6 +71,7 @@ export const layout = {
     paddingHorizontal: 16, // Left/right padding
     paddingVertical: 16, // Top/bottom padding
     iconButtonSize: 44, // Touch target size for icon buttons
+    marginTop: 16, // Space from top of safe area (below status bar)
   },
 } as const;
 

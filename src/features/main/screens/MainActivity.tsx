@@ -181,7 +181,7 @@ export const MainActivity: React.FC<MainActivityProps> = ({navigation}) => {
           onClose={handleMenuClose}
           onSelect={handleMenuSelect}
           anchorPosition={{
-            top: theme.layout.topBar.height,
+            top: theme.layout.topBar.height + theme.layout.topBar.marginTop,
             left: theme.layout.topBar.paddingHorizontal,
           }}
         />
@@ -359,6 +359,7 @@ const styles = StyleSheet.create({
     paddingVertical: theme.layout.topBar.paddingVertical,
     backgroundColor: theme.colors.backgroundPrimary,
     height: theme.layout.topBar.height,
+    marginTop: theme.layout.topBar.marginTop,
   },
 
   hamburgerButton: {
