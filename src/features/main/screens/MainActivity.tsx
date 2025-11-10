@@ -151,7 +151,7 @@ export const MainActivity: React.FC<MainActivityProps> = ({navigation}) => {
             ]}
             onPress={handleMenuToggle}>
             <HamburgerIcon
-              size={28}
+              size={theme.layout.topBar.iconSize}
               color={theme.colors.textPrimary}
             />
           </Pressable>
@@ -181,8 +181,8 @@ export const MainActivity: React.FC<MainActivityProps> = ({navigation}) => {
           onClose={handleMenuClose}
           onSelect={handleMenuSelect}
           anchorPosition={{
-            top: theme.layout.topBar.height + theme.layout.topBar.marginTop,
-            left: theme.layout.topBar.paddingHorizontal,
+            top: theme.layout.topBar.height + theme.spacing.xl,
+            left: theme.spacing.m,
           }}
         />
 
@@ -355,11 +355,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: theme.layout.topBar.paddingHorizontal,
-    paddingVertical: theme.layout.topBar.paddingVertical,
+    paddingHorizontal: theme.spacing.m,
+    paddingVertical: theme.spacing.m,
     backgroundColor: theme.colors.backgroundPrimary,
     height: theme.layout.topBar.height,
-    marginTop: theme.layout.topBar.marginTop,
+    marginTop: theme.spacing.xl,
   },
 
   hamburgerButton: {
@@ -393,7 +393,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.xl,
     fontFamily: theme.typography.fontFamily.brand,
     color: theme.colors.textPrimary,
-    letterSpacing: 1,
+    letterSpacing: theme.typography.letterSpacing.normal,
     ...theme.textShadows.default,
   },
 
@@ -526,9 +526,9 @@ const styles = StyleSheet.create({
   },
 
   exerciseBullet: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    width: theme.layout.bullet.size,
+    height: theme.layout.bullet.size,
+    borderRadius: theme.layout.bullet.borderRadius,
     backgroundColor: theme.colors.primary,
     marginRight: theme.spacing.m,
   },
@@ -550,7 +550,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.layout.bottomNav.paddingHorizontal,
     justifyContent: 'space-around',
     alignItems: 'center',
-    borderTopWidth: 1,
+    borderTopWidth: theme.layout.border.thin,
     borderTopColor: theme.colors.borderDefault,
   },
 

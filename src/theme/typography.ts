@@ -50,6 +50,13 @@ export const typography = {
     xl: 31, // 24 + 7
     xxl: 39, // 32 + 7
   },
+
+  // === LETTER SPACING ===
+  letterSpacing: {
+    tight: 0,
+    normal: 1,
+    wide: 2,
+  },
 } as const;
 
 // === PRE-BUILT TEXT STYLES ===

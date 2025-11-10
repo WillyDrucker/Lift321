@@ -67,11 +67,20 @@ export const layout = {
 
   // === TOP BAR ===
   topBar: {
-    height: 60, // Total height of top bar
-    paddingHorizontal: 16, // Left/right padding
-    paddingVertical: 16, // Top/bottom padding
-    iconButtonSize: 44, // Touch target size for icon buttons
-    marginTop: 16, // Space from top of safe area (below status bar)
+    height: 60, // Total height of top bar (using base spacing multiples)
+    iconButtonSize: 44, // Touch target size for icon buttons (standard touch target)
+    iconSize: 28, // Actual icon size within button
+  },
+
+  // === UI ELEMENTS ===
+  bullet: {
+    size: 6, // Bullet point diameter
+    borderRadius: 3, // Half of size for circular shape
+  },
+
+  border: {
+    thin: 1, // Thin borders (dividers, separators)
+    medium: 2, // Medium borders (inputs, buttons)
   },
 } as const;
 
