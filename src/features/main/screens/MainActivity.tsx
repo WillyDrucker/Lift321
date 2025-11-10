@@ -456,7 +456,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: theme.layout.dayTabs.paddingHorizontal,
-    marginTop: theme.spacing.xl,
+    marginTop: theme.spacing.m,
     marginBottom: theme.layout.dayTabs.marginBottom,
     gap: theme.layout.dayTabs.spacing,
   },
