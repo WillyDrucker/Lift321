@@ -14,10 +14,12 @@ import type {TextStyle} from 'react-native';
 export const typography = {
   // === FONT FAMILIES ===
   fontFamily: {
-    regular: 'System', // React Native default
-    medium: 'System',
-    bold: 'System',
-    // Custom fonts can be added here after loading
+    // Brand font - Bebas Neue for headlines and brand elements
+    brand: 'BebasNeue-Regular',
+    // Primary font - Roboto for UI text (Android default)
+    primary: 'Roboto',
+    // System fallback
+    system: 'System',
   },
 
   // === FONT SIZES ===
@@ -25,9 +27,9 @@ export const typography = {
     xs: 12,
     s: 14,
     m: 16, // Base size
-    l: 18,
-    xl: 24,
-    xxl: 32,
+    l: 20,
+    xl: 32, // 2rem
+    xxl: 64, // 4rem - Large display text
   },
 
   // === FONT WEIGHTS ===
