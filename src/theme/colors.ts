@@ -159,6 +159,10 @@ export const colors = {
   shadowBlack: '#000000',
   // Pure Black (#000000) - Shadow color for all drop shadows
   // Use for: Button shadows, logo shadows, text shadows, elevation effects
+
+  overlayBackground: 'rgba(0, 0, 0, 0.5)',
+  // Semi-transparent Black - Overlay/backdrop color
+  // Use for: Modal backdrops, drawer overlays, dimmed backgrounds
 } as const;
 
 // TypeScript helper for autocomplete

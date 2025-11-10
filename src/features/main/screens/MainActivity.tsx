@@ -29,7 +29,7 @@ import {
   StatsIcon,
   ProfileIcon,
 } from '@/components/icons';
-import {SimpleMenu} from '@/components/SimpleMenu';
+import {Sidebar} from '@/components/Sidebar';
 
 // === TYPES ===
 
@@ -175,15 +175,11 @@ export const MainActivity: React.FC<MainActivityProps> = ({navigation}) => {
           <View style={styles.rightSpacer} />
         </View>
 
-        {/* Simple Menu Dropdown */}
-        <SimpleMenu
+        {/* Sidebar Drawer */}
+        <Sidebar
           visible={menuVisible}
           onClose={handleMenuClose}
           onSelect={handleMenuSelect}
-          anchorPosition={{
-            top: theme.layout.topBar.height + theme.spacing.xl,
-            left: theme.spacing.m,
-          }}
         />
 
         {/* Main Content with ScrollView */}

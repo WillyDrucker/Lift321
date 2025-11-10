@@ -1,15 +1,17 @@
 // ==========================================================================
-// SIMPLE MENU COMPONENT
+// SIDEBAR COMPONENT
 //
-// Dropdown menu for hamburger navigation.
-// Shows Settings, Profile, and Logout options.
+// Slide-out sidebar drawer for navigation and menu options.
+// Slides from left with dark overlay backdrop.
 //
-// Dependencies: theme tokens, React Native
+// Dependencies: theme tokens, React Native Animated API
 // Used by: MainActivity hamburger menu
 // ==========================================================================
 
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {
+  Animated,
+  Dimensions,
   Modal,
   Pressable,
   StyleSheet,
@@ -23,21 +25,47 @@ import {theme} from '@/theme';
 
 type MenuOption = 'settings' | 'profile' | 'logout';
 
-type SimpleMenuProps = {
+type SidebarProps = {
   visible: boolean;
   onClose: () => void;
   onSelect: (option: MenuOption) => void;
-  anchorPosition?: {top: number; left: number};
 };
 
 // === COMPONENT ===
 
-export const SimpleMenu: React.FC<SimpleMenuProps> = ({
+export const Sidebar: React.FC<SidebarProps> = ({
   visible,
   onClose,
   onSelect,
-  anchorPosition = {top: 140, left: 16},
 }) => {
+  // === STATE ===
+  // Animation value for slide-in/out
+
+  const slideAnim = useRef(new Animated.Value(-1)).current;
+  const screenWidth = Dimensions.get('window').width;
+  const sidebarWidth = (screenWidth * theme.layout.sidebar.widthPercentage) / 100;
+
+  // === HOOKS ===
+  // Trigger animation when visibility changes
+
+  useEffect(() => {
+    if (visible) {
+      // Slide in
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: theme.layout.sidebar.animationDuration,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      // Slide out
+      Animated.timing(slideAnim, {
+        toValue: -1,
+        duration: theme.layout.sidebar.animationDuration,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [visible, slideAnim]);
+
   // === EVENT HANDLERS ===
   // Handle menu item selection
 
@@ -47,22 +75,35 @@ export const SimpleMenu: React.FC<SimpleMenuProps> = ({
   };
 
   // === RENDER ===
-  // Modal with menu options positioned near hamburger icon
+  // Modal with animated sidebar
 
   return (
     <Modal
       visible={visible}
       transparent
-      animationType="fade"
+      animationType="none"
       onRequestClose={onClose}>
+      {/* Backdrop - tap to close */}
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
+          {/* Sidebar - prevent tap-through */}
           <TouchableWithoutFeedback>
-            <View
+            <Animated.View
               style={[
-                styles.menuContainer,
-                {top: anchorPosition.top, left: anchorPosition.left},
+                styles.sidebar,
+                {
+                  width: sidebarWidth,
+                  transform: [
+                    {
+                      translateX: slideAnim.interpolate({
+                        inputRange: [-1, 0],
+                        outputRange: [-sidebarWidth, 0],
+                      }),
+                    },
+                  ],
+                },
               ]}>
+              {/* Menu Items */}
               <Pressable
                 style={({pressed}) => [
                   styles.menuItem,
@@ -93,7 +134,7 @@ export const SimpleMenu: React.FC<SimpleMenuProps> = ({
                 onPress={() => handleSelect('logout')}>
                 <Text style={styles.menuText}>Logout</Text>
               </Pressable>
-            </View>
+            </Animated.View>
           </TouchableWithoutFeedback>
         </View>
       </TouchableWithoutFeedback>
@@ -107,20 +148,20 @@ export const SimpleMenu: React.FC<SimpleMenuProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: theme.colors.overlayBackground,
+    justifyContent: 'flex-start',
   },
 
-  menuContainer: {
-    position: 'absolute',
+  sidebar: {
+    height: '100%',
     backgroundColor: theme.colors.backgroundCard,
-    borderRadius: theme.spacing.s,
-    minWidth: 150,
+    paddingTop: theme.spacing.xxl,
     ...theme.viewShadows.large,
   },
 
   menuItem: {
-    paddingVertical: theme.spacing.m,
-    paddingHorizontal: theme.spacing.l,
+    paddingVertical: theme.layout.sidebar.itemPaddingVertical,
+    paddingHorizontal: theme.layout.sidebar.itemPaddingHorizontal,
   },
 
   menuItemPressed: {
@@ -134,8 +175,8 @@ const styles = StyleSheet.create({
   },
 
   divider: {
-    height: theme.layout.form.dividerThickness,
+    height: theme.layout.border.thin,
     backgroundColor: theme.colors.borderDefault,
-    marginHorizontal: theme.spacing.s,
+    marginHorizontal: theme.spacing.m,
   },
 });

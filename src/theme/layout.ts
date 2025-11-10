@@ -82,6 +82,14 @@ export const layout = {
     thin: 1, // Thin borders (dividers, separators)
     medium: 2, // Medium borders (inputs, buttons)
   },
+
+  // === SIDEBAR DRAWER ===
+  sidebar: {
+    widthPercentage: 70, // Sidebar width as percentage of screen
+    animationDuration: 300, // Slide animation duration in ms
+    itemPaddingVertical: 16, // Vertical padding for menu items
+    itemPaddingHorizontal: 24, // Horizontal padding for menu items
+  },
 } as const;
 
 export type LayoutToken = keyof typeof layout;
