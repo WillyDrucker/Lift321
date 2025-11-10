@@ -141,8 +141,9 @@ export const MainActivity: React.FC<MainActivityProps> = ({navigation}) => {
         backgroundColor={theme.colors.backgroundPrimary}
       />
       <SafeAreaView style={styles.container}>
-        {/* Header with Hamburger Menu and Logo */}
-        <View style={styles.header}>
+        {/* Top Bar with Hamburger Menu and Centered Logo */}
+        <View style={styles.topBar}>
+          {/* Left: Hamburger Menu */}
           <Pressable
             style={({pressed}) => [
               styles.hamburgerButton,
@@ -155,7 +156,8 @@ export const MainActivity: React.FC<MainActivityProps> = ({navigation}) => {
             />
           </Pressable>
 
-          <View style={styles.logoContainer}>
+          {/* Center: LIFT Logo */}
+          <View style={styles.centerLogo}>
             <Text style={styles.liftText}>LIFT</Text>
             <View style={styles.logoWrapper}>
               <View style={styles.logoShadowLayer3} />
@@ -168,6 +170,9 @@ export const MainActivity: React.FC<MainActivityProps> = ({navigation}) => {
               />
             </View>
           </View>
+
+          {/* Right: Empty spacer for balance */}
+          <View style={styles.rightSpacer} />
         </View>
 
         {/* Simple Menu Dropdown */}
@@ -175,6 +180,10 @@ export const MainActivity: React.FC<MainActivityProps> = ({navigation}) => {
           visible={menuVisible}
           onClose={handleMenuClose}
           onSelect={handleMenuSelect}
+          anchorPosition={{
+            top: theme.layout.topBar.height,
+            left: theme.layout.topBar.paddingHorizontal,
+          }}
         />
 
         {/* Main Content with ScrollView */}
@@ -340,29 +349,43 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.backgroundPrimary,
   },
 
-  // === HEADER STYLES ===
+  // === TOP BAR STYLES ===
 
-  header: {
+  topBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingLeft: theme.layout.header.indent,
-    paddingRight: theme.layout.header.indent,
-    marginTop: theme.layout.header.appTopSpacing,
+    justifyContent: 'space-between',
+    paddingHorizontal: theme.layout.topBar.paddingHorizontal,
+    paddingVertical: theme.layout.topBar.paddingVertical,
+    backgroundColor: theme.colors.backgroundPrimary,
+    height: theme.layout.topBar.height,
   },
 
   hamburgerButton: {
     padding: theme.spacing.s,
-    marginRight: theme.spacing.m,
+    width: theme.layout.topBar.iconButtonSize,
+    height: theme.layout.topBar.iconButtonSize,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   hamburgerPressed: {
     opacity: 0.6,
   },
 
-  logoContainer: {
+  centerLogo: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    justifyContent: 'center',
+    pointerEvents: 'none',
+  },
+
+  rightSpacer: {
+    width: theme.layout.topBar.iconButtonSize,
+    height: theme.layout.topBar.iconButtonSize,
   },
 
   liftText: {

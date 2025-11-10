@@ -64,6 +64,14 @@ export const layout = {
     borderRadius: 12, // Corner radius for card
     exerciseSpacing: 12, // Space between exercise items
   },
+
+  // === TOP BAR ===
+  topBar: {
+    height: 60, // Total height of top bar
+    paddingHorizontal: 16, // Left/right padding
+    paddingVertical: 16, // Top/bottom padding
+    iconButtonSize: 44, // Touch target size for icon buttons
+  },
 } as const;
 
 export type LayoutToken = keyof typeof layout;
