@@ -30,7 +30,7 @@ This file contains only critical architectural patterns and current session stat
 - Working tree clean (no uncommitted changes)
 
 ### Next Session Should
-1. Read CLAUDE.md first (core context)
+1. Read README.md first (core context and project documentation)
 2. Read CLAUDE_DEV_STANDARDS.md (coding standards)
 3. Begin building shared components OR setting up Supabase
 
