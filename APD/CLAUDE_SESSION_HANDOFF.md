@@ -13,10 +13,10 @@ This file contains only critical architectural patterns and current session stat
 
 ---
 
-## Current Version: 1.0.2
+## Current Version: 1.0.3
 
-**Branch**: Claude-v1.0.2
-**Status**: Login Screen Complete - Design Tokens Fully Implemented
+**Branch**: Claude-v1.0.3
+**Status**: Navigation Complete - LoginFormScreen & MainActivity Implemented
 **Last Updated**: 2025-11-10
 
 ---
@@ -24,36 +24,43 @@ This file contains only critical architectural patterns and current session stat
 ## Session State
 
 ### Current Work
-- LoginScreen fully implemented with Bebas Neue font, gym background, drop shadows
-- Complete design token system implemented (typography, shadows, buttons, colors, spacing)
-- All files refactored to CLAUDE_DEV_STANDARDS
-- Gradle upgraded to 9.2.0 for Android Studio compatibility
-- Android emulator working and tested
-- Ready for next screen/feature development
+- LoginScreen, LoginFormScreen, and MainActivity fully implemented
+- React Navigation set up with type-safe navigation
+- Complete design token system with centralized layout constants
+- All screens fully tokenized (zero magic numbers)
+- SVG icon system implemented (chevrons, eye icons)
+- All files meet CLAUDE_DEV_STANDARDS
+- Ready for authentication logic implementation
 
 ### Completed This Session
-- Fixed Gradle 9.x compatibility issues (upgraded to 9.2.0, Foojay plugin 1.0.0)
-- Created complete LoginScreen with brand design
-- Added Bebas Neue custom font for brand elements
-- Implemented multi-layer shadow system for buttons and logo (works on both platforms)
-- Created new theme modules: shadows.ts, buttons.ts, updated typography.ts
-- Tokenized all magic numbers and hard-coded values
-- Applied CLAUDE_DEV_STANDARDS formatting to all modified files
-- Tested app successfully in Android emulator
+- Set up React Navigation (@react-navigation/native, @react-navigation/native-stack)
+- Created LoginFormScreen with email/password inputs and social login buttons
+- Created MainActivity screen for guest users
+- Added third "Login as Guest" button to LoginScreen
+- Created SVG icon components (LeftChevron, RightChevron, EyeOpen, EyeClosed)
+- Installed and configured react-native-svg
+- Created new layout.ts token file for all layout constants
+- Enhanced buttons.ts with shadowLayers tokens
+- Added new color tokens (textYellowMaintenance, backgroundTertiary, shadowBlack)
+- Updated shadow system to drop straight down with proper black base
+- Fully tokenized all screens - removed ALL local constants and magic numbers
+- Applied CLAUDE_DEV_STANDARDS to all modified files
 
 ### Next Session Should
 1. Read README.md first (core context and project documentation)
 2. Read CLAUDE_DEV_STANDARDS.md (coding standards)
-3. Build signup/login form screens (next in auth flow)
-4. OR build shared components (Button, Input) needed for forms
-5. Consider navigation setup (React Navigation) for screen transitions
+3. Implement authentication logic (login, signup, guest login)
+4. Set up Supabase Auth configuration
+5. OR continue with other main app features (workout logging, plans)
 
 ### User Decisions Made
-- Use Bebas Neue for brand text ("LIFT") and Roboto for UI text
-- Pure green (#00FF00) on dark gray (#1E1E1E) color scheme
-- Multi-layer shadow approach for Android compatibility
-- Gym background image (gym-background.png)
-- 16px spacing system throughout
+- Navigation: slide_from_right animation for all screen transitions
+- LoginFormScreen: Centered form layout with 100px header spacing
+- MainActivity: Simple gray background (no gym image), LIFT logo at top
+- Guest button: Lighter gray (#424242) with yellow "GUEST" text (#FFFF00)
+- Shadow system: Pure black (#000000) base, dropping straight down, 0.4 → 0.25 → 0.15 opacity fade
+- Icons: SVG-based (LeftChevron for back, EyeOpen/EyeClosed for password toggle)
+- All layout values centralized in theme.layout tokens
 
 ---
 
@@ -66,83 +73,174 @@ This file contains only critical architectural patterns and current session stat
 // ✅ CORRECT - Using design tokens
 import {theme} from '@/theme';
 const styles = StyleSheet.create({
+  header: {
+    paddingLeft: theme.layout.header.indent,
+    marginTop: theme.layout.header.topSpacing,
+  },
   button: {
-    height: theme.buttons.height.medium,
+    height: theme.layout.form.inputHeight,
     backgroundColor: theme.colors.primary,
-    borderRadius: theme.buttons.borderRadius.medium,
-    ...theme.textShadows.default,
+    borderRadius: theme.layout.form.inputBorderRadius,
+  },
+  logo: {
+    width: theme.layout.logo.size,
+    height: theme.layout.logo.size,
   },
 });
 
 // ❌ WRONG - Magic numbers and hard-coded colors
 const styles = StyleSheet.create({
+  header: {
+    paddingLeft: 32,
+    marginTop: 100,
+  },
   button: {
     height: 50,
     backgroundColor: '#00FF00',
-    borderRadius: 8,
   },
 });
 ```
 
 **Token Modules**:
-- `theme.colors` - All semantic colors (primary, backgroundPrimary, textSecondary, etc.)
+- `theme.colors` - All semantic colors (primary, backgroundPrimary, textYellowMaintenance, shadowBlack, etc.)
 - `theme.spacing` - Spacing scale (xs, s, m, l, xl, xxl) based on 16px rhythm
 - `theme.typography` - Font families (brand, primary, system), sizes, weights
 - `theme.textShadows` - Text shadow presets (default, subtle, strong)
 - `theme.viewShadows` - iOS view shadows (small, medium, large)
 - `theme.elevation` - Android elevation values
-- `theme.buttons` - Button sizing, padding, border radius, margins
+- `theme.buttons` - Button sizing, padding, border radius, margins, shadowLayers
+- `theme.layout` - Layout constants (header, logo, form, bottom)
 
-**Custom Fonts**:
-- Bebas Neue (brand font) linked via `react-native.config.js` and `npx react-native-asset`
-- Use `theme.typography.fontFamily.brand` for brand elements
-- Use `theme.typography.fontFamily.primary` for UI text (Roboto)
+**New Layout Tokens (theme.layout)**:
+```typescript
+// Header positioning
+theme.layout.header.topSpacing // 100px from top
+theme.layout.header.indent // 32px left/right padding
+
+// Logo dimensions
+theme.layout.logo.size // 40px
+theme.layout.logo.borderRadius // 20px (half of size)
+
+// Form elements
+theme.layout.form.inputHeight // 50px
+theme.layout.form.inputBorderWidth // 2px
+theme.layout.form.inputBorderRadius // 8px
+theme.layout.form.inputHorizontalMargin // 5px
+theme.layout.form.buttonHorizontalMargin // 32px
+theme.layout.form.dividerSpacing // 32px
+theme.layout.form.dividerThickness // 1px
+
+// Bottom spacing
+theme.layout.bottom.buttonSpacing // 100px from bottom
+```
+
+**Shadow Layer Tokens (theme.buttons.shadowLayers)**:
+```typescript
+// Three-layer shadow system with fade
+theme.buttons.shadowLayers.layer1 // {top: 1, left: 0, right: 0, opacity: 0.4}
+theme.buttons.shadowLayers.layer2 // {top: 2, left: 0, right: 0, opacity: 0.25}
+theme.buttons.shadowLayers.layer3 // {top: 3, left: 0, right: 0, opacity: 0.15}
+
+// Usage in styles
+shadowLayer1: {
+  position: 'absolute',
+  top: theme.buttons.shadowLayers.layer1.top,
+  left: theme.buttons.shadowLayers.layer1.left,
+  right: theme.buttons.shadowLayers.layer1.right,
+  backgroundColor: `rgba(0, 0, 0, ${theme.buttons.shadowLayers.layer1.opacity})`,
+  borderRadius: theme.buttons.borderRadius.medium,
+},
+```
 
 ### 2. Multi-Layer Shadow Pattern (ANDROID FIX)
-Android doesn't render view shadows reliably. Use multi-layer Views for consistent shadows.
+Android doesn't render view shadows reliably. Use multi-layer Views with pure black base that fades downward.
+
+**Pattern**: Shadows drop straight down (no horizontal shift), strong black base (0.4) fading to light (0.15).
 
 ```typescript
-// Pattern for button shadows
+// Button/Logo shadow pattern
 <View style={styles.buttonWrapper}>
-  <View style={styles.shadowLayer3} />
-  <View style={styles.shadowLayer2} />
-  <View style={styles.shadowLayer1} />
+  <View style={styles.shadowLayer3} /> {/* Farthest, lightest */}
+  <View style={styles.shadowLayer2} /> {/* Middle */}
+  <View style={styles.shadowLayer1} /> {/* Closest, darkest */}
   <Pressable style={styles.button}>
     <Text>Button Text</Text>
   </Pressable>
 </View>
 
-// Shadow styles (3 layers with progressive offset/opacity)
+// Shadow styles using tokens
 shadowLayer1: {
   position: 'absolute',
-  top: 1,
-  left: 1,
-  right: -1,
+  top: theme.buttons.shadowLayers.layer1.top,
+  left: theme.buttons.shadowLayers.layer1.left,
+  right: theme.buttons.shadowLayers.layer1.right,
   height: theme.buttons.height.medium,
-  backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  backgroundColor: `rgba(0, 0, 0, ${theme.buttons.shadowLayers.layer1.opacity})`,
   borderRadius: theme.buttons.borderRadius.medium,
 },
 shadowLayer2: {
   position: 'absolute',
-  top: 2,
-  left: 1,
-  right: -1,
+  top: theme.buttons.shadowLayers.layer2.top,
+  left: theme.buttons.shadowLayers.layer2.left,
+  right: theme.buttons.shadowLayers.layer2.right,
   height: theme.buttons.height.medium,
-  backgroundColor: 'rgba(0, 0, 0, 0.15)',
+  backgroundColor: `rgba(0, 0, 0, ${theme.buttons.shadowLayers.layer2.opacity})`,
   borderRadius: theme.buttons.borderRadius.medium,
 },
 shadowLayer3: {
   position: 'absolute',
-  top: 3,
-  left: 2,
-  right: -2,
+  top: theme.buttons.shadowLayers.layer3.top,
+  left: theme.buttons.shadowLayers.layer3.left,
+  right: theme.buttons.shadowLayers.layer3.right,
   height: theme.buttons.height.medium,
-  backgroundColor: 'rgba(0, 0, 0, 0.2)',
+  backgroundColor: `rgba(0, 0, 0, ${theme.buttons.shadowLayers.layer3.opacity})`,
   borderRadius: theme.buttons.borderRadius.medium,
 },
 ```
 
-### 3. Context + Custom Hook Pattern (REQUIRED)
+### 3. SVG Icon System
+Use react-native-svg for scalable, customizable icons. All icons accept size and color props.
+
+```typescript
+import {LeftChevron, EyeOpen, EyeClosed} from '@/components/icons';
+
+// Usage
+<LeftChevron size={32} color={theme.colors.textPrimary} />
+<EyeOpen size={20} color={theme.colors.textPrimary} />
+```
+
+**Icon Components**:
+- `LeftChevron` - Back/previous navigation
+- `RightChevron` - Forward/next navigation (stored for future use)
+- `EyeOpen` - Show password
+- `EyeClosed` - Hide password
+
+### 4. Navigation Pattern (Type-Safe)
+Use React Navigation with TypeScript for type-safe navigation.
+
+```typescript
+// Define routes in src/navigation/types.ts
+export type RootStackParamList = {
+  LoginScreen: undefined;
+  LoginFormScreen: undefined;
+  MainActivity: undefined;
+  // ...other routes
+};
+
+// Use in components
+import type {RootStackScreenProps} from '@/navigation/types';
+
+type MyScreenProps = RootStackScreenProps<'LoginScreen'>;
+
+export const MyScreen: React.FC<MyScreenProps> = ({navigation}) => {
+  const handleNavigate = () => {
+    navigation.navigate('LoginFormScreen');
+  };
+  // ...
+};
+```
+
+### 5. Context + Custom Hook Pattern (REQUIRED)
 Never expose Context directly. Always through custom hook with memoization.
 
 ```typescript
@@ -170,7 +268,7 @@ export const useMyContext = () => {
 };
 ```
 
-### 4. Service Layer Pattern (REQUIRED)
+### 6. Service Layer Pattern (REQUIRED)
 Never query Supabase directly from components. Always through service layer.
 
 **Structure**:
@@ -201,7 +299,7 @@ const signIn = useCallback(async (email: string, password: string) => {
 }, []);
 ```
 
-### 5. Absolute Imports (REQUIRED)
+### 7. Absolute Imports (REQUIRED)
 All imports use `@/` path aliases. NO relative imports.
 
 **Configuration**: Set up in both `tsconfig.json` and `babel.config.js`.
@@ -211,12 +309,13 @@ All imports use `@/` path aliases. NO relative imports.
 import {Button} from '@/components/Button';
 import {theme} from '@/theme';
 import {useAuth} from '@/features/auth/context/AuthContext';
+import {LeftChevron} from '@/components/icons';
 
 // ❌ WRONG
 import {Button} from '../../../components/Button';
 ```
 
-### 6. TypeScript Strict Mode (ENFORCED)
+### 8. TypeScript Strict Mode (ENFORCED)
 No `any` types unless absolutely necessary. All types explicit.
 
 ```typescript
@@ -232,7 +331,7 @@ const Button: React.FC<ButtonProps> = ({title, onPress, disabled}) => {};
 const Button = (props) => {};  // Implicit 'any'
 ```
 
-### 7. File Header Format
+### 9. File Header Format
 ```typescript
 // ==========================================================================
 // COMPONENT NAME
@@ -244,7 +343,7 @@ const Button = (props) => {};  // Implicit 'any'
 // ==========================================================================
 ```
 
-### 8. Component Structure
+### 10. Component Structure
 Organize with section comments:
 ```typescript
 // === TYPES ===
@@ -255,12 +354,13 @@ Organize with section comments:
 // === RENDER ===
 // === STYLES ===
 
-// For styles section, define constants above StyleSheet.create
-const LOGO_SIZE = 40;
-const HEADER_INDENT = theme.spacing.xl;
-
+// For styles section, use tokens exclusively
 const styles = StyleSheet.create({
-  // ... styles
+  header: {
+    paddingLeft: theme.layout.header.indent,
+    marginTop: theme.layout.header.topSpacing,
+  },
+  // ...
 });
 ```
 
@@ -275,13 +375,18 @@ const styles = StyleSheet.create({
 
 ### Metro Cache
 - After adding new assets (images, fonts), may need to restart Metro with `--reset-cache`
-- Command: `npm start -- --reset-cache`
+- After installing native modules (react-native-svg), need to rebuild Android app
+- Command: `npm start -- --reset-cache` then `npm run android`
+
+### Native Modules
+- react-native-svg requires native code rebuild
+- After installation: Stop Metro, run `cd android && gradlew.bat clean`, restart everything
 
 ---
 
 ## In-Progress Work
 
-None. LoginScreen complete and ready for next feature.
+None. Navigation and basic screens complete. Ready for authentication implementation.
 
 ---
 
@@ -291,10 +396,12 @@ None. LoginScreen complete and ready for next feature.
 - **Lift 3-2-1**: Brand new (at C:\Dev\Lift321) - Active development
 - **Supabase**: Configured in .env (credentials added, database schema pending)
 - **GitHub**: https://github.com/WillyDrucker/Lift321 (all code synced)
-- **Design tokens**: Fully implemented with real values (no longer placeholders)
-- **Branch**: Claude-v1.0.2 (current working branch)
-- **Testing**: Android emulator working, app runs successfully
-- **Fonts**: Bebas Neue linked for brand text, Roboto for UI
+- **Design tokens**: Fully implemented with centralized layout constants
+- **Branch**: Claude-v1.0.3 (current working branch)
+- **Testing**: Android emulator working, navigation tested
+- **Fonts**: Bebas Neue for brand text, Roboto for UI
+- **Icons**: SVG-based via react-native-svg
+- **All screens**: Fully tokenized (zero magic numbers)
 
 ---
 
@@ -304,108 +411,89 @@ None. LoginScreen complete and ready for next feature.
 - ✅ Supabase credentials in .env
 - ✅ Metro bundler running (http://localhost:8081)
 - ✅ GitHub repository synced
-- ✅ All dependencies installed (891 packages)
+- ✅ All dependencies installed (including react-native-svg)
 - ✅ Android emulator set up and working
 - ✅ Gradle 9.2.0 (latest stable)
 - ✅ Custom fonts linked (Bebas Neue)
-- ✅ Complete design token system
+- ✅ Complete design token system with layout module
+- ✅ React Navigation configured
+- ✅ SVG icon system implemented
 
 ### Not Yet Set Up
-- ⏳ React Navigation (screen transitions)
 - ⏳ Database schema and tables
 - ⏳ Supabase Auth configuration
 - ⏳ TypeScript types from database
+- ⏳ Authentication logic implementation
 
 ---
 
 ## Quick Reference: Using Design Tokens
 
-### Shadows
+### Layout Constants
 ```typescript
-// Text shadows
-<Text style={{...theme.textShadows.default}}>Text</Text>
+// Header
+paddingLeft: theme.layout.header.indent,
+marginTop: theme.layout.header.topSpacing,
 
-// Button shadows (multi-layer)
-<View style={styles.buttonWrapper}>
-  <View style={styles.shadowLayer3} />
-  <View style={styles.shadowLayer2} />
-  <View style={styles.shadowLayer1} />
-  <Pressable style={styles.button}>...</Pressable>
-</View>
+// Logo
+width: theme.layout.logo.size,
+borderRadius: theme.layout.logo.borderRadius,
+
+// Form
+height: theme.layout.form.inputHeight,
+borderWidth: theme.layout.form.inputBorderWidth,
+marginHorizontal: theme.layout.form.buttonHorizontalMargin,
 ```
 
-### Typography
+### Shadow Layers
 ```typescript
-fontSize: theme.typography.fontSize.xl,
-fontFamily: theme.typography.fontFamily.brand, // Bebas Neue
-fontWeight: theme.typography.fontWeight.bold,
+// Using shadow tokens
+top: theme.buttons.shadowLayers.layer1.top,
+backgroundColor: `rgba(0, 0, 0, ${theme.buttons.shadowLayers.layer1.opacity})`,
 ```
 
 ### Colors
 ```typescript
 backgroundColor: theme.colors.backgroundPrimary,
-color: theme.colors.textSecondary,
+color: theme.colors.textYellowMaintenance, // Yellow for maintenance
+backgroundColor: theme.colors.backgroundTertiary, // Lighter gray for guest button
 ```
 
-### Buttons
+### Icons
 ```typescript
-height: theme.buttons.height.medium,
-borderRadius: theme.buttons.borderRadius.medium,
-marginBottom: theme.buttons.marginBottom.default,
+import {LeftChevron, EyeOpen, EyeClosed} from '@/components/icons';
+
+<LeftChevron size={32} color={theme.colors.textPrimary} />
+<EyeOpen size={20} color={theme.colors.textPrimary} />
 ```
-
----
-
-## Quick Reference: Creating New Components
-
-1. Use PascalCase filename: `MyComponent.tsx`
-2. Add file header with description
-3. Define props type with `type` (not `interface`)
-4. Use `React.FC<PropsType>` pattern
-5. Organize with section comments
-6. Use design tokens for ALL styling (NO magic numbers)
-7. Place in appropriate location:
-   - Shared: `src/components/`
-   - Feature-specific: `src/features/[feature]/components/`
-
----
-
-## Quick Reference: Creating New Features
-
-1. Create folder: `src/features/myFeature/`
-2. Add subfolders: `screens/`, `components/`, `hooks/`, `context/`, `services/`, `types/`
-3. Create service first: `services/myFeatureService.ts`
-4. Create types: `types/myFeature.types.ts`
-5. Create context: `context/MyFeatureContext.tsx` (with custom hook)
-6. Create screens: `screens/MyFeatureScreen.tsx`
-7. Add routes to `navigation/types.ts`
 
 ---
 
 ## Recommended Next Steps
 
-1. **Set Up React Navigation**
-   - Install @react-navigation/native and dependencies
-   - Create navigation stack
-   - Link LoginScreen to signup/login forms
+1. **Implement Authentication Logic**
+   - Create AuthContext with login/signup/guest methods
+   - Connect LoginFormScreen to actual auth service
+   - Add form validation
+   - Handle loading and error states
 
-2. **Build Signup/Login Form Screens**
-   - SignupScreen with email/password inputs
-   - LoginFormScreen with email/password inputs
-   - Use design tokens for all styling
-   - Implement form validation
+2. **Set Up Supabase Auth Configuration**
+   - Configure auth providers (email, Google, Facebook)
+   - Set up auth policies
+   - Create user profiles table
 
-3. **Build Shared Input Component** (if needed for forms)
-   - Types: text, email, password
-   - States: focused, error, disabled
-   - Use theme tokens for all styling
+3. **OR Build Main App Features**
+   - Workout logging screens
+   - Training plan management
+   - History/analytics screens
 
-4. **OR Continue with Shared Components**
-   - Button component (variants: primary, secondary, danger)
-   - Card component (for workout lists later)
+4. **Consider Shared Components**
+   - Loading indicator
+   - Error message component
+   - Toast notifications
 
 ---
 
-**Version**: 1.0.2
+**Version**: 1.0.3
 **Last Updated**: 2025-11-10
-**Status**: LoginScreen Complete - Ready for Navigation/Forms
+**Status**: Navigation Complete - Ready for Authentication

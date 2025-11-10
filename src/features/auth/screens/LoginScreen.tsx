@@ -19,15 +19,17 @@ import {
   View,
 } from 'react-native';
 import {theme} from '@/theme';
+import type {RootStackScreenProps} from '@/navigation/types';
 
 // === TYPES ===
 
-type LoginScreenProps = Record<string, never>;
+type LoginScreenProps = RootStackScreenProps<'LoginScreen'>;
 
 // === COMPONENT ===
 
-export const LoginScreen: React.FC<LoginScreenProps> = () => {
+export const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
   // === EVENT HANDLERS ===
+  // Handle user interactions and navigation actions
 
   const handleCreateAccount = () => {
     console.log('Create Account pressed');
@@ -35,11 +37,17 @@ export const LoginScreen: React.FC<LoginScreenProps> = () => {
   };
 
   const handleLogin = () => {
-    console.log('Login pressed');
-    // TODO: Navigate to login form screen
+    console.log('Login pressed - navigating to LoginFormScreen');
+    navigation.navigate('LoginFormScreen');
+  };
+
+  const handleGuestLogin = () => {
+    console.log('Guest Login pressed - navigating to MainActivity');
+    navigation.navigate('MainActivity');
   };
 
   // === RENDER ===
+  // Main component JSX structure
 
   return (
     <>
@@ -112,6 +120,25 @@ export const LoginScreen: React.FC<LoginScreenProps> = () => {
                 </Text>
               </Pressable>
             </View>
+
+            <View style={styles.buttonWrapper}>
+              <View style={styles.shadowLayer3} />
+              <View style={styles.shadowLayer2} />
+              <View style={styles.shadowLayer1} />
+              <Pressable
+                style={({pressed}) => [
+                  styles.button,
+                  styles.tertiaryButton,
+                  pressed && styles.buttonPressed,
+                ]}
+                onPress={handleGuestLogin}
+              >
+                <Text style={styles.tertiaryButtonText}>
+                  LOGIN AS{' '}
+                  <Text style={styles.guestText}>GUEST</Text>
+                </Text>
+              </Pressable>
+            </View>
           </View>
         </SafeAreaView>
       </ImageBackground>
@@ -120,12 +147,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = () => {
 };
 
 // === STYLES ===
-
-const LOGO_SIZE = 40;
-const LOGO_BORDER_RADIUS = LOGO_SIZE / 2;
-const HEADER_INDENT = theme.spacing.xl;
-const HEADER_TOP_SPACING = 100;
-const BUTTON_BOTTOM_SPACING = 100;
+// StyleSheet definitions using global theme tokens
 
 const styles = StyleSheet.create({
   backgroundImage: {
@@ -143,8 +165,8 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingLeft: HEADER_INDENT,
-    marginTop: HEADER_TOP_SPACING,
+    paddingLeft: theme.layout.header.indent,
+    marginTop: theme.layout.header.topSpacing,
   },
 
   liftText: {
@@ -158,43 +180,43 @@ const styles = StyleSheet.create({
   logoWrapper: {
     marginLeft: theme.spacing.s,
     position: 'relative',
-    width: LOGO_SIZE,
-    height: LOGO_SIZE,
+    width: theme.layout.logo.size,
+    height: theme.layout.logo.size,
   },
 
   logoShadowLayer1: {
     position: 'absolute',
-    top: 1,
-    left: 1,
-    width: LOGO_SIZE,
-    height: LOGO_SIZE,
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    borderRadius: LOGO_BORDER_RADIUS,
+    top: theme.buttons.shadowLayers.layer1.top,
+    left: theme.buttons.shadowLayers.layer1.left,
+    width: theme.layout.logo.size,
+    height: theme.layout.logo.size,
+    backgroundColor: `rgba(0, 0, 0, ${theme.buttons.shadowLayers.layer1.opacity})`,
+    borderRadius: theme.layout.logo.borderRadius,
   },
 
   logoShadowLayer2: {
     position: 'absolute',
-    top: 2,
-    left: 1,
-    width: LOGO_SIZE,
-    height: LOGO_SIZE,
-    backgroundColor: 'rgba(0, 0, 0, 0.15)',
-    borderRadius: LOGO_BORDER_RADIUS,
+    top: theme.buttons.shadowLayers.layer2.top,
+    left: theme.buttons.shadowLayers.layer2.left,
+    width: theme.layout.logo.size,
+    height: theme.layout.logo.size,
+    backgroundColor: `rgba(0, 0, 0, ${theme.buttons.shadowLayers.layer2.opacity})`,
+    borderRadius: theme.layout.logo.borderRadius,
   },
 
   logoShadowLayer3: {
     position: 'absolute',
-    top: 3,
-    left: 2,
-    width: LOGO_SIZE,
-    height: LOGO_SIZE,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
-    borderRadius: LOGO_BORDER_RADIUS,
+    top: theme.buttons.shadowLayers.layer3.top,
+    left: theme.buttons.shadowLayers.layer3.left,
+    width: theme.layout.logo.size,
+    height: theme.layout.logo.size,
+    backgroundColor: `rgba(0, 0, 0, ${theme.buttons.shadowLayers.layer3.opacity})`,
+    borderRadius: theme.layout.logo.borderRadius,
   },
 
   logo: {
-    width: LOGO_SIZE,
-    height: LOGO_SIZE,
+    width: theme.layout.logo.size,
+    height: theme.layout.logo.size,
     position: 'relative',
   },
 
@@ -204,7 +226,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'flex-start',
-    paddingLeft: HEADER_INDENT,
+    paddingLeft: theme.layout.header.indent,
   },
 
   guaranteedText: {
@@ -253,7 +275,7 @@ const styles = StyleSheet.create({
 
   buttonContainer: {
     paddingHorizontal: theme.spacing.xl,
-    paddingBottom: BUTTON_BOTTOM_SPACING,
+    paddingBottom: theme.layout.bottom.buttonSpacing,
   },
 
   buttonWrapper: {
@@ -263,31 +285,31 @@ const styles = StyleSheet.create({
 
   shadowLayer1: {
     position: 'absolute',
-    top: 1,
-    left: 1,
-    right: -1,
+    top: theme.buttons.shadowLayers.layer1.top,
+    left: theme.buttons.shadowLayers.layer1.left,
+    right: theme.buttons.shadowLayers.layer1.right,
     height: theme.buttons.height.medium,
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    backgroundColor: `rgba(0, 0, 0, ${theme.buttons.shadowLayers.layer1.opacity})`,
     borderRadius: theme.buttons.borderRadius.medium,
   },
 
   shadowLayer2: {
     position: 'absolute',
-    top: 2,
-    left: 1,
-    right: -1,
+    top: theme.buttons.shadowLayers.layer2.top,
+    left: theme.buttons.shadowLayers.layer2.left,
+    right: theme.buttons.shadowLayers.layer2.right,
     height: theme.buttons.height.medium,
-    backgroundColor: 'rgba(0, 0, 0, 0.15)',
+    backgroundColor: `rgba(0, 0, 0, ${theme.buttons.shadowLayers.layer2.opacity})`,
     borderRadius: theme.buttons.borderRadius.medium,
   },
 
   shadowLayer3: {
     position: 'absolute',
-    top: 3,
-    left: 2,
-    right: -2,
+    top: theme.buttons.shadowLayers.layer3.top,
+    left: theme.buttons.shadowLayers.layer3.left,
+    right: theme.buttons.shadowLayers.layer3.right,
     height: theme.buttons.height.medium,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    backgroundColor: `rgba(0, 0, 0, ${theme.buttons.shadowLayers.layer3.opacity})`,
     borderRadius: theme.buttons.borderRadius.medium,
   },
 
@@ -305,6 +327,10 @@ const styles = StyleSheet.create({
 
   secondaryButton: {
     backgroundColor: theme.colors.backgroundSecondary,
+  },
+
+  tertiaryButton: {
+    backgroundColor: theme.colors.backgroundTertiary,
   },
 
   buttonPressed: {
@@ -325,5 +351,17 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeight.medium,
     color: theme.colors.textPrimary,
     letterSpacing: 0.5,
+  },
+
+  tertiaryButtonText: {
+    fontSize: theme.typography.fontSize.l,
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: theme.typography.fontWeight.medium,
+    color: theme.colors.textPrimary,
+    letterSpacing: 0.5,
+  },
+
+  guestText: {
+    color: theme.colors.textYellowMaintenance,
   },
 });

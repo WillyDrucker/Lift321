@@ -14,11 +14,12 @@ import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 // Define all routes and their parameters here
 export type RootStackParamList = {
   // Auth Stack
-  Auth: undefined;
-  Login: undefined;
-  SignUp: undefined;
+  LoginScreen: undefined;
+  LoginFormScreen: undefined;
+  SignUpScreen: undefined;
 
   // Main Stack
+  MainActivity: undefined;
   Home: undefined;
   WorkoutList: undefined;
   WorkoutSession: {workoutId: string};

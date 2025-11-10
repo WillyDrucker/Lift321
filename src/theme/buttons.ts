@@ -44,6 +44,30 @@ export const buttons = {
     default: 16,
     loose: 24,
   },
+
+  // === BUTTON SHADOW LAYERS ===
+  // Three-layer shadow system for depth (pure black with fade)
+  // Usage: Apply as position: absolute behind button
+  shadowLayers: {
+    layer1: {
+      top: 1,
+      left: 0,
+      right: 0,
+      opacity: 0.4, // Strong black base
+    },
+    layer2: {
+      top: 2,
+      left: 0,
+      right: 0,
+      opacity: 0.25, // Medium fade
+    },
+    layer3: {
+      top: 3,
+      left: 0,
+      right: 0,
+      opacity: 0.15, // Light fade
+    },
+  },
 } as const;
 
 export type ButtonToken = keyof typeof buttons;

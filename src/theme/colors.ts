@@ -36,6 +36,10 @@ export const colors = {
   // Elevated Gray (#303030) - Raised/elevated elements (12% lighter than primary)
   // Use for: Modal backgrounds, dropdown menus, elevated cards, overlays
 
+  backgroundTertiary: '#424242',
+  // Neutral Gray (#424242) - Tertiary surfaces (18% lighter than secondary)
+  // Use for: Guest/maintenance buttons, low-priority actions, optional features
+
   // === TEXT COLORS ===
 
   textPrimary: '#FFFFFF',
@@ -53,6 +57,10 @@ export const colors = {
   textOnAction: '#000000',
   // Black (#000000) - Text on colored action buttons
   // Use for: Text on pure green buttons, ensures readability on bright backgrounds
+
+  textYellowMaintenance: '#FFFF00',
+  // Yellow (#FFFF00) - Maintenance mode indicator
+  // Use for: Maintenance mode text, guest user indicators, temporary features
 
   // === ACTION COLORS ===
   // Semantic naming: describes purpose, not literal color
@@ -78,6 +86,10 @@ export const colors = {
   borderDefault: '#424242',
   // Neutral Gray (#424242) - Default borders
   // Use for: Input borders, card outlines, dividers, default states
+
+  borderMuted: '#008000',
+  // Muted Green (#008000) - Unfocused input borders
+  // Use for: Input field borders in default state, subtle green accents
 
   borderFocus: '#00FF00',
   // Pure Green (#00FF00) - Focused element borders
@@ -113,6 +125,12 @@ export const colors = {
   setSkipped: '#ff4444',
   // Red (#ff4444) - Skipped exercise set indicator
   // Use for: Skipped sets, missed exercises, incomplete workouts
+
+  // === UTILITY COLORS ===
+
+  shadowBlack: '#000000',
+  // Pure Black (#000000) - Shadow color for all drop shadows
+  // Use for: Button shadows, logo shadows, text shadows, elevation effects
 } as const;
 
 // TypeScript helper for autocomplete

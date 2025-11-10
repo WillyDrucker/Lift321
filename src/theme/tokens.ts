@@ -17,6 +17,7 @@ import {spacing} from './spacing';
 import {typography, textStyles} from './typography';
 import {textShadows, viewShadows, elevation} from './shadows';
 import {buttons} from './buttons';
+import {layout} from './layout';
 
 export const theme = {
   colors,
@@ -27,9 +28,10 @@ export const theme = {
   viewShadows,
   elevation,
   buttons,
+  layout,
 } as const;
 
 export type Theme = typeof theme;
 
 // Re-export individual modules for convenience
-export {colors, spacing, typography, textStyles, textShadows, viewShadows, elevation, buttons};
+export {colors, spacing, typography, textStyles, textShadows, viewShadows, elevation, buttons, layout};
