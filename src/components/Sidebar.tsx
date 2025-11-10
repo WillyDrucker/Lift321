@@ -8,7 +8,7 @@
 // Used by: MainActivity hamburger menu
 // ==========================================================================
 
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   Animated,
   Dimensions,
@@ -40,8 +40,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   // === STATE ===
   // Animation value for slide-in/out
+  // Modal visibility separate from animation state
 
   const slideAnim = useRef(new Animated.Value(-1)).current;
+  const [modalVisible, setModalVisible] = useState(false);
   const screenWidth = Dimensions.get('window').width;
   const sidebarWidth = (screenWidth * theme.layout.sidebar.widthPercentage) / 100;
 
@@ -50,19 +52,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   useEffect(() => {
     if (visible) {
-      // Slide in
+      // Show modal first, then slide in
+      setModalVisible(true);
       Animated.timing(slideAnim, {
         toValue: 0,
         duration: theme.layout.sidebar.animationDuration,
         useNativeDriver: true,
       }).start();
     } else {
-      // Slide out
+      // Slide out, then hide modal
       Animated.timing(slideAnim, {
         toValue: -1,
         duration: theme.layout.sidebar.animationDuration,
         useNativeDriver: true,
-      }).start();
+      }).start(() => {
+        // Hide modal after animation completes
+        setModalVisible(false);
+      });
     }
   }, [visible, slideAnim]);
 
@@ -79,7 +85,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <Modal
-      visible={visible}
+      visible={modalVisible}
       transparent
       animationType="none"
       onRequestClose={onClose}>
