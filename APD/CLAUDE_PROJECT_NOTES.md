@@ -10,6 +10,169 @@ This file contains the historical record of version changes for Lift 3-2-1. Deta
 
 ## Version History
 
+### v1.0.4 - MainActivity Base UI Complete (2025-11-10)
+**Branch**: mainactivity-base-ui (merged to main)
+
+**Summary**: Complete MainActivity base UI implementation with hamburger sidebar, day selector tabs, workout preview card, bottom navigation, and Start Workout button. All components fully tokenized with zero magic numbers. Slide-out sidebar drawer replaces dropdown menu.
+
+**What Was Built**:
+- Top Bar with Hamburger Menu
+  - Hamburger icon on left, LIFT logo centered
+  - Top bar positioned 32px from top (theme.spacing.xl)
+  - Transparent background matching screen
+  - 60px height with 44px touch targets
+- Slide-Out Sidebar Drawer
+  - Replaces SimpleMenu dropdown with professional drawer
+  - Slides from left using React Native Animated API
+  - 70% screen width with dark overlay backdrop
+  - 300ms smooth animation (slide in/out)
+  - Tap outside to close functionality
+  - Menu items: Settings, Profile, Logout
+  - Properly handles animation state for repeated open/close
+- Day Selector Tabs
+  - 7-day tabs (Mon-Sun) in horizontal row
+  - Active state with green (#00FF00) background
+  - Inactive state with gray (#424242) background
+  - 45px height, 8px spacing between tabs
+  - 16px spacing below tabs to workout card
+- Workout Preview Card
+  - Shows selected day's workout name and exercises
+  - Day name in Bebas Neue with green color and text shadow
+  - 4 placeholder exercises with bullet points
+  - Card background (#303030) with 20px padding
+  - 12px border radius, 16px horizontal margins
+- Start Workout Button
+  - Prominent green (#00FF00) button below workout card
+  - Text: "START WORKOUT!" in 32px Bebas Neue
+  - Tight letter spacing (0) for compact look
+  - Multi-layer shadow system (3 layers, Android compatible)
+  - 60px height, 8px margin from workout card
+  - Perfect vertical text centering
+  - Press state: 0.8 opacity
+  - Console.log handler (ready for navigation)
+- Bottom Navigation Bar
+  - 5 buttons: Plans, History, Home, Stats, Profile
+  - SVG icons with active/inactive states
+  - Active: green (#00FF00), Inactive: gray (#666666)
+  - 70px height, 1px top border
+  - Icon size: 24px
+- SVG Icon System Expansion
+  - Created 6 new icons: HamburgerIcon, HomeIcon, PlansIcon, HistoryIcon, StatsIcon, ProfileIcon
+  - All icons scalable with size and color props
+  - Consistent stroke width and design language
+
+**New Design Tokens Added**:
+- Layout tokens (theme.layout):
+  - `topBar.height: 60` - Top bar height
+  - `topBar.iconButtonSize: 44` - Touch target size
+  - `topBar.iconSize: 28` - Actual icon size
+  - `bottomNav.height: 70` - Bottom nav bar height
+  - `bottomNav.iconSize: 24` - Nav icon size
+  - `bottomNav.paddingVertical: 10`
+  - `bottomNav.paddingHorizontal: 16`
+  - `dayTabs.height: 45` - Day tab height
+  - `dayTabs.spacing: 8` - Space between tabs
+  - `dayTabs.paddingHorizontal: 16`
+  - `dayTabs.buttonMinWidth: 45`
+  - `dayTabs.marginBottom: 16` - Space below tabs
+  - `workoutCard.padding: 20`
+  - `workoutCard.marginHorizontal: 16`
+  - `workoutCard.marginBottom: 16`
+  - `workoutCard.borderRadius: 12`
+  - `workoutCard.exerciseSpacing: 12`
+  - `sidebar.widthPercentage: 70`
+  - `sidebar.animationDuration: 300`
+  - `sidebar.itemPaddingVertical: 16`
+  - `sidebar.itemPaddingHorizontal: 24`
+  - `bullet.size: 6` - Bullet point diameter
+  - `bullet.borderRadius: 3`
+  - `border.thin: 1` - Thin borders
+  - `border.medium: 2` - Medium borders
+- Color tokens (theme.colors):
+  - `navActive: #00FF00` - Active navigation item
+  - `navInactive: #666666` - Inactive navigation items
+  - `tabActive: #00FF00` - Active tab
+  - `tabInactive: #424242` - Inactive tab
+  - `tabActiveText: #000000` - Text on active tab
+  - `tabInactiveText: #B0B0B0` - Text on inactive tab
+  - `overlayBackground: rgba(0, 0, 0, 0.5)` - Sidebar backdrop
+- Typography tokens (theme.typography):
+  - `letterSpacing.tight: 0` - Tight letter spacing
+  - `letterSpacing.normal: 1` - Normal letter spacing
+  - `letterSpacing.wide: 2` - Wide letter spacing
+
+**Complete Tokenization**:
+- Removed ALL magic numbers from MainActivity
+- Every dimension uses theme tokens
+- HamburgerIcon size: theme.layout.topBar.iconSize
+- Letter spacing: theme.typography.letterSpacing.*
+- Bullet points: theme.layout.bullet.*
+- Borders: theme.layout.border.*
+- All spacing: theme.spacing.* or theme.layout.*
+- ZERO hard-coded values remaining
+
+**Files Created**:
+- `src/components/Sidebar.tsx` - Slide-out drawer component
+- `src/components/icons/HamburgerIcon.tsx` - Menu icon
+- `src/components/icons/HomeIcon.tsx` - Home nav icon
+- `src/components/icons/PlansIcon.tsx` - Plans nav icon
+- `src/components/icons/HistoryIcon.tsx` - History nav icon
+- `src/components/icons/StatsIcon.tsx` - Stats nav icon
+- `src/components/icons/ProfileIcon.tsx` - Profile nav icon
+
+**Files Modified**:
+- `src/features/main/screens/MainActivity.tsx` - Complete rebuild with all UI elements
+- `src/theme/layout.ts` - Added extensive layout tokens
+- `src/theme/colors.ts` - Added navigation and tab colors
+- `src/theme/typography.ts` - Added letter spacing tokens
+- `src/components/icons/index.ts` - Added new icon exports
+
+**Files Deleted**:
+- `src/components/SimpleMenu.tsx` - Replaced by Sidebar
+
+**Technical Achievements**:
+- Animated drawer with proper state management (modal visibility separate from animation)
+- Multi-layer shadow pattern applied consistently
+- Type-safe navigation throughout
+- Memoized callbacks with useCallback
+- Perfect vertical text centering (includeFontPadding: false)
+- All components follow CLAUDE_DEV_STANDARDS
+
+**User Decisions**:
+- Top bar: Hamburger left, LIFT logo centered
+- Sidebar: 70% width, left side, tap-outside-to-close
+- Day tabs: Row of 7 days, tappable to switch workouts
+- Start button: Below card, 8px spacing, "START WORKOUT!" with tight letters
+- Bottom nav: 5 buttons (Plans, History, Home, Stats, Profile)
+- Workout card: Medium detail (day + exercise list)
+
+**Testing**:
+- Sidebar slides in/out smoothly on every open/close
+- Day tabs switch workout preview correctly
+- Bottom nav highlights active item
+- Start button press state works
+- All navigation flows tested
+
+**Git Commits** (mainactivity-base-ui branch):
+- Created SVG icon components
+- Added design tokens for navigation, tabs, sidebar
+- Created Sidebar component with slide animation
+- Updated MainActivity with complete UI
+- Fixed sidebar animation state management
+- Added Start Workout button
+- Multiple styling refinements (spacing, fonts, centering)
+- Merged to main branch
+
+**Key Learnings**:
+- Modal visibility must be separate from animation state for proper slide-out
+- Android text centering requires includeFontPadding: false
+- Bebas Neue font creates strong fitness aesthetic
+- Consistent token usage prevents drift and ensures maintainability
+
+**Next Steps**: Implement workout tracking screen, connect authentication logic, build out other navigation screens
+
+---
+
 ### v1.0.3 - Navigation Complete & Full Tokenization (2025-11-10)
 **Branch**: Claude-v1.0.3
 
