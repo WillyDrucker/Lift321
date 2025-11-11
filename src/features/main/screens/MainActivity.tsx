@@ -560,7 +560,7 @@ const styles = StyleSheet.create({
 
   startButtonWrapper: {
     marginHorizontal: theme.spacing.xl,
-    marginTop: theme.spacing.l,
+    marginTop: theme.spacing.m,
     marginBottom: theme.spacing.xl,
     position: 'relative',
   },
@@ -609,11 +609,11 @@ const styles = StyleSheet.create({
   },
 
   startButtonText: {
-    fontSize: theme.typography.fontSize.l,
-    fontFamily: theme.typography.fontFamily.primary,
-    fontWeight: theme.typography.fontWeight.bold,
+    fontSize: theme.typography.fontSize.xl,
+    fontFamily: theme.typography.fontFamily.brand,
     color: theme.colors.textOnAction,
     letterSpacing: theme.typography.letterSpacing.wide,
+    ...theme.textShadows.subtle,
   },
 
   // === BOTTOM NAVIGATION STYLES ===
