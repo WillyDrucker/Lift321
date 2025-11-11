@@ -131,6 +131,11 @@ export const MainActivity: React.FC<MainActivityProps> = ({navigation}) => {
     console.log('Nav pressed:', nav);
   }, []);
 
+  const handleStartWorkout = useCallback(() => {
+    // TODO: Navigate to workout screen
+    console.log('Starting workout:', currentWorkout.name, '-', currentWorkout.day);
+  }, [currentWorkout]);
+
   // === RENDER ===
   // Main component JSX structure
 
@@ -226,6 +231,21 @@ export const MainActivity: React.FC<MainActivityProps> = ({navigation}) => {
                 </View>
               ))}
             </View>
+          </View>
+
+          {/* Start Workout Button */}
+          <View style={styles.startButtonWrapper}>
+            <View style={styles.startButtonShadowLayer3} />
+            <View style={styles.startButtonShadowLayer2} />
+            <View style={styles.startButtonShadowLayer1} />
+            <Pressable
+              style={({pressed}) => [
+                styles.startButton,
+                pressed && styles.startButtonPressed,
+              ]}
+              onPress={handleStartWorkout}>
+              <Text style={styles.startButtonText}>START WORKOUT</Text>
+            </Pressable>
           </View>
         </ScrollView>
 
@@ -534,6 +554,66 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.fontFamily.primary,
     color: theme.colors.textPrimary,
     flex: 1,
+  },
+
+  // === START WORKOUT BUTTON STYLES ===
+
+  startButtonWrapper: {
+    marginHorizontal: theme.spacing.xl,
+    marginTop: theme.spacing.l,
+    marginBottom: theme.spacing.xl,
+    position: 'relative',
+  },
+
+  startButtonShadowLayer1: {
+    position: 'absolute',
+    top: theme.buttons.shadowLayers.layer1.top,
+    left: theme.buttons.shadowLayers.layer1.left,
+    right: theme.buttons.shadowLayers.layer1.right,
+    height: theme.buttons.height.large,
+    backgroundColor: `rgba(0, 0, 0, ${theme.buttons.shadowLayers.layer1.opacity})`,
+    borderRadius: theme.buttons.borderRadius.medium,
+  },
+
+  startButtonShadowLayer2: {
+    position: 'absolute',
+    top: theme.buttons.shadowLayers.layer2.top,
+    left: theme.buttons.shadowLayers.layer2.left,
+    right: theme.buttons.shadowLayers.layer2.right,
+    height: theme.buttons.height.large,
+    backgroundColor: `rgba(0, 0, 0, ${theme.buttons.shadowLayers.layer2.opacity})`,
+    borderRadius: theme.buttons.borderRadius.medium,
+  },
+
+  startButtonShadowLayer3: {
+    position: 'absolute',
+    top: theme.buttons.shadowLayers.layer3.top,
+    left: theme.buttons.shadowLayers.layer3.left,
+    right: theme.buttons.shadowLayers.layer3.right,
+    height: theme.buttons.height.large,
+    backgroundColor: `rgba(0, 0, 0, ${theme.buttons.shadowLayers.layer3.opacity})`,
+    borderRadius: theme.buttons.borderRadius.medium,
+  },
+
+  startButton: {
+    height: theme.buttons.height.large,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.buttons.borderRadius.medium,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+
+  startButtonPressed: {
+    opacity: 0.8,
+  },
+
+  startButtonText: {
+    fontSize: theme.typography.fontSize.l,
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.textOnAction,
+    letterSpacing: theme.typography.letterSpacing.wide,
   },
 
   // === BOTTOM NAVIGATION STYLES ===
