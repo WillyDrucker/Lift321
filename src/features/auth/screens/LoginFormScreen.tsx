@@ -87,7 +87,7 @@ export const LoginFormScreen: React.FC<LoginFormScreenProps> = ({
         backgroundColor={theme.colors.backgroundPrimary}
       />
       <View style={styles.container}>
-        {/* Header with Back and Support - Fixed at 50dp from top */}
+        {/* Header with Back and Support - 64dp from top */}
         <View style={styles.header}>
           <Pressable onPress={handleBack} style={styles.backButton}>
             <LeftChevron size={32} color={theme.colors.textPrimary} />

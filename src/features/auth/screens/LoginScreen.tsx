@@ -3,7 +3,7 @@
 //
 // Initial landing/login screen with brand messaging and authentication CTAs.
 //
-// Dependencies: theme tokens, SafeAreaView
+// Dependencies: theme tokens
 // Used by: App.tsx (initial screen)
 // ==========================================================================
 
@@ -12,7 +12,6 @@ import {
   Image,
   ImageBackground,
   Pressable,
-  SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
@@ -60,8 +59,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
         style={styles.backgroundImage}
         resizeMode="cover"
       >
-        <SafeAreaView style={styles.container}>
-          {/* Header with Logo and "Lift" text */}
+        <View style={styles.container}>
+          {/* Header with Logo and "Lift" text - 64dp from top */}
           <View style={styles.header}>
             <Text style={styles.liftText}>LIFT</Text>
             <View style={styles.logoWrapper}>
@@ -140,7 +139,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
               </Pressable>
             </View>
           </View>
-        </SafeAreaView>
+        </View>
       </ImageBackground>
     </>
   );
