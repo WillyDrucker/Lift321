@@ -14,11 +14,15 @@ export const colors = {
   // Fitness theme: Pure green (#00FF00) on charcoal gray
 
   primary: '#00FF00',
-  // Pure Green - Main brand/action color
+  // Pure Green (#00FF00) - Main brand/action color
   // Use for: Primary buttons, CTAs, active states, success indicators
 
+  primaryMuted: '#00BF00',
+  // Muted Green (#00BF00 - 75% brightness) - Softer brand accent
+  // Use for: Secondary brand text, softer green accents, reduced emphasis highlights
+
   secondary: '#2A2A2A',
-  // Medium Charcoal - Secondary brand color
+  // Medium Charcoal (#2A2A2A) - Secondary brand color
   // Use for: Secondary buttons, inactive states, alternative surfaces
 
   // === BACKGROUND COLORS ===
@@ -163,6 +167,28 @@ export const colors = {
   overlayBackground: 'rgba(0, 0, 0, 0.5)',
   // Semi-transparent Black - Overlay/backdrop color
   // Use for: Modal backdrops, drawer overlays, dimmed backgrounds
+
+  // === ABSOLUTE COLORS ===
+  // Pure black and white for specific design needs
+
+  pureBlack: '#000000',
+  // Pure Black (#000000) - Absolute black
+  // Use for: True black backgrounds, maximum contrast elements, text on bright colors
+
+  pureWhite: '#FFFFFF',
+  // Pure White (#FFFFFF) - Absolute white
+  // Use for: Maximum contrast backgrounds, light mode surfaces, bright UI elements
+
+  // === SOCIAL MEDIA BRAND COLORS ===
+  // Official brand colors for third-party authentication
+
+  googleBlue: '#4285F4',
+  // Google Blue (#4285F4) - Official Google brand color
+  // Use for: Google logo, Google-branded buttons and elements
+
+  facebookBlue: '#1877F2',
+  // Facebook Blue (#1877F2) - Official Facebook brand color
+  // Use for: Facebook logo, Facebook-branded buttons and elements
 } as const;
 
 // TypeScript helper for autocomplete

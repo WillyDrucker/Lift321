@@ -22,7 +22,7 @@ interface EyeClosedProps {
 // === COMPONENT ===
 
 export const EyeClosed: React.FC<EyeClosedProps> = ({
-  size = 24,
+  size = 15,
   color = 'currentColor',
 }) => {
   return (
@@ -44,9 +44,9 @@ export const EyeClosed: React.FC<EyeClosedProps> = ({
         strokeLinejoin="round"
       />
       <Line
-        x1={2}
+        x1={22}
         y1={2}
-        x2={22}
+        x2={2}
         y2={22}
         stroke={color}
         strokeWidth={2}

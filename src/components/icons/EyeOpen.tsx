@@ -22,7 +22,7 @@ interface EyeOpenProps {
 // === COMPONENT ===
 
 export const EyeOpen: React.FC<EyeOpenProps> = ({
-  size = 24,
+  size = 15,
   color = 'currentColor',
 }) => {
   return (
@@ -38,6 +38,7 @@ export const EyeOpen: React.FC<EyeOpenProps> = ({
         cx={12}
         cy={12}
         r={3}
+        fill="#00FF00"
         stroke={color}
         strokeWidth={2}
         strokeLinecap="round"

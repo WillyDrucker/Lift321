@@ -256,6 +256,128 @@ This file contains the historical record of version changes for Lift 3-2-1. Deta
 
 ---
 
+### v1.0.4c - Design Token System Refactored (2025-11-11)
+**Branch**: Claude-v1.0.4 (in progress)
+
+**Summary**: Comprehensive design token refactoring establishing 64dp safe zone standard, complete px-to-dp conversion, expanded typography scale, new semantic color tokens, and new development standard for forward-looking comments. All auth screens fully tokenized with zero hardcoded values remaining.
+
+**What Was Built**:
+- **64dp Safe Zone Standard**: Established universal clearance from top/bottom screen edges
+  - Accounts for Android navigation bar (48dp maximum) + comfortable margin (16dp)
+  - Applied consistently across all screens (LoginScreen, LoginFormScreen, SignUpScreen)
+  - New `theme.spacing.safeZone: 64` and `theme.spacing.safeZoneHorizontal: 32`
+- **Complete px to dp Conversion**: Removed ALL "px" references from code and comments
+  - All measurements now use "dp" (density-independent pixels) terminology
+  - Confirmed numeric values in React Native are always dp by default
+  - Updated comments throughout to reflect correct unit system
+- **Expanded Color Token System**: Added 5 new semantic color tokens with full documentation
+  - `primaryMuted: #00BF00` - 75% brightness green for softer accents
+  - `pureBlack: #000000` - True black for maximum contrast backgrounds
+  - `pureWhite: #FFFFFF` - Maximum contrast for bright UI elements
+  - `googleBlue: #4285F4` - Official Google brand color
+  - `facebookBlue: #1877F2` - Official Facebook brand color
+  - All colors include hex value, description, and use case documentation
+- **Expanded Typography Scale**: Grew from 6 to 9 font sizes based on 16dp baseline
+  - Added `xl: 24dp` (1.5× baseline) - Small headlines, section titles
+  - Added `xxl: 28dp` (1.75× baseline) - Medium headlines, sub-headers
+  - Added `xxxl: 32dp` (2× baseline) - Large headlines, page titles
+  - Added `display: 48dp` (3× baseline) - Hero text, main branding
+  - Added `mega: 64dp` (4× baseline) - Extra large display text
+  - Follows rem-like scaling pattern for consistency
+- **Enhanced Spacing Tokens**: Added context-specific spacing values
+  - `safeZone: 64` - Standard clearance from top/bottom edges
+  - `safeZoneHorizontal: 32` - Standard horizontal clearance
+  - `textLineGap: 10` - Vertical spacing between text lines
+  - `textGroupSpacing: 32` - Spacing between text groups/paragraphs
+  - `buttonSpacing: 16` - Vertical spacing between stacked buttons
+- **Updated Layout Tokens**: Standardized to 64dp safe zone
+  - `header.topSpacing: 64` (changed from 100dp to match safe zone)
+  - `bottom.safeZone: 64` - Distance from bottom for interactive elements
+  - `bottom.buttonGroupPadding: 48` - Container padding (48dp + 16dp margin = 64dp visual)
+  - Added `icon` sizes: small (16), medium (24), large (32), xlarge (40)
+  - Added `backgroundImage` configuration: topSpacing (32), widthPercentage (80), heightPercentage (70), opacity (0.5)
+
+**Screen Refactoring** (All Fully Tokenized):
+- **LoginScreen**: All spacing/typography uses tokens, zero hardcoded values
+  - Header positioning: `theme.spacing.safeZone` and `theme.spacing.safeZoneHorizontal`
+  - Text sizes: `theme.typography.fontSize.xxxl` and `theme.typography.fontSize.display`
+  - Text spacing: `theme.spacing.textLineGap` for consistent line gaps
+  - Button container: `theme.layout.bottom.buttonGroupPadding` for proper bottom clearance
+- **LoginFormScreen**: Social media colors tokenized, header uses layout tokens
+  - Google button: `theme.colors.pureWhite` background, `theme.colors.googleBlue` logo, `theme.colors.pureBlack` text
+  - Facebook button: `theme.colors.facebookBlue` background, `theme.colors.pureWhite` text/logo
+  - Header positioning: `theme.layout.header.topSpacing` and `theme.spacing.safeZoneHorizontal`
+  - Button spacing: `theme.spacing.buttonSpacing` between stacked buttons
+- **SignUpScreen**: Background image tokenized, all colors semantic
+  - Background: `theme.colors.pureBlack` for true black backgrounds
+  - Text colors: `theme.colors.primaryMuted` for softer green accents
+  - Background image: Uses `theme.layout.backgroundImage` tokens for positioning and opacity
+  - Bottom positioning: `theme.layout.bottom.safeZone` for button clearance
+
+**New Development Standard**:
+- **Standard #10: Forward-Looking Comments** added to CLAUDE_DEV_STANDARDS.md
+  - Comments must explain design intent and purpose, not historical changes
+  - Example (Bad): "Changed from 50dp to 64dp to fix alignment issue"
+  - Example (Good): "64dp safe zone clearance for system UI compatibility"
+  - Historical context belongs in git history, not code comments
+  - Keeps code clean, focused on present intent, prevents stale historical artifacts
+- Updated CRITICAL REMINDERS: "NO historical comments"
+- Updated CLAUDE.md with new standard in Essential Patterns and Critical Standards
+
+**Files Modified (11)**:
+- `src/theme/colors.ts` - Added 5 new semantic color tokens with documentation
+- `src/theme/spacing.ts` - Added safe zone and context-specific spacing tokens
+- `src/theme/typography.ts` - Expanded from 6 to 9 font sizes
+- `src/theme/layout.ts` - Updated to 64dp standard, added icon sizes and backgroundImage settings
+- `src/features/auth/screens/LoginScreen.tsx` - Fully tokenized, zero hardcoded values
+- `src/features/auth/screens/LoginFormScreen.tsx` - Social colors tokenized, header uses layout tokens
+- `src/features/auth/screens/SignUpScreen.tsx` - Complete tokenization with semantic colors
+- `APD/CLAUDE_DEV_STANDARDS.md` - Added Standard #10 (Forward-Looking Comments)
+- `APD/CLAUDE.md` - Updated with new standard
+- `APD/CLAUDE_SESSION_HANDOFF.md` - Comprehensive documentation of session work
+- `APD/CLAUDE_PROJECT_NOTES.md` - This file, version history updated
+
+**Technical Concepts Covered**:
+- React Native dp (density-independent pixels) vs physical pixels
+  - Numeric values in React Native are dp by default, not px
+  - At 480dpi (xxhdpi), 1dp = 3 physical pixels
+  - dp provides consistent sizing across different screen densities
+- Android SafeAreaView behavior
+  - Handles status bar but NOT navigation bar on Android
+  - Need manual bottom padding to account for navigation bar
+- Design token systems and semantic naming
+  - Purpose-driven names (primaryMuted) not literal (lightGreen)
+  - Token architecture matters more than specific values
+  - Tokens evolve during development
+- Typography scaling systems
+  - 16dp baseline with rem-like scaling (1.5×, 1.75×, 2×, 3×, 4×)
+  - Consistent scale makes sizing decisions predictable
+- Flexbox responsive layouts
+  - `flex: 1` with `justifyContent: 'center'` for automatic vertical centering
+  - Percentage-based sizing for responsive backgrounds
+
+**User Decisions**:
+- Establish 64dp as standard safe zone clearance (top/bottom)
+- Use 32dp as standard horizontal clearance
+- All measurements in dp (density-independent pixels)
+- 16dp as baseline for typography scaling (rem-like system)
+- Comments must be forward-looking, not historical
+- Token architecture matters more than exact values (values can evolve)
+
+**Key Learnings**:
+- React Native uses dp by default - no need to specify unit
+- SafeAreaView doesn't handle Android nav bar - manual padding required
+- 64dp safe zone (48dp nav bar + 16dp margin) provides comfortable clearance
+- Consistent token usage prevents drift and ensures maintainability
+- Forward-looking comments keep code clean and prevent confusion
+- Semantic naming (primaryMuted) communicates intent better than literal (lightGreen)
+
+**Testing Status**: Not yet tested on Android emulator - needs verification of all token rendering
+
+**Next Steps**: Test refactored screens on Android emulator, verify tokens render correctly, continue with app features (authentication logic, workout logging, training plans)
+
+---
+
 ### Historical Versions (v1.0.0 - v1.0.3)
 
 **v1.0.0-v1.0.3 Summary**: Project evolved from foundation (React Native 0.82.1 with TypeScript, Supabase, feature-based architecture, design token system) through LoginScreen implementation with custom fonts (Bebas Neue/Roboto), multi-layer shadows, and complete tokenization, to full navigation setup with React Navigation, LoginFormScreen, MainActivity, SVG icon system, and theme.layout module. Gradle upgraded to 9.2.0 for Android Studio compatibility. All screens fully tokenized with zero magic numbers, shadow system refined to pure black dropping straight down (0.4→0.25→0.15 opacity fade). Navigation flows: LoginScreen ↔ LoginFormScreen ↔ MainActivity with slide_from_right animation and type-safe routing.

@@ -87,7 +87,7 @@ export const LoginFormScreen: React.FC<LoginFormScreenProps> = ({
         backgroundColor={theme.colors.backgroundPrimary}
       />
       <View style={styles.container}>
-        {/* Header with Back and Support - Fixed at 100px from top */}
+        {/* Header with Back and Support - Fixed at 50dp from top */}
         <View style={styles.header}>
           <Pressable onPress={handleBack} style={styles.backButton}>
             <LeftChevron size={32} color={theme.colors.textPrimary} />
@@ -147,9 +147,9 @@ export const LoginFormScreen: React.FC<LoginFormScreenProps> = ({
               style={styles.eyeButton}
             >
               {showPassword ? (
-                <EyeOpen size={20} color={theme.colors.textPrimary} />
+                <EyeOpen size={15} color={theme.colors.textPrimary} />
               ) : (
-                <EyeClosed size={20} color={theme.colors.textPrimary} />
+                <EyeClosed size={15} color={theme.colors.textPrimary} />
               )}
             </Pressable>
           </View>
@@ -237,12 +237,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: theme.spacing.m,
+    paddingLeft: 24, // 24dp + 8dp button padding = 32dp visual from left
+    paddingRight: theme.spacing.safeZoneHorizontal,
     zIndex: 10,
   },
 
   backButton: {
-    padding: theme.spacing.xs,
+    padding: theme.spacing.s, // 8dp padding for better touch target
   },
 
   supportText: {
@@ -266,8 +267,8 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.m,
     fontFamily: theme.typography.fontFamily.primary,
     color: theme.colors.textPrimary,
-    marginBottom: theme.layout.form.inputHorizontalMargin,
-    marginHorizontal: theme.layout.form.inputHorizontalMargin,
+    marginBottom: 5, // 5dp spacing between inputs
+    marginHorizontal: 5, // 5dp from left and right edges
   },
 
   inputFocused: {
@@ -276,7 +277,7 @@ const styles = StyleSheet.create({
 
   passwordContainer: {
     position: 'relative',
-    marginBottom: theme.spacing.m,
+    marginBottom: 16, // 16dp spacing to Forgot Password
   },
 
   passwordInput: {
@@ -286,7 +287,7 @@ const styles = StyleSheet.create({
 
   eyeButton: {
     position: 'absolute',
-    right: theme.spacing.m + theme.layout.form.inputHorizontalMargin,
+    right: theme.spacing.m + 5, // 16dp padding + 5dp margin
     top: 0,
     bottom: 0,
     justifyContent: 'center',
@@ -297,8 +298,8 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.fontFamily.primary,
     color: theme.colors.borderMuted,
     textAlign: 'center',
-    marginBottom: theme.spacing.m,
-    marginHorizontal: theme.layout.form.buttonHorizontalMargin,
+    marginBottom: 16, // 16dp spacing to Continue button
+    marginHorizontal: 5, // 5dp from left and right edges (match inputs)
   },
 
   // === BUTTON STYLES ===
@@ -309,8 +310,8 @@ const styles = StyleSheet.create({
     borderRadius: theme.layout.form.inputBorderRadius,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: theme.layout.form.dividerSpacing,
-    marginHorizontal: theme.layout.form.buttonHorizontalMargin,
+    marginBottom: 32, // 32dp spacing to OR divider
+    marginHorizontal: 32, // 32dp from left and right edges
   },
 
   continueButtonText: {
@@ -329,8 +330,8 @@ const styles = StyleSheet.create({
   dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: theme.layout.form.dividerSpacing,
-    marginHorizontal: theme.layout.form.buttonHorizontalMargin,
+    marginBottom: 32, // 32dp spacing to Google button
+    marginHorizontal: 32, // 32dp from left and right edges
   },
 
   dividerLine: {
@@ -355,18 +356,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: theme.layout.form.inputBorderRadius,
-    marginBottom: theme.spacing.m,
-    marginHorizontal: theme.layout.form.buttonHorizontalMargin,
+    marginHorizontal: 32, // 32dp from left and right edges
   },
 
   googleButton: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.pureWhite,
+    marginBottom: theme.spacing.buttonSpacing,
   },
 
   googleLogo: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#4285F4',
+    color: theme.colors.googleBlue,
     marginRight: theme.spacing.s,
   },
 
@@ -374,17 +375,17 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.m,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
-    color: '#000000',
+    color: theme.colors.pureBlack,
   },
 
   facebookButton: {
-    backgroundColor: '#1877F2',
+    backgroundColor: theme.colors.facebookBlue,
   },
 
   facebookLogo: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: theme.colors.pureWhite,
     marginRight: theme.spacing.s,
   },
 
@@ -392,6 +393,6 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.m,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
-    color: '#FFFFFF',
+    color: theme.colors.pureWhite,
   },
 });

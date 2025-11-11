@@ -1,8 +1,8 @@
 // ==========================================================================
 // DESIGN TOKENS - Spacing
 //
-// 16px base rhythm for consistent spacing throughout the app.
-// All spacing uses multiples/divisions of 16px for visual consistency.
+// 16dp base rhythm for consistent spacing throughout the app.
+// All spacing uses multiples/divisions of 16dp for visual consistency.
 //
 // Philosophy: Global spacing rhythm prevents magic numbers
 // Dependencies: None
@@ -11,25 +11,36 @@
 
 export const spacing = {
   // === BASE RHYTHM ===
-  // 16px base system
+  // 16dp base system for consistent spacing throughout app
   base: 16,
 
   // === STANDARD SPACING SCALE ===
-  xs: 4, // 16 / 4 - Micro adjustments
-  s: 8, // 16 / 2 - Tight spacing
-  m: 16, // Base - Default element spacing
-  l: 24, // 16 * 1.5 - Breathing room
-  xl: 32, // 16 * 2 - Large gaps
-  xxl: 48, // 16 * 3 - Major sections
+  // T-shirt sizing system following 16dp base rhythm
+  xs: 4, // 0.25× base - Micro adjustments, tight inline spacing
+  s: 8, // 0.5× base - Tight spacing, compact elements
+  m: 16, // 1× base - Default element spacing, standard gaps
+  l: 24, // 1.5× base - Breathing room, comfortable spacing
+  xl: 32, // 2× base - Large gaps, section separation
+  xxl: 48, // 3× base - Major sections, significant visual breaks
 
-  // === SPECIFIC CONTEXTS ===
-  // Context-specific spacing for mobile UI patterns
-  textLineGap: 7, // Text line spacing
-  labelGap: 7, // Label to element spacing
-  cardMargin: 10, // Card margins from viewport
-  cardPadding: 16, // Internal card padding
-  buttonPadding: 12, // Button internal padding
-  inputPadding: 12, // Input field padding
+  // === SAFE ZONE SPACING ===
+  // Standard clearance from screen edges to avoid system UI
+  safeZone: 64, // Standard safe distance from top/bottom edges (accounts for Android nav bar + margin)
+  safeZoneHorizontal: 32, // Standard horizontal safe distance from left/right edges
+
+  // === CONTEXT-SPECIFIC SPACING ===
+  // Specific use-case spacing values
+  textLineGap: 10, // Vertical spacing between text lines for readability
+  textGroupSpacing: 32, // Spacing between text groups or paragraphs
+  buttonSpacing: 16, // Vertical spacing between stacked buttons
+  sectionSpacing: 48, // Spacing between major UI sections
+
+  // === ELEMENT-SPECIFIC SPACING ===
+  // Internal spacing for UI elements
+  cardPadding: 16, // Internal padding for cards and containers
+  buttonPaddingVertical: 12, // Vertical padding inside buttons
+  buttonPaddingHorizontal: 24, // Horizontal padding inside buttons
+  inputPadding: 16, // Internal padding for input fields
 } as const;
 
 export type SpacingToken = keyof typeof spacing;

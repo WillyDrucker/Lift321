@@ -32,8 +32,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
   // Handle user interactions and navigation actions
 
   const handleCreateAccount = () => {
-    console.log('Create Account pressed');
-    // TODO: Navigate to sign up screen
+    console.log('Create Account pressed - navigating to SignUpScreen');
+    navigation.navigate('SignUpScreen');
   };
 
   const handleLogin = () => {
@@ -165,12 +165,12 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingLeft: theme.layout.header.indent,
-    marginTop: theme.layout.header.topSpacing,
+    paddingLeft: theme.spacing.safeZoneHorizontal,
+    marginTop: theme.spacing.safeZone,
   },
 
   liftText: {
-    fontSize: theme.typography.fontSize.xl,
+    fontSize: theme.typography.fontSize.xxxl,
     fontFamily: theme.typography.fontFamily.brand,
     color: theme.colors.textPrimary,
     letterSpacing: 1,
@@ -226,16 +226,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'flex-start',
-    paddingLeft: theme.layout.header.indent,
+    paddingLeft: theme.spacing.safeZoneHorizontal,
   },
 
   guaranteedText: {
-    fontSize: theme.typography.fontSize.xl,
+    fontSize: theme.typography.fontSize.xxxl,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.textSecondary,
+    color: theme.colors.textPrimary,
     letterSpacing: 2,
-    lineHeight: theme.typography.fontSize.xl,
+    lineHeight: theme.typography.fontSize.xxxl,
     includeFontPadding: false,
     paddingVertical: 0,
     marginTop: 0,
@@ -244,29 +244,29 @@ const styles = StyleSheet.create({
   },
 
   optimalText: {
-    fontSize: theme.typography.fontSize.xl,
+    fontSize: theme.typography.fontSize.xxxl,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.textSecondary,
+    color: theme.colors.textPrimary,
     letterSpacing: 2,
-    lineHeight: theme.typography.fontSize.xl,
+    lineHeight: theme.typography.fontSize.xxxl,
     includeFontPadding: false,
     paddingVertical: 0,
-    marginTop: 10,
+    marginTop: theme.spacing.textLineGap,
     marginBottom: 0,
     ...theme.textShadows.default,
   },
 
   resultsText: {
-    fontSize: theme.typography.fontSize.xxl,
+    fontSize: theme.typography.fontSize.display,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.primary,
     letterSpacing: 3,
-    lineHeight: theme.typography.fontSize.xxl,
+    lineHeight: theme.typography.fontSize.display,
     includeFontPadding: false,
     paddingVertical: 0,
-    marginTop: 6,
+    marginTop: 8, // Adjusted for visual spacing (compensates for larger lineHeight)
     marginBottom: 0,
     ...theme.textShadows.default,
   },
@@ -274,12 +274,13 @@ const styles = StyleSheet.create({
   // === BUTTON STYLES ===
 
   buttonContainer: {
-    paddingHorizontal: theme.spacing.xl,
-    paddingBottom: theme.layout.bottom.buttonSpacing,
+    paddingLeft: theme.spacing.safeZoneHorizontal,
+    paddingRight: theme.spacing.safeZoneHorizontal,
+    paddingBottom: theme.layout.bottom.buttonGroupPadding,
   },
 
   buttonWrapper: {
-    marginBottom: theme.buttons.marginBottom.default,
+    marginBottom: theme.spacing.buttonSpacing,
     position: 'relative',
   },
 
