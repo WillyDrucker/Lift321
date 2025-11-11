@@ -4,7 +4,7 @@
 // Initializes Supabase client for React Native.
 // Configured with AsyncStorage for session persistence.
 //
-// IMPORTANT: This is for a BRAND NEW Supabase project (not Will's 3-2-1).
+// IMPORTANT: This connects to a brand new Supabase project for Lift 3-2-1.
 // Create new project at https://supabase.com and update .env file.
 //
 // Dependencies: @supabase/supabase-js, AsyncStorage, environment variables

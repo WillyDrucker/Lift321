@@ -4,7 +4,7 @@
 // Global color palette for Lift 3-2-1 fitness app.
 // Purpose-driven naming (semantic, not color-based).
 //
-// Philosophy: Semantic naming from Will's 3-2-1 adapted for React Native
+// Philosophy: Semantic naming for scalability and maintainability
 // Dependencies: None
 // Used by: All components via theme object
 // ==========================================================================
@@ -108,7 +108,7 @@ export const colors = {
   // Use for: Invalid inputs, error states, failed validation
 
   // === WORKOUT-SPECIFIC COLORS ===
-  // Based on Will's 3-2-1 semantic system for workout tracking
+  // Semantic color system for workout tracking and status indicators
 
   planSuccess: '#00FF00',
   // Pure Green (#00FF00) - On-plan workout indicator
