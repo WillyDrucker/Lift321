@@ -560,7 +560,7 @@ const styles = StyleSheet.create({
 
   startButtonWrapper: {
     marginHorizontal: theme.spacing.xl,
-    marginTop: theme.spacing.s,
+    marginTop: theme.layout.dayTabs.marginBottom,
     marginBottom: theme.spacing.xl,
     position: 'relative',
   },
