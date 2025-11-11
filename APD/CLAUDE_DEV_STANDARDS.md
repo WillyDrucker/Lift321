@@ -52,12 +52,16 @@ Organize by feature not file type. Each feature has screens/ components/ context
 
 Establish global files first for all reusable patterns before creating local customizations. Repeated elements like buttons, selectors, inputs, text sizes, spacing, and visual rhythm must be defined in global files as established patterns. Common UI components flow through src/components or src/theme as the single source of truth. Only after global patterns are established should local customizations be added at the feature or component level. This ensures consistency across the app, reduces duplication, makes updates easier by changing one file instead of many, and creates a predictable system where developers know where to find standard implementations. Global patterns include button variants in theme.buttons, input field styling, common spacing rhythms, standard text sizes, reusable component wrappers, and shared interaction patterns. Local customizations are acceptable only when a specific feature truly needs deviation from the global standard.
 
+### 10. FORWARD-LOOKING COMMENTS
+
+Code comments must explain design intent and purpose, never document historical changes or past fixes. Comments should be forward-looking documentation that helps future developers understand why code exists and how it should be used, not a changelog of what was modified or adjusted. Instead of "Changed from 50dp to 64dp to fix alignment issue" write "64dp safe zone clearance for system UI compatibility". Instead of "Fixed bug where button was too close to edge" write "32dp horizontal padding ensures comfortable touch targets". Comments describe the current state and its rationale, treating the codebase as the authoritative present. Historical context belongs in git history and version control, not in code comments. This keeps code clean, focused on present intent, and prevents comments from becoming stale historical artifacts that confuse rather than clarify.
+
 ---
 
 ## CRITICAL REMINDERS
 
-NO magic numbers, NO hard-coded colors, NO relative imports, NO any types, NO direct database queries.
-ALWAYS use design tokens, ALWAYS establish global patterns first, ALWAYS use service layer, ALWAYS memoize contexts, ALWAYS use custom hooks.
+NO magic numbers, NO hard-coded colors, NO relative imports, NO any types, NO direct database queries, NO historical comments.
+ALWAYS use design tokens, ALWAYS establish global patterns first, ALWAYS use service layer, ALWAYS memoize contexts, ALWAYS use custom hooks, ALWAYS write forward-looking comments.
 
 ---
 

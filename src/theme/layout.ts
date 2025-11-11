@@ -11,10 +11,11 @@
 
 export const layout = {
   // === HEADER LAYOUT ===
+  // Standard positioning for headers across different screen types
   header: {
-    topSpacing: 100, // Distance from top of screen (login screens)
+    topSpacing: 64, // Distance from top of screen (auth screens) - matches safe zone
     appTopSpacing: 16, // Distance from top for in-app headers (main screens)
-    indent: 32, // Left/right padding (same as theme.spacing.xl)
+    horizontalPadding: 32, // Left/right padding for header content (matches safe zone horizontal)
   },
 
   // === LOGO DIMENSIONS ===
@@ -35,8 +36,19 @@ export const layout = {
   },
 
   // === BOTTOM SPACING ===
+  // Standard positioning for elements at bottom of screen
   bottom: {
-    buttonSpacing: 100, // Distance from bottom for button containers
+    safeZone: 64, // Distance from bottom for interactive elements - matches safe zone standard
+    buttonGroupPadding: 48, // Container padding that accounts for button margins (48dp + 16dp margin = 64dp visual)
+  },
+
+  // === ICON SIZES ===
+  // Standard icon dimensions for consistent visual weight
+  icon: {
+    small: 16, // Small icons (inline, decorative)
+    medium: 24, // Medium icons (navigation, actions)
+    large: 32, // Large icons (primary actions, chevrons)
+    xlarge: 40, // Extra large icons (logo, hero elements)
   },
 
   // === BOTTOM NAVIGATION BAR ===
@@ -89,6 +101,15 @@ export const layout = {
     animationDuration: 300, // Slide animation duration in ms
     itemPaddingVertical: 16, // Vertical padding for menu items
     itemPaddingHorizontal: 24, // Horizontal padding for menu items
+  },
+
+  // === BACKGROUND IMAGE SETTINGS ===
+  // Standardized background image positioning and sizing
+  backgroundImage: {
+    topSpacing: 32, // Distance from top of screen for auth screen backgrounds
+    widthPercentage: 80, // Percentage of screen width (10% padding on each side)
+    heightPercentage: 70, // Percentage of available height
+    opacity: 0.5, // Standard opacity for background images (50% for subtle effect)
   },
 } as const;
 

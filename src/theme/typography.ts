@@ -23,13 +23,17 @@ export const typography = {
   },
 
   // === FONT SIZES ===
+  // Based on 16dp baseline following rem-like scaling
   fontSize: {
-    xs: 12,
-    s: 14,
-    m: 16, // Base size
-    l: 20,
-    xl: 32, // 2rem
-    xxl: 64, // 4rem - Large display text
+    xs: 12, // 0.75× base - Small labels, captions, meta text
+    s: 14, // 0.875× base - Secondary text, helper text
+    m: 16, // 1× base - Body text, standard UI text
+    l: 20, // 1.25× base - Button text, emphasized labels
+    xl: 24, // 1.5× base - Small headlines, section titles
+    xxl: 28, // 1.75× base - Medium headlines, sub-headers
+    xxxl: 32, // 2× base - Large headlines, page titles
+    display: 48, // 3× base - Hero text, main branding
+    mega: 64, // 4× base - Extra large display text
   },
 
   // === FONT WEIGHTS ===
@@ -41,7 +45,7 @@ export const typography = {
   },
 
   // === LINE HEIGHTS ===
-  // Calculated from font size + textLineGap (7px from spacing)
+  // Calculated from font size + textLineGap (7dp from spacing)
   lineHeight: {
     xs: 19, // 12 + 7
     s: 21, // 14 + 7

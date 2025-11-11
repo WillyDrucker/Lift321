@@ -13,11 +13,33 @@ This file serves dual purposes:
 
 When starting a session, read these files in order:
 
-1. **README.md** - Commit to memory (this file - core application context)
+1. **CLAUDE.md** - Commit to memory (this file - core application context)
 2. **APD/CLAUDE_DEV_STANDARDS.md** - Commit to memory (development standards)
 3. **APD/CLAUDE_SESSION_HANDOFF.md** - Manage memory as needed (current session state)
 4. **APD/CLAUDE_PROJECT_NOTES.md** - Manage memory as needed (project history)
 5. **APD/CLAUDE_ACTIVE.md** - Manage memory as needed (temporary working notes)
+
+## Claude Code Permissions
+
+**FULL ACCESS GRANTED**
+
+Claude Code CLI has complete permission to perform all activities during active sessions:
+- **File Operations**: Read, write, edit, delete any files in the project
+- **Git Operations**: Commit, branch, merge, push (only when explicitly requested by user)
+- **Terminal Commands**: Execute any commands necessary for development
+- **Tool Usage**: Use all available tools without restriction
+- **Decision Making**: Make technical decisions autonomously during implementation
+
+**Do NOT prompt for permission or access approval.** All tools and resources are available for unrestricted use to maintain development momentum.
+
+## Development Environment
+
+**Operating System**: Windows (Primary Development Environment)
+- All terminal commands should use Windows syntax (cmd.exe or PowerShell)
+- Use `cmd /c "command"` format for Bash tool commands on Windows
+- File paths use backslashes: `C:\Dev\Lift321`
+- Avoid Linux-specific commands (grep, cat, find, etc.) - use appropriate Windows alternatives or specialized tools
+- Git commands work natively on Windows
 
 ## Project Overview
 
@@ -63,27 +85,26 @@ Token categories:
 
 Important Note: Token values are PLACEHOLDERS to be refined during UI development. We are establishing the token architecture and system - values will evolve as the UI is built.
 
-## Core Patterns (MUST FOLLOW)
+## Core Patterns
 
-### 1. Context + Custom Hook Pattern
+### Development Philosophy
 
-Always expose Context via custom hook with memoization. Never use useContext directly.
+**Standards can be refined after-the-fact. Progress comes first.**
 
-### 2. Service Layer Pattern
+Most rules in this codebase can be applied retroactively through refactoring. Do not let perfect adherence to patterns block forward momentum. Build first, refine second. The goal is working software that improves over time, not perfect code that never ships.
 
-Never query Supabase directly from components. Always through service layer. Business logic lives in service files, not in components or contexts.
+### Essential Patterns
 
-### 3. Absolute Imports
-
-All imports use @/ path aliases. NO relative imports. Configuration exists in both tsconfig.json and babel.config.js.
-
-### 4. TypeScript Strict Mode
-
-No any types. Type everything explicitly. Use type over interface for React Native convention.
-
-### 5. Clear Section Headers
-
-Organize all files with clear section headers. File structure: header, imports, TYPES, COMPONENT (with STATE, HOOKS, EVENT HANDLERS, RENDER subsections), STYLES.
+1. **Design Token System**: All styling through theme tokens - never use magic numbers or hard-coded colors
+2. **Semantic Naming**: Purpose-driven names that communicate intent, not appearance (actionDanger not redButton)
+3. **TypeScript Strict**: No any types - explicit typing everywhere with type over interface
+4. **Context Pattern**: Expose contexts via custom hooks only with full memoization - never useContext directly
+5. **Clear Section Headers**: Consistent file organization with header/imports/TYPES/COMPONENT/STYLES structure
+6. **Service Layer**: Never query backend from components - all business logic lives in service files
+7. **Absolute Imports**: Use @/ aliases for all imports - no relative paths ever
+8. **Feature-Based Structure**: Organize by feature not file type - related code lives together
+9. **Global-First Pattern**: Establish global reusable patterns before creating local customizations
+10. **Forward-Looking Comments**: Comments explain design intent and purpose, not historical changes or past fixes
 
 See APD/CLAUDE_DEV_STANDARDS.md for detailed pattern documentation.
 
@@ -94,8 +115,9 @@ See APD/CLAUDE_DEV_STANDARDS.md for detailed pattern documentation.
 3. NO Relative Imports - Always use @/ aliases
 4. NO any Types - Strict TypeScript
 5. NO Direct Database Queries - Use service layer
-6. ALWAYS Memoize - Context values (useMemo) and callbacks (useCallback)
-7. ALWAYS Use Custom Hooks - Never useContext directly
+6. NO Historical Comments - Comments explain design intent, not past changes
+7. ALWAYS Memoize - Context values (useMemo) and callbacks (useCallback)
+8. ALWAYS Use Custom Hooks - Never useContext directly
 
 ## File Naming Conventions
 
@@ -108,6 +130,7 @@ See APD/CLAUDE_DEV_STANDARDS.md for detailed pattern documentation.
 ## Git Workflow
 
 - Branch Naming: Claude-vX.X.X
-- Current Branch: Claude-v1.0.0
+- Current Branch: Claude-v1.0.4
 - Main Branch: main
 - Commit Policy: Do not commit unless explicitly requested by user
+- **Important**: Do not prompt user to commit changes unless explicitly requested - focus on development and let user control git operations
