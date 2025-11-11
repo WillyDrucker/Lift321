@@ -244,7 +244,7 @@ export const MainActivity: React.FC<MainActivityProps> = ({navigation}) => {
                 pressed && styles.startButtonPressed,
               ]}
               onPress={handleStartWorkout}>
-              <Text style={styles.startButtonText}>START WORKOUT</Text>
+              <Text style={styles.startButtonText}>START WORKOUT!</Text>
             </Pressable>
           </View>
         </ScrollView>
@@ -602,6 +602,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
+    paddingTop: 0,
+    paddingBottom: 0,
   },
 
   startButtonPressed: {
@@ -612,8 +614,10 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.xl,
     fontFamily: theme.typography.fontFamily.brand,
     color: theme.colors.textOnAction,
-    letterSpacing: theme.typography.letterSpacing.wide,
+    letterSpacing: theme.typography.letterSpacing.tight,
     ...theme.textShadows.subtle,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
   },
 
   // === BOTTOM NAVIGATION STYLES ===
