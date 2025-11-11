@@ -18,7 +18,7 @@ Mobile-first: Touch-optimized, immediate UI responses.
 
 ### 1. DESIGN TOKEN SYSTEM
 
-All styling through theme tokens. Never use magic numbers or hard-coded colors. Token values are placeholders that evolve during UI development. We are establishing the system and pattern, not recreating Will's 3-2-1 specific values. The architecture is what matters - global theme object with semantic properties accessible throughout the app. Token categories include theme.colors for all colors with semantic names, theme.spacing for all spacing values, theme.typography for font properties, and theme.textStyles for pre-built text combinations.
+All styling through theme tokens. Never use magic numbers or hard-coded colors. Token values are placeholders that evolve during UI development - the token architecture and system is what matters. The goal is a global theme object with semantic properties accessible throughout the app. Token categories include theme.colors for all colors with semantic names, theme.spacing for all spacing values, theme.typography for font properties, and theme.textStyles for pre-built text combinations.
 
 ### 2. SEMANTIC NAMING
 
@@ -48,12 +48,16 @@ Use @/ aliases for all imports. Never use relative paths. Absolute imports make 
 
 Organize by feature not file type. Each feature has screens/ components/ context/ services/ types/ subfolders. Related code lives together rather than scattered across global folders. Features are self-contained modules that can be understood, tested, and modified independently. Shared code that truly needs global access lives in src/components, src/hooks, src/utils, or src/services. Everything else belongs in a feature folder. This structure scales better as applications grow and makes it clear what code is related to what functionality.
 
+### 9. GLOBAL-FIRST PATTERN
+
+Establish global files first for all reusable patterns before creating local customizations. Repeated elements like buttons, selectors, inputs, text sizes, spacing, and visual rhythm must be defined in global files as established patterns. Common UI components flow through src/components or src/theme as the single source of truth. Only after global patterns are established should local customizations be added at the feature or component level. This ensures consistency across the app, reduces duplication, makes updates easier by changing one file instead of many, and creates a predictable system where developers know where to find standard implementations. Global patterns include button variants in theme.buttons, input field styling, common spacing rhythms, standard text sizes, reusable component wrappers, and shared interaction patterns. Local customizations are acceptable only when a specific feature truly needs deviation from the global standard.
+
 ---
 
 ## CRITICAL REMINDERS
 
 NO magic numbers, NO hard-coded colors, NO relative imports, NO any types, NO direct database queries.
-ALWAYS use design tokens, ALWAYS use service layer, ALWAYS memoize contexts, ALWAYS use custom hooks.
+ALWAYS use design tokens, ALWAYS establish global patterns first, ALWAYS use service layer, ALWAYS memoize contexts, ALWAYS use custom hooks.
 
 ---
 

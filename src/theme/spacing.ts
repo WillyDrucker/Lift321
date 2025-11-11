@@ -1,8 +1,8 @@
 // ==========================================================================
 // DESIGN TOKENS - Spacing
 //
-// 16px base rhythm matching Will's 3-2-1 spacing system.
-// All spacing uses multiples/divisions of 16px for consistency.
+// 16px base rhythm for consistent spacing throughout the app.
+// All spacing uses multiples/divisions of 16px for visual consistency.
 //
 // Philosophy: Global spacing rhythm prevents magic numbers
 // Dependencies: None
@@ -11,7 +11,7 @@
 
 export const spacing = {
   // === BASE RHYTHM ===
-  // 16px system from Will's 3-2-1
+  // 16px base system
   base: 16,
 
   // === STANDARD SPACING SCALE ===
@@ -23,7 +23,7 @@ export const spacing = {
   xxl: 48, // 16 * 3 - Major sections
 
   // === SPECIFIC CONTEXTS ===
-  // From Will's 3-2-1 standards (adapted for mobile)
+  // Context-specific spacing for mobile UI patterns
   textLineGap: 7, // Text line spacing
   labelGap: 7, // Label to element spacing
   cardMargin: 10, // Card margins from viewport
