@@ -12,6 +12,7 @@ export {RightChevron} from './RightChevron';
 export {EyeOpen} from './EyeOpen';
 export {EyeClosed} from './EyeClosed';
 export {HamburgerIcon} from './HamburgerIcon';
+export {SearchIcon} from './SearchIcon';
 export {HomeIcon} from './HomeIcon';
 export {PlansIcon} from './PlansIcon';
 export {HistoryIcon} from './HistoryIcon';

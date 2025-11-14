@@ -19,81 +19,51 @@ This file contains only critical architectural patterns and current session stat
 
 ---
 
-## Current Version: 1.0.4
+## Current Version: 1.0.6
 
-**Branch**: Claude-v1.0.4
-**Status**: Design Token System Refactored - Production Ready
-**Last Updated**: 2025-11-11
+**Branch**: Claude-v1.0.6
+**Status**: Development Complete - Ready to Merge
+**Last Updated**: 2025-11-14
 
 ---
 
 ## Session State
 
 ### Current Work
-- **COMPLETED**: Comprehensive design token refactoring
-- All screens (LoginScreen, LoginFormScreen, SignUpScreen) fully tokenized
-- Zero hardcoded colors or magic numbers remaining
-- 64dp safe zone standard established across all screens
-- New CLAUDE_DEV_STANDARDS rule #10 added: Forward-Looking Comments
+- HomePage UI finalized with top navigation bar and bottom tab bar
+- All files tokenized per CLAUDE_DEV_STANDARDS
+- Physical device testing completed
+- Ready to merge to main and create v1.0.7
 
 ### Completed This Session
-1. **Color Token System** - Complete refactoring:
-   - Added `primaryMuted` (#00BF00) for 75% green accents
-   - Added `pureBlack` (#000000) and `pureWhite` (#FFFFFF) for absolute values
-   - Added `googleBlue` (#4285F4) and `facebookBlue` (#1877F2) for social login
-   - All colors now have semantic names, hex values, and use case documentation
-
-2. **Spacing Token System** - 64dp standard:
-   - Added `safeZone: 64` - Standard clearance from top/bottom edges
-   - Added `safeZoneHorizontal: 32` - Standard horizontal clearance
-   - Added `textLineGap: 10` - Consistent text line spacing
-   - Added `textGroupSpacing: 32` - Spacing between text groups
-   - Added `buttonSpacing: 16` - Vertical spacing between buttons
-
-3. **Typography Token System** - Complete font scale:
-   - Added `xl: 24dp` (1.5× baseline)
-   - Added `xxl: 28dp` (1.75× baseline)
-   - Added `xxxl: 32dp` (2× baseline)
-   - Added `display: 48dp` (3× baseline)
-   - Added `mega: 64dp` (4× baseline)
-   - All based on 16dp baseline with rem-like scaling
-
-4. **Layout Token System** - Semantic naming:
-   - Updated `header.topSpacing: 64` (changed from 100dp to match safe zone)
-   - Added `bottom.safeZone: 64` - Standard bottom spacing
-   - Added `bottom.buttonGroupPadding: 48` - Accounts for button margins
-   - Added `icon` sizes: small (16), medium (24), large (32), xlarge (40)
-   - Added `backgroundImage` configuration: topSpacing (32), widthPercentage (80), heightPercentage (70), opacity (0.5)
-
-5. **Screen Refactoring** - All auth screens tokenized:
-   - **LoginScreen**: All spacing uses tokens, no hardcoded values
-   - **LoginFormScreen**: Social media colors tokenized, header uses layout tokens
-   - **SignUpScreen**: Background image uses layout tokens, all colors tokenized
-
-6. **Documentation Standards**:
-   - Added Standard #10: Forward-Looking Comments
-   - Comments must explain design intent, not historical changes
-   - Updated CLAUDE_DEV_STANDARDS.md and CLAUDE.md
+1. Created HomePage with top navigation bar (search icon, hamburger menu)
+2. Added bottom tab bar with Home/Plans/Performance/Profile tabs
+3. Physical phone testing via USB (R5CT40X95AW device)
+4. Icon size iterations based on real device feedback
+5. Moved SignUpStep2Screen "3-2-1 CHALLENGE" text from 32dp to 64dp
+6. Applied CLAUDE_DEV_STANDARDS - eliminated all magic numbers
+7. Created theme.layout.topNav tokens for HomePage navigation
+8. Updated theme.layout.bottomNav with iconTopSpacing and height: 100dp
 
 ### Next Session Should
-1. **Test the refactored screens** on Android emulator
-2. **Verify all tokens render correctly** with new values
-3. **Continue with app features**:
+1. **Continue with app features**:
    - Implement authentication logic
    - Build workout logging functionality
    - Create training plan system
-4. **Apply token system** to any new screens or components
+2. **Apply token system** to any new screens or components
+3. **Consider**: Implement sidebar menu functionality for hamburger icon
 
 ### User Decisions Made
-- Establish 64dp as standard safe zone clearance (top/bottom)
-- Use 32dp as standard horizontal clearance
-- All measurements in dp (density-independent pixels)
-- 16dp as baseline for typography scaling (rem-like system)
-- Comments must be forward-looking, not historical
+- Production-ready design token system established (v1.0.5)
+- 64dp safe zone standard across all screens
+- Forward-looking comments required in all code
 
 ---
 
 ## Previous Sessions
+
+### v1.0.5 - Comprehensive Design Token System Refactoring (2025-11-11)
+Complete refactoring of design token system. Established 64dp safe zone standard, expanded color/typography/spacing tokens, refactored all auth screens (LoginScreen, LoginFormScreen, SignUpScreen) with zero hardcoded values. Added Standard #10: Forward-Looking Comments. Branch merged to main successfully.
 
 ### v1.0.4a - MainActivity Base UI Complete (2025-11-10)
 Complete MainActivity base UI with hamburger sidebar, day selector tabs, workout card, bottom navigation. Slide-out sidebar drawer with animation. All components fully tokenized. Branch merged to main successfully.
@@ -133,6 +103,17 @@ Built complete LoginScreen with gym background, custom Bebas Neue font, multi-la
 |----------|-------|-------|----------|
 | **Header** | theme.layout.header.topSpacing | 64dp | Auth screen headers (matches safe zone) |
 | | theme.layout.header.horizontalPadding | 32dp | Left/right header padding |
+| **Top Nav** | theme.layout.topNav.topSpacing | 32dp | Distance from screen top |
+| | theme.layout.topNav.height | 32dp | Navigation bar height |
+| | theme.layout.topNav.paddingHorizontal | 10dp | Icon spacing from edges |
+| | theme.layout.topNav.searchIconSize | 20dp | Search icon size |
+| | theme.layout.topNav.menuIconSize | 28dp | Hamburger menu icon size |
+| | theme.layout.topNav.borderWidth | 1dp | Development visibility border |
+| **Bottom Nav** | theme.layout.bottomNav.height | 100dp | Bottom tab bar height (device nav buttons) |
+| | theme.layout.bottomNav.iconSize | 24dp | Tab icon size |
+| | theme.layout.bottomNav.iconTopSpacing | 6dp | Icon position from bar top |
+| | theme.layout.bottomNav.paddingVertical | 10dp | Top/bottom padding |
+| | theme.layout.bottomNav.paddingHorizontal | 16dp | Left/right padding |
 | **Logo** | theme.layout.logo.size | 40dp | Logo dimensions |
 | | theme.layout.logo.borderRadius | 20dp | Circular logo shape |
 | **Form** | theme.layout.form.inputHeight | 50dp | Standard input height |
@@ -197,6 +178,12 @@ Built complete LoginScreen with gym background, custom Bebas Neue font, multi-la
 | RightChevron | Forward/next nav | 32dp (large) |
 | EyeOpen | Show password | 15dp (custom) |
 | EyeClosed | Hide password | 15dp (custom) |
+| SearchIcon | Search functionality | 20dp (topNav) |
+| HamburgerIcon | Menu/sidebar toggle | 28dp (topNav) |
+| HomeIcon | Home tab navigation | 24dp (bottomNav) |
+| PlansIcon | Plans tab navigation | 24dp (bottomNav) |
+| StatsIcon | Performance tab | 24dp (bottomNav) |
+| ProfileIcon | Profile tab | 24dp (bottomNav) |
 
 **All accept**: size (number), color (string) props
 
@@ -246,7 +233,7 @@ DB schema/tables | Supabase Auth config | TS types from DB | Auth logic
 - **Project Root**: C:\Dev\Lift321 (ACTIVE DEV)
 - **GitHub**: https://github.com/WillyDrucker/Lift321
 - **Historical Context**: Fresh React Native build informed by previous project learnings (reference code at C:\Dev\Wills321 - untouched)
-- **Branch**: Claude-v1.0.4 (refactoring complete)
+- **Branch**: Claude-v1.0.6 (ready for development)
 
 ### Next Steps
 1. **Test refactored screens** on Android emulator
@@ -258,6 +245,6 @@ DB schema/tables | Supabase Auth config | TS types from DB | Auth logic
 
 ---
 
-**Version**: 1.0.4
+**Version**: 1.0.6
 **Last Updated**: 2025-11-11
-**Status**: Design Token System Refactored - Production Ready
+**Status**: Ready for Development

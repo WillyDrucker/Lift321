@@ -87,7 +87,7 @@ export const LoginFormScreen: React.FC<LoginFormScreenProps> = ({
         backgroundColor={theme.colors.backgroundPrimary}
       />
       <View style={styles.container}>
-        {/* Header with Back and Support - Fixed at 50dp from top */}
+        {/* Header with Back and Support - 32dp from top */}
         <View style={styles.header}>
           <Pressable onPress={handleBack} style={styles.backButton}>
             <LeftChevron size={32} color={theme.colors.textPrimary} />
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
 
   header: {
     position: 'absolute',
-    top: theme.layout.header.topSpacing,
+    top: 32, // 32dp from top
     left: 0,
     right: 0,
     flexDirection: 'row',
@@ -312,6 +312,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 32, // 32dp spacing to OR divider
     marginHorizontal: 32, // 32dp from left and right edges
+    ...theme.viewShadows.medium,
+    elevation: theme.elevation.medium,
   },
 
   continueButtonText: {
