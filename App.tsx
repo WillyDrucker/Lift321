@@ -15,7 +15,9 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {LoginScreen} from '@/features/auth/screens/LoginScreen';
 import {LoginFormScreen} from '@/features/auth/screens/LoginFormScreen';
 import {SignUpScreen} from '@/features/auth/screens/SignUpScreen';
-import {MainActivity} from '@/features/main/screens/MainActivity';
+import {SignUpStep2Screen} from '@/features/auth/screens/SignUpStep2Screen';
+import {WelcomeScreen} from '@/features/auth/screens/WelcomeScreen';
+import {HomePage} from '@/features/main/screens/HomePage';
 import type {RootStackParamList} from '@/navigation/types';
 
 // === TYPES ===
@@ -45,7 +47,9 @@ const App: React.FC<AppProps> = () => {
           <Stack.Screen name="LoginScreen" component={LoginScreen} />
           <Stack.Screen name="LoginFormScreen" component={LoginFormScreen} />
           <Stack.Screen name="SignUpScreen" component={SignUpScreen} />
-          <Stack.Screen name="MainActivity" component={MainActivity} />
+          <Stack.Screen name="SignUpStep2Screen" component={SignUpStep2Screen} />
+          <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
+          <Stack.Screen name="HomePage" component={HomePage} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

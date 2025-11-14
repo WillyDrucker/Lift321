@@ -17,10 +17,11 @@ export type RootStackParamList = {
   LoginScreen: undefined;
   LoginFormScreen: undefined;
   SignUpScreen: undefined;
+  SignUpStep2Screen: undefined;
+  WelcomeScreen: undefined;
 
   // Main Stack
-  MainActivity: undefined;
-  Home: undefined;
+  HomePage: undefined;
   WorkoutList: undefined;
   WorkoutSession: {workoutId: string};
   PlanList: undefined;

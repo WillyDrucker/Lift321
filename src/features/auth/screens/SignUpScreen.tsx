@@ -35,6 +35,10 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({navigation}) => {
     navigation.goBack();
   };
 
+  const handleNext = () => {
+    navigation.navigate('SignUpStep2Screen');
+  };
+
   // === RENDER ===
   // Main component JSX structure
 
@@ -64,7 +68,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({navigation}) => {
 
           {/* Next Button - 64dp from bottom, right side */}
           <View style={styles.nextButtonContainer}>
-            <Pressable onPress={() => {}} style={styles.nextButton}>
+            <Pressable onPress={handleNext} style={styles.nextButton}>
               <Text style={styles.nextButtonText}>NEXT</Text>
             </Pressable>
           </View>
@@ -134,6 +138,8 @@ const styles = StyleSheet.create({
     borderRadius: theme.buttons.borderRadius.medium,
     justifyContent: 'center',
     alignItems: 'center',
+    ...theme.viewShadows.medium,
+    elevation: theme.elevation.medium,
   },
   nextButtonText: {
     fontSize: theme.typography.fontSize.l,
@@ -215,7 +221,7 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.textPrimary,
     letterSpacing: 2,
-    marginTop: 3,
+    marginTop: 2,
     includeFontPadding: false,
     paddingVertical: 0,
     ...theme.textShadows.default,
@@ -227,7 +233,7 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.primaryMuted,
     letterSpacing: 2,
-    marginTop: 3,
+    marginTop: 2,
     includeFontPadding: false,
     paddingVertical: 0,
     ...theme.textShadows.default,

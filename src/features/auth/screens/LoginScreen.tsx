@@ -41,8 +41,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
   };
 
   const handleGuestLogin = () => {
-    console.log('Guest Login pressed - navigating to MainActivity');
-    navigation.navigate('MainActivity');
+    console.log('Guest Login pressed - navigating to HomePage');
+    navigation.navigate('HomePage');
   };
 
   // === RENDER ===

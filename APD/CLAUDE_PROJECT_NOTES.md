@@ -16,6 +16,143 @@ This file contains the historical record of version changes for Lift 3-2-1. Deta
 
 ## Version History
 
+### v1.0.6 - HomePage Implementation & Physical Device Testing (2025-11-14)
+**Branch**: Claude-v1.0.6 (ready to merge)
+
+**Summary**: Complete HomePage implementation with top navigation bar and bottom tab bar. Refactored MainActivity to HomePage with semantic naming. Added SearchIcon component. Extensive physical device testing via USB with iterative UI refinements. Applied CLAUDE_DEV_STANDARDS to eliminate all magic numbers - created theme.layout.topNav tokens and updated bottomNav tokens.
+
+**What Was Built**:
+- **HomePage Screen (New)**
+  - Replaced MainActivity with properly named HomePage
+  - Pure black background (theme.colors.pureBlack)
+  - Top navigation bar with search and hamburger menu icons
+  - Bottom tab bar with 4 tabs: Home, Plans, Performance, Profile
+  - Active tab state with green highlight (theme.colors.navActive)
+  - Fully tokenized with zero magic numbers
+- **Top Navigation Bar**
+  - Positioned 32dp from screen top
+  - Height: 32dp
+  - Search icon (20dp) left-aligned
+  - Hamburger menu (28dp) right-aligned
+  - 1dp white border for development visibility
+  - 10dp horizontal padding for icon spacing
+- **Bottom Tab Bar**
+  - Height: 100dp (sized for device navigation buttons)
+  - Dark gray background (theme.colors.backgroundPrimary)
+  - Icons positioned 6dp from top
+  - 4 tabs with icons and labels
+  - Active/inactive states with color changes
+  - Proper clearance for Samsung on-screen navigation
+- **SearchIcon Component (New)**
+  - SVG magnifying glass icon
+  - Circle (8dp radius) with search line
+  - Accepts size and color props
+  - Used in HomePage top navigation
+- **Navigation Refactoring**
+  - Renamed MainActivity to HomePage throughout codebase
+  - Updated navigation types (MainActivity → HomePage)
+  - Updated App.tsx route configuration
+  - Updated LoginScreen guest login navigation
+  - Deleted old MainActivity.tsx file
+
+**Physical Device Testing**:
+- Connected phone via USB debugging (R5CT40X95AW device)
+- Metro bundler hot reload working
+- Iterative UI adjustments based on real device feedback:
+  - Bottom tab bar: 64dp → 88dp → 64dp → 80dp → 70dp → 76dp → 100dp
+  - Top nav bar: 16dp → 32dp height
+  - Search icon: 16dp → 24dp → 20dp
+  - Hamburger icon: 24dp → 32dp → 28dp → 20dp → 28dp
+  - Icon positions swapped: search left, hamburger right
+- Proper rendering with Samsung on-screen navigation buttons
+- Status bar and safe areas working correctly
+
+**Design Token System Enhancement**:
+- **New theme.layout.topNav** tokens added to layout.ts:
+  - `topSpacing: 32` - Distance from screen top
+  - `height: 32` - Navigation bar height
+  - `paddingHorizontal: 10` - Icon spacing from edges
+  - `searchIconSize: 20` - Search icon size
+  - `menuIconSize: 28` - Hamburger menu icon size
+  - `borderWidth: 1` - Development visibility border
+- **Updated theme.layout.bottomNav** tokens:
+  - `height: 100` - Updated from 70dp (accounts for device nav buttons)
+  - `iconTopSpacing: 6` - New token for icon positioning
+  - Existing tokens: iconSize (24), paddingVertical (10), paddingHorizontal (16)
+
+**CLAUDE_DEV_STANDARDS Applied**:
+- **HomePage.tsx**: All magic numbers eliminated
+  - Icon sizes use theme.layout.topNav tokens
+  - All spacing/sizing uses theme tokens
+  - Comments are forward-looking (explain intent, not history)
+- **SignUpStep2Screen.tsx**: Tokenized all remaining magic numbers
+  - Icon size: 32dp → theme.layout.icon.large
+  - Top position: 64dp → theme.layout.header.topSpacing
+  - Bottom position: 64dp → theme.layout.bottom.safeZone
+  - Left padding: 24dp → theme.spacing.l
+  - All comments updated to be forward-looking
+- **layout.ts**: Enhanced with new token categories
+  - topNav section for minimal navigation bars
+  - bottomNav updated with new tokens
+  - All values documented with use cases
+
+**Files Created (3)**:
+- `src/features/main/screens/HomePage.tsx` - Main landing page with navigation
+- `src/components/icons/SearchIcon.tsx` - Search icon component
+- `USERPROMPT/USERPROMPT_Claude-v1.0.6.md` - Session prompt tracking
+
+**Files Modified (6)**:
+- `src/theme/layout.ts` - Added topNav tokens, updated bottomNav tokens
+- `src/features/auth/screens/SignUpStep2Screen.tsx` - Tokenized, moved "3-2-1 CHALLENGE" to 64dp
+- `src/components/icons/index.ts` - Added SearchIcon export
+- `src/navigation/types.ts` - MainActivity → HomePage in navigation types
+- `App.tsx` - Updated imports and routes (MainActivity → HomePage)
+- `src/features/auth/screens/LoginScreen.tsx` - Updated guest login navigation
+
+**Files Deleted (1)**:
+- `src/features/main/screens/MainActivity.tsx` - Replaced by HomePage.tsx
+
+**Icon System Expansion**:
+- SearchIcon added to icon library
+- All bottom nav icons documented: HomeIcon, PlansIcon, StatsIcon, ProfileIcon
+- Icon sizing standardized via theme tokens
+
+**User Decisions**:
+- HomePage is correct semantic name for main landing page
+- Top nav: Search left (20dp), hamburger right (28dp)
+- Bottom tab bar: 100dp height to account for device navigation buttons
+- Icon positioning: 6dp from top for bottom tabs
+- Physical device testing preferred over emulator
+- USB debugging for development with hot reload
+
+**Technical Achievements**:
+- Physical device testing workflow established
+- USB debugging setup documented
+- Metro bundler over USB working smoothly
+- Complete design token compliance
+- Zero magic numbers in modified files
+- All navigation flows properly typed
+- Forward-looking comments throughout
+
+**Testing**:
+- App running successfully on physical Android device (R5CT40X95AW)
+- Hot reload working via Metro bundler
+- Navigation flows tested (LoginScreen → HomePage)
+- Tab switching functional with proper state management
+- Icon sizes and spacing verified on real device
+
+**Key Learnings**:
+- Physical device testing reveals sizing issues not visible in emulator
+- On-screen navigation buttons require extra bottom padding (100dp vs 70dp)
+- Iterative refinement is essential for real-world UI
+- Token system allows rapid adjustment without touching multiple files
+- Semantic naming (HomePage not MainActivity) improves code clarity
+- Forward-looking comments keep code clean and maintainable
+
+**Next Steps**: Merge v1.0.6 to main, create v1.0.7 branch, implement sidebar menu functionality, continue with authentication logic and workout features
+
+---
+
 ### v1.0.4a - MainActivity Base UI Complete (2025-11-10)
 **Branch**: mainactivity-base-ui (merged to main)
 
@@ -438,5 +575,5 @@ This file contains the historical record of version changes for Lift 3-2-1. Deta
 
 ---
 
-**Current Version**: 1.0.4
-**Last Updated**: 2025-11-11
+**Current Version**: 1.0.6
+**Last Updated**: 2025-11-14

@@ -53,8 +53,9 @@ export const layout = {
 
   // === BOTTOM NAVIGATION BAR ===
   bottomNav: {
-    height: 70, // Bottom navigation bar height
+    height: 100, // Bottom navigation bar height (sized for device navigation buttons)
     iconSize: 24, // Navigation icon size
+    iconTopSpacing: 6, // Icon position from top of bar
     paddingVertical: 10, // Top/bottom padding inside nav bar
     paddingHorizontal: 16, // Left/right padding inside nav bar
   },
@@ -82,6 +83,17 @@ export const layout = {
     height: 60, // Total height of top bar (using base spacing multiples)
     iconButtonSize: 44, // Touch target size for icon buttons (standard touch target)
     iconSize: 28, // Actual icon size within button
+  },
+
+  // === TOP NAVIGATION BAR ===
+  // Minimal top navigation for HomePage and main screens
+  topNav: {
+    topSpacing: 32, // Distance from screen top
+    height: 32, // Navigation bar height
+    paddingHorizontal: 10, // Left/right padding for icon spacing
+    searchIconSize: 20, // Search icon size
+    menuIconSize: 28, // Hamburger menu icon size
+    borderWidth: 1, // Border for visibility during development
   },
 
   // === UI ELEMENTS ===
