@@ -12,3 +12,18 @@ export type {DayData} from './useWeekCalendar';
 
 export {useSwipeGesture} from './useSwipeGesture';
 export type {SwipeGestureConfig, SwipeGestureReturn} from './useSwipeGesture';
+
+export {useFormInput} from './useFormInput';
+export type {FormInputConfig, FormInputReturn} from './useFormInput';
+
+export {
+  useFadeAnimation,
+  useSlideAnimation,
+  useScaleAnimation,
+} from './useAnimation';
+export type {
+  AnimationConfig,
+  FadeAnimationReturn,
+  SlideAnimationReturn,
+  ScaleAnimationReturn,
+} from './useAnimation';
