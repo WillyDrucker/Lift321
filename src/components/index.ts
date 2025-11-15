@@ -17,6 +17,9 @@ export * from './Button';
 // === INPUTS ===
 export * from './Input';
 
+// === NAVIGATION ===
+export * from './Navigation';
+
 // === UI COMPONENTS ===
 export {WelcomeBox} from './WelcomeBox';
 export {RecommendedWorkoutBox} from './RecommendedWorkoutBox';
