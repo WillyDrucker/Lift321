@@ -57,9 +57,11 @@ export const typography = {
 
   // === LETTER SPACING ===
   letterSpacing: {
-    tight: 0,
-    normal: 1,
-    wide: 2,
+    tight: 0, // No extra spacing
+    button: 0.5, // Subtle spacing for button text
+    normal: 1, // Standard spacing for body text
+    wide: 2, // Wider spacing for emphasis
+    extraWide: 3, // Extra wide spacing for large display text
   },
 } as const;
 

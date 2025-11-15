@@ -33,6 +33,8 @@ export const layout = {
     buttonHorizontalMargin: 32, // Left/right margin for buttons
     dividerSpacing: 32, // Spacing around dividers
     dividerThickness: 1, // Divider line thickness
+    passwordInputPaddingRight: 50, // Right padding for password input (space for eye icon)
+    eyeIconButtonRight: 21, // Position of eye icon from right edge (16dp padding + 5dp margin)
   },
 
   // === BOTTOM SPACING ===
@@ -49,6 +51,21 @@ export const layout = {
     medium: 24, // Medium icons (navigation, actions)
     large: 32, // Large icons (primary actions, chevrons)
     xlarge: 40, // Extra large icons (logo, hero elements)
+  },
+
+  // === AUTH SCREEN NAVIGATION ===
+  // Standard layout for auth screen navigation (back/next buttons)
+  authNavigation: {
+    backButtonLeft: 24, // Left position of back button (plus 8dp padding = 32dp visual)
+    nextButtonLeft: 96, // Left position of next button (32dp left + 32dp icon + 32dp gap)
+    textContainerBottom: 146, // Bottom position of text above button (64dp safe + 50dp button + 32dp gap)
+  },
+
+  // === SOCIAL LOGIN BUTTONS ===
+  // Font sizes for social login provider logos
+  socialLogin: {
+    googleLogoFontSize: 20, // Google 'G' logo size
+    facebookLogoFontSize: 24, // Facebook 'f' logo size
   },
 
   // === BOTTOM NAVIGATION BAR ===
@@ -91,9 +108,77 @@ export const layout = {
     topSpacing: 32, // Distance from screen top
     height: 32, // Navigation bar height
     paddingHorizontal: 10, // Left/right padding for icon spacing
-    searchIconSize: 20, // Search icon size
-    menuIconSize: 28, // Hamburger menu icon size
-    borderWidth: 1, // Border for visibility during development
+    searchIconSize: 24, // Search icon size
+    menuIconSize: 32, // Hamburger menu icon size
+    borderWidth: 0, // No border
+  },
+
+  // === WEEK CALENDAR BAR ===
+  // Week view calendar for day selection
+  weekCalendar: {
+    height: 32, // Calendar bar height
+    topPosition: 64, // Position below top nav (32dp spacing + 32dp nav height)
+  },
+
+  // === PLAN PROGRESS BAR ===
+  // Progress tracking for active workout plan
+  planProgress: {
+    height: 24, // Progress bar height
+    topPosition: 96, // Position below calendar bar (64dp + 32dp calendar height)
+  },
+
+  // === ANIMATION SETTINGS ===
+  // Gesture and animation configuration for interactive elements
+  animation: {
+    gestureMovementThreshold: 5, // Minimum dx/dy to register as swipe (not tap)
+    swipeDismissThreshold: 100, // Distance required to trigger dismiss action
+    swipeAnimationDistance: 400, // Full animation travel distance for dismissal
+    duration: 200, // Standard animation duration in milliseconds
+    tripleTapTimeout: 500, // Time window for triple-tap detection in milliseconds
+  },
+
+  // === WELCOME BOX ===
+  // Swipeable welcome message box for new sessions
+  welcomeBox: {
+    topPosition: 136, // Position below plan progress bar (96dp + 24dp + 16dp spacing)
+    leftMargin: 6, // Left margin from screen edge
+    rightMargin: 0, // Right margin (flush to edge for swipe affordance)
+    borderRadius: 8, // Corner radius for left side only
+    paddingLeft: 16, // Left inner padding
+    paddingRight: 16, // Right inner padding
+    paddingTop: 14, // Top padding (swipe indicator + spacing)
+    paddingBottom: 6, // Bottom padding
+    swipeIndicatorWidth: 24, // Swipe indicator bar width
+    swipeIndicatorHeight: 4, // Swipe indicator bar height
+    swipeIndicatorBorderRadius: 2, // Swipe indicator corner radius
+    swipeIndicatorOpacity: 0.5, // Swipe indicator transparency
+  },
+
+  // === RECOMMENDED WORKOUT BOX ===
+  // Daily recommended workout card with animated positioning
+  recommendedWorkout: {
+    topPositionWithWelcome: 238, // Position when welcome box visible (136dp + 86dp welcome + 16dp spacing)
+    topPositionWithoutWelcome: 136, // Position when welcome dismissed (same as welcome position)
+    leftMargin: 32, // Left margin from screen edge
+    rightMargin: 32, // Right margin from screen edge
+    height: 256, // Fixed card height
+    borderRadius: 8, // Corner radius
+    paddingLeft: 16, // Left inner padding
+    paddingTop: 16, // Top inner padding
+  },
+
+  // === DAY CALENDAR ADJUSTMENTS ===
+  // Fine-tuning for day calendar text positioning
+  dayCalendar: {
+    dayLetterMarginTop: 3, // Vertical adjustment for day letters
+    dayDateMarginTop: -2, // Negative margin to tighten spacing with day letters
+  },
+
+  // === PROGRESS BAR DIMENSIONS ===
+  // Progress visualization component sizing
+  progressBar: {
+    height: 8, // Progress bar track height
+    borderRadius: 4, // Corner radius for track and fill
   },
 
   // === UI ELEMENTS ===

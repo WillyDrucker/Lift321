@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.xxxl,
     fontFamily: theme.typography.fontFamily.brand,
     color: theme.colors.textPrimary,
-    letterSpacing: 1,
+    letterSpacing: theme.typography.letterSpacing.normal,
     ...theme.textShadows.default,
   },
 
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.textPrimary,
-    letterSpacing: 2,
+    letterSpacing: theme.typography.letterSpacing.wide,
     lineHeight: theme.typography.fontSize.xxxl,
     includeFontPadding: false,
     paddingVertical: 0,
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.textPrimary,
-    letterSpacing: 2,
+    letterSpacing: theme.typography.letterSpacing.wide,
     lineHeight: theme.typography.fontSize.xxxl,
     includeFontPadding: false,
     paddingVertical: 0,
@@ -261,11 +261,11 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.primary,
-    letterSpacing: 3,
+    letterSpacing: theme.typography.letterSpacing.extraWide,
     lineHeight: theme.typography.fontSize.display,
     includeFontPadding: false,
     paddingVertical: 0,
-    marginTop: 8, // Adjusted for visual spacing (compensates for larger lineHeight)
+    marginTop: theme.spacing.s,
     marginBottom: 0,
     ...theme.textShadows.default,
   },
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
   },
 
   buttonPressed: {
-    opacity: 0.8,
+    opacity: theme.buttons.opacity.pressed,
   },
 
   primaryButtonText: {
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.medium,
     color: theme.colors.textOnAction,
-    letterSpacing: 0.5,
+    letterSpacing: theme.typography.letterSpacing.button,
   },
 
   secondaryButtonText: {
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.medium,
     color: theme.colors.textPrimary,
-    letterSpacing: 0.5,
+    letterSpacing: theme.typography.letterSpacing.button,
   },
 
   tertiaryButtonText: {
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.medium,
     color: theme.colors.textPrimary,
-    letterSpacing: 0.5,
+    letterSpacing: theme.typography.letterSpacing.button,
   },
 
   guestText: {

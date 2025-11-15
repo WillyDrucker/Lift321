@@ -231,13 +231,13 @@ const styles = StyleSheet.create({
 
   header: {
     position: 'absolute',
-    top: 32, // 32dp from top
+    top: theme.spacing.xl,
     left: 0,
     right: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingLeft: 24, // 24dp + 8dp button padding = 32dp visual from left
+    paddingLeft: theme.spacing.l,
     paddingRight: theme.spacing.safeZoneHorizontal,
     zIndex: 10,
   },
@@ -267,8 +267,8 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.m,
     fontFamily: theme.typography.fontFamily.primary,
     color: theme.colors.textPrimary,
-    marginBottom: 5, // 5dp spacing between inputs
-    marginHorizontal: 5, // 5dp from left and right edges
+    marginBottom: theme.spacing.inputMarginSmall,
+    marginHorizontal: theme.spacing.inputMarginSmall,
   },
 
   inputFocused: {
@@ -277,17 +277,17 @@ const styles = StyleSheet.create({
 
   passwordContainer: {
     position: 'relative',
-    marginBottom: 16, // 16dp spacing to Forgot Password
+    marginBottom: theme.spacing.m,
   },
 
   passwordInput: {
     marginBottom: 0,
-    paddingRight: 50,
+    paddingRight: theme.layout.form.passwordInputPaddingRight,
   },
 
   eyeButton: {
     position: 'absolute',
-    right: theme.spacing.m + 5, // 16dp padding + 5dp margin
+    right: theme.layout.form.eyeIconButtonRight,
     top: 0,
     bottom: 0,
     justifyContent: 'center',
@@ -298,8 +298,8 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.fontFamily.primary,
     color: theme.colors.borderMuted,
     textAlign: 'center',
-    marginBottom: 16, // 16dp spacing to Continue button
-    marginHorizontal: 5, // 5dp from left and right edges (match inputs)
+    marginBottom: theme.spacing.m,
+    marginHorizontal: theme.spacing.inputMarginSmall,
   },
 
   // === BUTTON STYLES ===
@@ -310,8 +310,8 @@ const styles = StyleSheet.create({
     borderRadius: theme.layout.form.inputBorderRadius,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 32, // 32dp spacing to OR divider
-    marginHorizontal: 32, // 32dp from left and right edges
+    marginBottom: theme.spacing.xl,
+    marginHorizontal: theme.layout.form.buttonHorizontalMargin,
     ...theme.viewShadows.medium,
     elevation: theme.elevation.medium,
   },
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
   },
 
   buttonPressed: {
-    opacity: 0.8,
+    opacity: theme.buttons.opacity.pressed,
   },
 
   // === DIVIDER STYLES ===
@@ -332,8 +332,8 @@ const styles = StyleSheet.create({
   dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 32, // 32dp spacing to Google button
-    marginHorizontal: 32, // 32dp from left and right edges
+    marginBottom: theme.spacing.xl,
+    marginHorizontal: theme.layout.form.buttonHorizontalMargin,
   },
 
   dividerLine: {
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: theme.layout.form.inputBorderRadius,
-    marginHorizontal: 32, // 32dp from left and right edges
+    marginHorizontal: theme.layout.form.buttonHorizontalMargin,
   },
 
   googleButton: {
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
   },
 
   googleLogo: {
-    fontSize: 20,
+    fontSize: theme.layout.socialLogin.googleLogoFontSize,
     fontWeight: 'bold',
     color: theme.colors.googleBlue,
     marginRight: theme.spacing.s,
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
   },
 
   facebookLogo: {
-    fontSize: 24,
+    fontSize: theme.layout.socialLogin.facebookLogoFontSize,
     fontWeight: 'bold',
     color: theme.colors.pureWhite,
     marginRight: theme.spacing.s,

@@ -137,12 +137,12 @@ const styles = StyleSheet.create({
     zIndex: 5,
   },
   challengeTitleText: {
-    fontSize: theme.typography.fontSize.xxxl, // 32dp
+    fontSize: theme.typography.fontSize.xxxl,
     lineHeight: theme.typography.fontSize.xxxl,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.primaryMuted, // 75% green
-    letterSpacing: 3,
+    color: theme.colors.primaryMuted,
+    letterSpacing: theme.typography.letterSpacing.extraWide,
     textAlign: 'center',
     includeFontPadding: false,
     paddingVertical: 0,
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   nextButtonContainer: {
     position: 'absolute',
     bottom: theme.layout.bottom.safeZone,
-    left: 96, // 32dp (left edge) + 32dp (chevron icon) + 32dp (gap) = 96dp
+    left: theme.layout.authNavigation.nextButtonLeft,
     right: theme.spacing.safeZoneHorizontal,
     zIndex: 10,
   },
@@ -180,29 +180,29 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.medium,
     color: theme.colors.textOnAction,
-    letterSpacing: 0.5,
+    letterSpacing: theme.typography.letterSpacing.button,
   },
   textContainer: {
     position: 'absolute',
-    bottom: 146, // 64dp (bottom safe zone) + 50dp (button height) + 32dp (gap) = 146dp
+    bottom: theme.layout.authNavigation.textContainerBottom,
     left: theme.spacing.safeZoneHorizontal,
     right: theme.spacing.safeZoneHorizontal,
     alignItems: 'center',
   },
   challengeText: {
     fontSize: theme.typography.fontSize.xxl,
-    lineHeight: theme.typography.fontSize.xxl + 2, // 30dp line height (28dp + 2dp spacing)
+    lineHeight: theme.typography.fontSize.xxl + theme.spacing.xxs,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.textPrimary,
     textAlign: 'center',
-    letterSpacing: 2,
+    letterSpacing: theme.typography.letterSpacing.wide,
     includeFontPadding: false,
     paddingVertical: 0,
     ...theme.textShadows.default,
   },
   challengeTextSpacing: {
-    marginTop: 2, // 2dp spacing between text blocks (matches line spacing)
+    marginTop: theme.spacing.xxs,
   },
   highlightGreen: {
     color: theme.colors.primaryMuted, // 75% green (#00BF00)
