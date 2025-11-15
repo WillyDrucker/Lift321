@@ -11,3 +11,5 @@ export {ShadowButton} from './ShadowButton';
 export type {ShadowButtonProps, ShadowButtonVariant} from './ShadowButton';
 export {SocialButton} from './SocialButton';
 export type {SocialButtonProps, SocialProvider} from './SocialButton';
+export {ActionButton} from './ActionButton';
+export type {ActionButtonProps} from './ActionButton';
