@@ -68,6 +68,13 @@ export const buttons = {
       opacity: 0.15, // Light fade
     },
   },
+
+  // === BUTTON STATES ===
+  // Opacity values for interactive states
+  opacity: {
+    pressed: 0.8, // Opacity when button is pressed
+    disabled: 0.5, // Opacity when button is disabled
+  },
 } as const;
 
 export type ButtonToken = keyof typeof buttons;

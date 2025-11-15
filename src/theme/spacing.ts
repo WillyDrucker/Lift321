@@ -16,6 +16,7 @@ export const spacing = {
 
   // === STANDARD SPACING SCALE ===
   // T-shirt sizing system following 16dp base rhythm
+  xxs: 2, // 0.125× base - Ultra-tight spacing, text line micro adjustments
   xs: 4, // 0.25× base - Micro adjustments, tight inline spacing
   s: 8, // 0.5× base - Tight spacing, compact elements
   m: 16, // 1× base - Default element spacing, standard gaps
@@ -41,6 +42,7 @@ export const spacing = {
   buttonPaddingVertical: 12, // Vertical padding inside buttons
   buttonPaddingHorizontal: 24, // Horizontal padding inside buttons
   inputPadding: 16, // Internal padding for input fields
+  inputMarginSmall: 5, // Small margin for form inputs (horizontal/vertical tight spacing)
 } as const;
 
 export type SpacingToken = keyof typeof spacing;

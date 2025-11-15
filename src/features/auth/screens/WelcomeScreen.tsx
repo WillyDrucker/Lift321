@@ -95,46 +95,46 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   welcomeText: {
-    fontSize: theme.typography.fontSize.display, // 48dp
+    fontSize: theme.typography.fontSize.display,
     lineHeight: theme.typography.fontSize.display,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.primaryMuted, // 75% green
-    letterSpacing: 3,
+    color: theme.colors.primaryMuted,
+    letterSpacing: theme.typography.letterSpacing.extraWide,
     textAlign: 'center',
     includeFontPadding: false,
     paddingVertical: 0,
     marginVertical: 0,
   },
   descriptionText1: {
-    fontSize: theme.typography.fontSize.m, // 16dp
+    fontSize: theme.typography.fontSize.m,
     lineHeight: theme.typography.fontSize.m,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.textSecondary, // Light gray
+    color: theme.colors.textSecondary,
     textAlign: 'center',
-    marginTop: 16, // 16dp from Welcome text
+    marginTop: theme.spacing.m,
     includeFontPadding: false,
     paddingVertical: 0,
   },
   boldText: {
-    color: theme.colors.textPrimary, // Keep white
+    color: theme.colors.textPrimary,
   },
   descriptionText2: {
-    fontSize: theme.typography.fontSize.m, // 16dp
+    fontSize: theme.typography.fontSize.m,
     lineHeight: theme.typography.fontSize.m,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.textSecondary, // Light gray
+    color: theme.colors.textSecondary,
     textAlign: 'center',
-    marginTop: 5, // 5dp separation from previous text
+    marginTop: theme.spacing.inputMarginSmall,
     includeFontPadding: false,
     paddingVertical: 0,
   },
   header: {
     position: 'absolute',
     bottom: theme.layout.bottom.safeZone,
-    left: 24, // 24dp + 8dp button padding = 32dp visual from left edge
+    left: theme.layout.authNavigation.backButtonLeft,
     zIndex: 10,
   },
   backButton: {
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   nextButtonContainer: {
     position: 'absolute',
     bottom: theme.layout.bottom.safeZone,
-    left: 96, // 32dp (left edge) + 32dp (chevron icon) + 32dp (gap) = 96dp
+    left: theme.layout.authNavigation.nextButtonLeft,
     right: theme.spacing.safeZoneHorizontal,
     zIndex: 10,
   },
@@ -162,6 +162,6 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.textOnAction,
-    letterSpacing: 0.5,
+    letterSpacing: theme.typography.letterSpacing.button,
   },
 });
