@@ -7,7 +7,7 @@
 // Used by: App.tsx (initial screen)
 // ==========================================================================
 
-import React from 'react';
+import React, {useState} from 'react';
 import {
   Image,
   ImageBackground,
@@ -19,6 +19,7 @@ import {
 import {theme} from '@/theme';
 import type {RootStackScreenProps} from '@/navigation/types';
 import {ShadowButton} from '@/components';
+import {enableGuestMode} from '@/services';
 
 // === TYPES ===
 
@@ -27,6 +28,10 @@ type LoginScreenProps = RootStackScreenProps<'LoginScreen'>;
 // === COMPONENT ===
 
 export const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
+  // === STATE ===
+
+  const [isLoading, setIsLoading] = useState(false);
+
   // === EVENT HANDLERS ===
   // Handle user interactions and navigation actions
 
@@ -40,9 +45,18 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
     navigation.navigate('LoginFormScreen');
   };
 
-  const handleGuestLogin = () => {
-    console.log('Guest Login pressed - navigating to HomePage');
-    navigation.navigate('HomePage');
+  const handleGuestLogin = async () => {
+    console.log('Guest Login pressed - enabling guest mode');
+    try {
+      setIsLoading(true);
+      await enableGuestMode();
+      // App.tsx will detect the guest mode and switch to MainNavigator
+      // which will automatically show HomePage
+      console.log('Guest mode enabled successfully');
+    } catch (error) {
+      console.error('Failed to enable guest mode:', error);
+      setIsLoading(false);
+    }
   };
 
   // === RENDER ===
@@ -84,21 +98,38 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
 
           {/* Bottom buttons */}
           <View style={styles.buttonContainer}>
-            <ShadowButton variant="primary" onPress={handleCreateAccount}>
+            <ShadowButton
+              variant="primary"
+              onPress={handleCreateAccount}
+              disabled={isLoading}
+            >
               <Text style={styles.primaryButtonText}>
                 CREATE NEW ACCOUNT
               </Text>
             </ShadowButton>
 
-            <ShadowButton variant="secondary" onPress={handleLogin}>
+            <ShadowButton
+              variant="secondary"
+              onPress={handleLogin}
+              disabled={isLoading}
+            >
               <Text style={styles.secondaryButtonText}>
                 I HAVE AN ACCOUNT
               </Text>
             </ShadowButton>
 
-            <ShadowButton variant="tertiary" onPress={handleGuestLogin}>
+            <ShadowButton
+              variant="tertiary"
+              onPress={handleGuestLogin}
+              disabled={isLoading}
+            >
               <Text style={styles.tertiaryButtonText}>
-                LOGIN AS <Text style={styles.guestText}>GUEST</Text>
+                {isLoading
+                  ? 'LOADING...'
+                  : <>
+                      LOGIN AS <Text style={styles.guestText}>GUEST</Text>
+                    </>
+                }
               </Text>
             </ShadowButton>
           </View>

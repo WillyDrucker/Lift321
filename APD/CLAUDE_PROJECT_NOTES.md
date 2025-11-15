@@ -16,6 +16,110 @@ This file contains the historical record of version changes for Lift 3-2-1. Deta
 
 ## Version History
 
+### v1.1.0 - Environment Setup & Guest Login (2025-11-15)
+**Branch**: Claude-v1.1.0
+
+**Summary**: Complete environment configuration with Supabase credentials and guest login system. Fixed critical navigation error preventing guest access to app. Established GitHub project tracking with 8 EPICs and 10 features. App now fully functional on Android device for testing and development.
+
+**What Was Built**:
+- **Environment Configuration**:
+  - Installed react-native-config package for environment variable management
+  - Created .env file with Supabase credentials (SUPABASE_URL, SUPABASE_ANON_KEY)
+  - Configured Android gradle to read .env via dotenv.gradle
+  - Added critical line to android/app/build.gradle: `apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"`
+  - Added react-native-url-polyfill to index.js for Supabase compatibility
+  - Removed unnecessary console.warn from supabaseClient.ts
+  - .env properly gitignored to protect credentials
+
+- **Guest Login System** (src/services/supabaseClient.ts):
+  - Created `enableGuestMode()`: Sets AsyncStorage flag for guest mode
+  - Created `disableGuestMode()`: Removes guest mode flag
+  - Created `isGuestMode()`: Checks if app is in guest mode
+  - Modified `isAuthenticated()`: Now checks guest mode before Supabase session
+  - Implemented AUTH_CHANGE_EVENT using DeviceEventEmitter
+  - Guest mode persisted in AsyncStorage with key '@lift321:guest_mode'
+
+- **App.tsx Auth Integration**:
+  - Added DeviceEventEmitter listener for AUTH_CHANGE_EVENT
+  - Added AppState listener to re-check auth when app comes to foreground
+  - Created memoized checkAuth callback
+  - App now dynamically switches between AuthNavigator and MainNavigator based on auth state
+  - Real-time auth detection allows seamless navigator switching
+
+- **LoginScreen Guest Button**:
+  - Updated to call enableGuestMode() instead of direct navigation
+  - Added loading state during guest login
+  - Disabled all buttons during loading
+  - Shows "LOADING..." text during guest mode activation
+
+- **GitHub Project Management**:
+  - Created 8 EPICs (never to close):
+    - #1: [EPIC] Login System
+    - #2: [EPIC] Create New Account
+    - #3: [EPIC] Home Page
+    - #4: [EPIC] Plan Page
+    - #5: [EPIC] Performance Page
+    - #6: [EPIC] Profile Page
+    - #7: [EPIC] Hamburger Menu
+    - #8: [EPIC] Normal Workout/Superset
+  - Created 10 Feature/Task Issues:
+    - #9: [FEATURE] Add Compared To Weight
+    - #10: [FEATURE] Profile Picture - Before After, Weight, Height, Body Fat
+    - #11: [FEATURE] Workout Complete Celebratory Text and Grading System
+    - #12: [TASK] Update Video Library
+    - #13: [FEATURE] Email Partner Completed Workout/Send to Coach/Trainer
+    - #14: [FEATURE] Recommended Music For Workout Icon
+    - #15: [FEATURE] Brainstorm Ideas For User Navigation Clearing Logs And Resetting Timer
+    - #16: [FEATURE] Extrapolated Weight/Set Recommendation
+    - #17: [FEATURE] Willpower/Adherence Gauge Tool - Tirzepatide Tracking Gauge, mg Tracking, Estimation
+    - #18: [FEATURE] Send Results to Social Media
+
+**Why This Approach**:
+- **Environment First**: Can't do anything without Supabase connection
+- **Guest Mode Essential**: Need to test app flows without authentication implementation
+- **AsyncStorage for Persistence**: Simple, reliable, built-in React Native solution
+- **Event-Driven Auth**: DeviceEventEmitter allows components to react to auth changes immediately
+- **Navigator Switching**: AuthNavigator for guests/logged out, MainNavigator for authenticated/guest users
+- **GitHub Issues**: Track work systematically, mirror Wills321 structure
+
+**Problems Solved**:
+1. **Navigation Error**: "LOGIN AS GUEST" was trying to navigate to HomePage which only exists in MainNavigator. Fixed by implementing proper auth state management that switches navigators.
+2. **Environment Variables**: react-native-config required specific Android gradle configuration. Added dotenv.gradle line.
+3. **Supabase Compatibility**: React Native doesn't have URL API. Added react-native-url-polyfill.
+4. **Auth State Detection**: App needed to know when guest mode was enabled. Implemented DeviceEventEmitter for real-time updates.
+5. **BOM Character**: Initial .env had byte order mark. Rewrote file without BOM.
+
+**What Changed**:
+- **Modified Files**: 8 files (App.tsx, android/app/build.gradle, index.js, package.json, package-lock.json, LoginScreen.tsx, services/index.ts, supabaseClient.ts)
+- **New Files**: .env (gitignored)
+- **New Dependencies**: react-native-config, react-native-url-polyfill
+
+**Key Learnings**:
+- react-native-config requires both npm install AND gradle configuration
+- Supabase requires URL polyfill in React Native
+- DeviceEventEmitter works great for cross-component auth events
+- AsyncStorage perfect for simple persistence like guest mode flags
+- Navigator switching in App.tsx based on auth state is clean pattern
+
+**User Decisions**:
+- Get app working before building features
+- Use guest mode for testing without authentication
+- Establish GitHub issues for project tracking
+- Mirror Wills321 issue structure
+- Keep .env credentials secure with .gitignore
+
+**Files Created/Modified**:
+- ✅ Created: .env (gitignored)
+- ✅ Modified: App.tsx (auth event listeners, navigator switching)
+- ✅ Modified: index.js (URL polyfill import)
+- ✅ Modified: android/app/build.gradle (dotenv.gradle configuration)
+- ✅ Modified: package.json (new dependencies)
+- ✅ Modified: src/features/auth/screens/LoginScreen.tsx (guest login implementation)
+- ✅ Modified: src/services/index.ts (export guest mode functions)
+- ✅ Modified: src/services/supabaseClient.ts (guest mode system, AUTH_CHANGE_EVENT)
+
+---
+
 ### v1.0.15 - Phase 7: Polish & Production Readiness (2025-11-15)
 **Branch**: Claude-v1.0.15 (merged to main)
 

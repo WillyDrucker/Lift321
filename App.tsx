@@ -8,14 +8,21 @@
 // Used by: index.js
 // ==========================================================================
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {ActivityIndicator, View, StyleSheet} from 'react-native';
+import {
+  ActivityIndicator,
+  View,
+  StyleSheet,
+  AppState,
+  DeviceEventEmitter,
+} from 'react-native';
+import type {AppStateStatus} from 'react-native';
 import {navigationRef} from '@/navigation/navigationService';
 import {AuthNavigator} from '@/navigation/AuthNavigator';
 import {MainNavigator} from '@/navigation/MainNavigator';
-import {isAuthenticated} from '@/services';
+import {isAuthenticated, AUTH_CHANGE_EVENT} from '@/services';
 import {theme} from '@/theme';
 
 // === TYPES ===
@@ -29,22 +36,54 @@ const App: React.FC<AppProps> = () => {
 
   const [isAuth, setIsAuth] = useState<boolean | null>(null);
 
+  // === CALLBACKS ===
+
+  // Memoized auth check function
+  const checkAuth = useCallback(async () => {
+    try {
+      const authenticated = await isAuthenticated();
+      setIsAuth(authenticated);
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      setIsAuth(false);
+    }
+  }, []);
+
   // === EFFECTS ===
 
   // Check auth status on mount
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const authenticated = await isAuthenticated();
-        setIsAuth(authenticated);
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        setIsAuth(false);
-      }
-    };
-
     checkAuth();
-  }, []);
+  }, [checkAuth]);
+
+  // Re-check auth when app comes to foreground
+  // This allows guest login to work by detecting the AsyncStorage change
+  useEffect(() => {
+    const subscription = AppState.addEventListener(
+      'change',
+      (nextAppState: AppStateStatus) => {
+        if (nextAppState === 'active') {
+          checkAuth();
+        }
+      },
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, [checkAuth]);
+
+  // Listen for auth state changes (e.g., guest login)
+  useEffect(() => {
+    const listener = DeviceEventEmitter.addListener(AUTH_CHANGE_EVENT, () => {
+      console.log('Auth state changed, re-checking authentication...');
+      checkAuth();
+    });
+
+    return () => {
+      listener.remove();
+    };
+  }, [checkAuth]);
 
   // === RENDER ===
 

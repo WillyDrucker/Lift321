@@ -19,10 +19,10 @@ This file contains only critical architectural patterns and current session stat
 
 ---
 
-## Current Version: 1.0.15
+## Current Version: 1.1.0
 
-**Branch**: main
-**Status**: Comprehensive Refactoring Complete
+**Branch**: Claude-v1.1.0
+**Status**: Environment Setup Complete & Guest Login Implemented
 **Last Updated**: 2025-11-15
 
 ---
@@ -30,40 +30,53 @@ This file contains only critical architectural patterns and current session stat
 ## Session State
 
 ### Current Work
-- All 7 phases of comprehensive refactoring complete (v1.0.8 through v1.0.15)
-- Production-ready framework established
-- All code 100% tokenized, organized, type-safe, and documented
+- Environment variables fully configured with Supabase credentials
+- Guest login system implemented and working
+- App successfully running on Android device
+- GitHub issues tracking system established (18 issues created)
 - Ready for feature development
 
 ### Completed This Session
-**Phase 0-7 Comprehensive Refactoring** (v1.0.8-v1.0.15):
-1. **Phase 0** (v1.0.8): Complete tokenization sweep - eliminated 51 magic numbers
-2. **Phase 1** (v1.0.9): Component library - ShadowButton, FormInput, PasswordInput, SocialButton
-3. **Phase 2** (v1.0.10): HomePage decomposition - 4 navigation components + 2 hooks (73% reduction)
-4. **Phase 3** (v1.0.11): Utils & hooks - 60+ utilities, useFormInput, useAnimation
-5. **Phase 4** (v1.0.12): Auth screens refactoring - ActionButton component
-6. **Phase 5** (v1.0.13): Data layer - Complete service infrastructure with Supabase
-7. **Phase 6** (v1.0.14): Navigation improvements - Type-safe navigation system
-8. **Phase 7** (v1.0.15): Polish & production - ErrorBoundary, state components, env validation
+**v1.1.0 - Environment Setup & Guest Login** (2025-11-15):
+1. **Environment Configuration**:
+   - Installed react-native-config package
+   - Created .env file with Supabase credentials (URL and anon key)
+   - Configured Android gradle to read .env file
+   - Added react-native-url-polyfill for Supabase compatibility
+   - Removed unnecessary console warnings
+
+2. **Guest Login Implementation**:
+   - Created enableGuestMode(), disableGuestMode(), isGuestMode() functions
+   - Modified isAuthenticated() to check guest mode via AsyncStorage
+   - Implemented AUTH_CHANGE_EVENT using DeviceEventEmitter
+   - Updated App.tsx to listen for auth changes and re-check authentication
+   - Updated LoginScreen to enable guest mode instead of direct navigation
+   - Guest login now properly switches from AuthNavigator to MainNavigator
+
+3. **GitHub Project Management**:
+   - Created 8 EPICs (never to close): Login System, Create Account, Home Page, Plan Page, Performance Page, Profile Page, Hamburger Menu, Normal Workout/Superset
+   - Created 10 feature/task issues with descriptions
+   - Established issue tracking foundation for future development
 
 ### Next Session Should
-1. **Build Features**: Authentication logic, workout logging, training plans
-2. **Environment Setup**: Configure .env with actual Supabase credentials
-3. **Testing**: Test all refactored code on Android device
-4. **Future Enhancements**: Use established patterns to add new screens/features
+1. **Build Features**: Begin implementing features tracked in GitHub issues
+2. **Authentication**: Implement actual Supabase auth using authService
+3. **Testing**: Continue testing on physical Android device
+4. **Feature Development**: Use established patterns to build workout tracking features
 
 ### User Decisions Made
-- Comprehensive refactoring complete across entire codebase
-- Framework over features - scalable foundation established
-- 100% design token compliance - zero magic numbers allowed
-- Type-safe navigation with autocomplete throughout
-- Service layer pattern for all backend operations
-- Reusable component library for consistent UX
-- Production-ready error handling and validation
+- Environment setup prioritized to get app running
+- Guest mode implemented for testing without authentication
+- GitHub issues created for project tracking
+- .env file properly gitignored to protect credentials
+- Focus on getting working app before building all features
 
 ---
 
 ## Previous Sessions (Recent)
+
+### v1.1.0 - Environment Setup & Guest Login (2025-11-15)
+Configured complete environment: react-native-config installed, .env with Supabase credentials, Android gradle dotenv configuration, URL polyfill added. Implemented guest login system with AsyncStorage persistence and AUTH_CHANGE_EVENT for real-time auth updates. Fixed navigation error where "LOGIN AS GUEST" couldn't navigate to HomePage (HomePage only exists in MainNavigator). Created 18 GitHub issues: 8 EPICs and 10 features/tasks. App now fully functional on Android device.
 
 ### v1.0.15 - Phase 7: Polish & Production Readiness (2025-11-15)
 Essential framework components: ErrorBoundary for crash protection, LoadingState/ErrorState/EmptyState components for consistent UX, environment validation (requireEnv, getEnv), app constants (API_TIMEOUT, STORAGE_KEYS, ERROR_MESSAGES, etc.). All components React.memo optimized with full design token compliance. Branch merged to main.
@@ -98,8 +111,9 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 - New assets/modules → Restart Metro with --reset-cache, rebuild Android
 
 ### Environment Variables
-- .env file needs actual Supabase credentials (SUPABASE_URL, SUPABASE_ANON_KEY)
-- App validates env vars on startup via requireEnv() - will throw if missing
+- ✅ .env file configured with Supabase credentials (SUPABASE_URL, SUPABASE_ANON_KEY)
+- ✅ react-native-config properly configured in Android gradle
+- ✅ .env file properly gitignored to protect credentials
 
 ---
 
@@ -207,27 +221,24 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 ## Environment & Critical Info
 
 ### Configured
-Supabase (.env structure) | Metro (8081) | GitHub synced | All deps installed | Android emulator | Gradle 9.2.0 | Fonts (Bebas Neue, Roboto) | **Design tokens complete** | **Component library established** | **Service layer complete** | **Navigation system complete** | **Utils/hooks infrastructure complete** | **Production readiness framework complete**
+✅ Supabase (.env with credentials) | ✅ react-native-config | ✅ URL polyfill | Metro (8081) | GitHub synced | All deps installed | Android device testing | Gradle 9.2.0 | Fonts (Bebas Neue, Roboto) | **Design tokens complete** | **Component library established** | **Service layer complete** | **Navigation system complete** | **Utils/hooks infrastructure complete** | **Production readiness framework complete** | **Guest login system** | **GitHub issues (18 created)**
 
 ### Not Yet Set Up
-.env with actual credentials | DB schema/tables | Supabase Auth config | TS types from DB | Auth implementation
+DB schema/tables | Supabase Auth config | TS types from DB | Actual authentication implementation (authService exists but not integrated)
 
 ### Critical Paths
 - **Project Root**: C:\Dev\Lift321 (ACTIVE DEV)
 - **GitHub**: https://github.com/WillyDrucker/Lift321
+- **GitHub Issues**: 8 EPICs + 10 features/tasks tracking future work
 - **Historical Context**: Fresh React Native build informed by previous project learnings (reference code at C:\Dev\Wills321 - untouched)
-- **Branch**: main (all refactoring complete)
+- **Branch**: Claude-v1.1.0 (environment setup complete)
 
 ### Next Steps
-1. **Configure Environment**: Add actual Supabase credentials to .env
-2. **Test Refactored Code**: Run app on Android device, verify all patterns work
-3. **Build Features**:
-   - Authentication logic using authService
-   - Workout logging functionality
-   - Training plan system
-   - Use LoadingState/ErrorState/EmptyState for async UX
-   - Use ErrorBoundary to wrap feature areas
-4. **Leverage Framework**:
+1. **Build Features**: Begin implementing features from GitHub issues
+2. **Authentication**: Integrate authService with LoginFormScreen and SignUpScreen
+3. **Database**: Create Supabase tables schema for workouts, plans, users
+4. **Continue Testing**: Verify all patterns on physical Android device
+5. **Leverage Framework**:
    - Import components from @/components
    - Use navigation hooks from @/navigation
    - Call services from @/services
@@ -236,6 +247,6 @@ Supabase (.env structure) | Metro (8081) | GitHub synced | All deps installed | 
 
 ---
 
-**Version**: 1.0.15
+**Version**: 1.1.0
 **Last Updated**: 2025-11-15
-**Status**: Comprehensive Refactoring Complete - Ready for Feature Development
+**Status**: Environment Setup Complete & Guest Login Implemented - App Running on Device

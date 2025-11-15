@@ -14,6 +14,10 @@ export {
   getCurrentSession,
   signOut,
   isAuthenticated,
+  enableGuestMode,
+  disableGuestMode,
+  isGuestMode,
+  AUTH_CHANGE_EVENT,
 } from './supabaseClient';
 
 // === API UTILITIES ===

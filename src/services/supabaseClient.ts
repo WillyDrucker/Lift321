@@ -10,18 +10,19 @@
 
 import {createClient} from '@supabase/supabase-js';
 import Config from 'react-native-config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {DeviceEventEmitter} from 'react-native';
 
 // === CONFIGURATION ===
 
 const SUPABASE_URL = Config.SUPABASE_URL || '';
 const SUPABASE_ANON_KEY = Config.SUPABASE_ANON_KEY || '';
 
-// Validate required environment variables
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  console.warn(
-    'Missing Supabase configuration. Please set SUPABASE_URL and SUPABASE_ANON_KEY in .env',
-  );
-}
+// Guest mode storage key
+const GUEST_MODE_KEY = '@lift321:guest_mode';
+
+// Auth change event name
+export const AUTH_CHANGE_EVENT = 'AUTH_STATE_CHANGED';
 
 // === CLIENT INITIALIZATION ===
 
@@ -73,9 +74,42 @@ export const signOut = async () => {
 };
 
 /**
- * Checks if user is authenticated
+ * Checks if user is authenticated (either via Supabase or guest mode)
  */
 export const isAuthenticated = async (): Promise<boolean> => {
+  // Check for guest mode first
+  const isGuest = await isGuestMode();
+  if (isGuest) {
+    return true;
+  }
+
+  // Check for Supabase session
   const {session} = await getCurrentSession();
   return session !== null;
+};
+
+/**
+ * Enables guest mode (bypasses authentication)
+ */
+export const enableGuestMode = async (): Promise<void> => {
+  await AsyncStorage.setItem(GUEST_MODE_KEY, 'true');
+  // Emit auth change event so App.tsx can re-check auth state
+  DeviceEventEmitter.emit(AUTH_CHANGE_EVENT);
+};
+
+/**
+ * Disables guest mode
+ */
+export const disableGuestMode = async (): Promise<void> => {
+  await AsyncStorage.removeItem(GUEST_MODE_KEY);
+  // Emit auth change event so App.tsx can re-check auth state
+  DeviceEventEmitter.emit(AUTH_CHANGE_EVENT);
+};
+
+/**
+ * Checks if app is in guest mode
+ */
+export const isGuestMode = async (): Promise<boolean> => {
+  const guestMode = await AsyncStorage.getItem(GUEST_MODE_KEY);
+  return guestMode === 'true';
 };
