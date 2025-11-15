@@ -19,58 +19,75 @@ This file contains only critical architectural patterns and current session stat
 
 ---
 
-## Current Version: 1.0.7
+## Current Version: 1.0.15
 
-**Branch**: Claude-v1.0.7
-**Status**: Ready for Development
-**Last Updated**: 2025-11-14
+**Branch**: main
+**Status**: Comprehensive Refactoring Complete
+**Last Updated**: 2025-11-15
 
 ---
 
 ## Session State
 
 ### Current Work
-- New branch Claude-v1.0.7 created and published
-- Ready for new development work
-- All v1.0.6 HomePage implementation merged to main
+- All 7 phases of comprehensive refactoring complete (v1.0.8 through v1.0.15)
+- Production-ready framework established
+- All code 100% tokenized, organized, type-safe, and documented
+- Ready for feature development
 
 ### Completed This Session
-1. Created new branch Claude-v1.0.7 from main
-2. Published branch to GitHub
+**Phase 0-7 Comprehensive Refactoring** (v1.0.8-v1.0.15):
+1. **Phase 0** (v1.0.8): Complete tokenization sweep - eliminated 51 magic numbers
+2. **Phase 1** (v1.0.9): Component library - ShadowButton, FormInput, PasswordInput, SocialButton
+3. **Phase 2** (v1.0.10): HomePage decomposition - 4 navigation components + 2 hooks (73% reduction)
+4. **Phase 3** (v1.0.11): Utils & hooks - 60+ utilities, useFormInput, useAnimation
+5. **Phase 4** (v1.0.12): Auth screens refactoring - ActionButton component
+6. **Phase 5** (v1.0.13): Data layer - Complete service infrastructure with Supabase
+7. **Phase 6** (v1.0.14): Navigation improvements - Type-safe navigation system
+8. **Phase 7** (v1.0.15): Polish & production - ErrorBoundary, state components, env validation
 
 ### Next Session Should
-1. **Continue with app features**:
-   - Implement authentication logic
-   - Build workout logging functionality
-   - Create training plan system
-2. **Consider**: Implement sidebar menu functionality for hamburger icon
-3. **Apply token system** to any new screens or components
+1. **Build Features**: Authentication logic, workout logging, training plans
+2. **Environment Setup**: Configure .env with actual Supabase credentials
+3. **Testing**: Test all refactored code on Android device
+4. **Future Enhancements**: Use established patterns to add new screens/features
 
 ### User Decisions Made
-- Production-ready design token system established (v1.0.5)
-- 64dp safe zone standard across all screens
-- Forward-looking comments required in all code
-- Physical device testing workflow established (v1.0.6)
-- HomePage UI finalized with 100dp bottom tab bar (v1.0.6)
+- Comprehensive refactoring complete across entire codebase
+- Framework over features - scalable foundation established
+- 100% design token compliance - zero magic numbers allowed
+- Type-safe navigation with autocomplete throughout
+- Service layer pattern for all backend operations
+- Reusable component library for consistent UX
+- Production-ready error handling and validation
 
 ---
 
-## Previous Sessions
+## Previous Sessions (Recent)
 
-### v1.0.6 - HomePage Implementation & Physical Device Testing (2025-11-14)
-Complete HomePage implementation with top navigation bar and bottom tab bar. Physical device testing via USB (R5CT40X95AW). Created theme.layout.topNav tokens, updated bottomNav (height: 100dp, iconTopSpacing: 6dp). Applied CLAUDE_DEV_STANDARDS - eliminated all magic numbers. SearchIcon component added. MainActivity renamed to HomePage throughout codebase. Branch merged to main successfully.
+### v1.0.15 - Phase 7: Polish & Production Readiness (2025-11-15)
+Essential framework components: ErrorBoundary for crash protection, LoadingState/ErrorState/EmptyState components for consistent UX, environment validation (requireEnv, getEnv), app constants (API_TIMEOUT, STORAGE_KEYS, ERROR_MESSAGES, etc.). All components React.memo optimized with full design token compliance. Branch merged to main.
 
-### v1.0.5 - Comprehensive Design Token System Refactoring (2025-11-11)
-Complete refactoring of design token system. Established 64dp safe zone standard, expanded color/typography/spacing tokens, refactored all auth screens (LoginScreen, LoginFormScreen, SignUpScreen) with zero hardcoded values. Added Standard #10: Forward-Looking Comments. Branch merged to main successfully.
+### v1.0.14 - Phase 6: Navigation Improvements (2025-11-15)
+Type-safe navigation system: useTypedNavigation/useTypedRoute hooks, navigationService for imperative navigation, auth guards (useAuthGuard, useGuestGuard), 12 custom transition presets, separated AuthNavigator and MainNavigator stacks. App.tsx now switches navigators based on auth state. Complete navigation documentation. Branch merged to main.
 
-### v1.0.4a - MainActivity Base UI Complete (2025-11-10)
-Complete MainActivity base UI with hamburger sidebar, day selector tabs, workout card, bottom navigation. Slide-out sidebar drawer with animation. All components fully tokenized. Branch merged to main successfully.
+### v1.0.13 - Phase 5: Data Layer & Architecture (2025-11-15)
+Complete service infrastructure: ApiResult<T> pattern, BaseService class for CRUD operations, authService example, Supabase client configuration, apiUtils (createSuccessResponse, handleSupabaseError, validateRequiredFields, retry), type guards (isApiSuccess, isApiError). Unified error handling across entire app. Branch merged to main.
 
-### v1.0.3 - Navigation Complete & Full Tokenization (2025-11-10)
-Implemented React Navigation with LoginFormScreen and MainActivity. Created complete tokenization system with theme.layout module. Built SVG icon system. Refined shadow system. All screens fully tokenized. Branch merged to main successfully.
+### v1.0.12 - Phase 4: Auth Screens Refactoring (2025-11-15)
+Created ActionButton component (simple CTA button), refactored SignUpScreen/SignUpStep2Screen/WelcomeScreen to use ActionButton, eliminated duplicate button code across 3 screens. Small focused phase. Branch merged to main.
 
-### v1.0.2 - LoginScreen Complete & Design Tokens (2025-11-10)
-Built complete LoginScreen with gym background, custom Bebas Neue font, multi-layer shadow system. Created theme modules for shadows and buttons. Upgraded Gradle to 9.2.0. Branch merged to main successfully.
+### v1.0.11 - Phase 3: Utils & Hook Infrastructure (2025-11-15)
+Comprehensive utilities: dateUtils (20+ functions), validationUtils (15+ validators with password strength), formatUtils (25+ formatters), useFormInput hook with validation, useAnimation (fade/slide/scale), refactored useWeekCalendar to use dateUtils (53% reduction). Branch merged to main.
+
+### v1.0.10 - Phase 2: HomePage Decomposition (2025-11-15)
+Extracted 4 navigation components (TopNavBar, WeekCalendar, PlanProgressBar, BottomTabBar) and 2 hooks (useWeekCalendar, useSwipeGesture) from HomePage. Reduced HomePage from 515 lines to 137 lines (73% reduction). All components React.memo optimized. Branch merged to main.
+
+### v1.0.9 - Phase 1: Component Library (2025-11-15)
+Created reusable components: ShadowButton (3 variants, eliminated 180+ lines of duplicate code), FormInput (with focus states), PasswordInput (extends FormInput with eye toggle), SocialButton (Google/Facebook config-driven). Reduced LoginFormScreen from 400 to 252 lines (37%). Branch merged to main.
+
+### v1.0.8 - Phase 0: Tokenization Sweep (2025-11-15)
+Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth screens, added 13 new design tokens (spacing.xxs, spacing.inputMarginSmall, typography.letterSpacing.*, layout.authNavigation.*, layout.socialLogin.*, buttons.opacity.*). 100% CLAUDE_DEV_STANDARDS compliance. Branch merged to main.
 
 ---
 
@@ -80,11 +97,66 @@ Built complete LoginScreen with gym background, custom Bebas Neue font, multi-la
 - Native shadows unreliable → Use multi-layer View pattern
 - New assets/modules → Restart Metro with --reset-cache, rebuild Android
 
+### Environment Variables
+- .env file needs actual Supabase credentials (SUPABASE_URL, SUPABASE_ANON_KEY)
+- App validates env vars on startup via requireEnv() - will throw if missing
+
 ---
 
 ## Quick Reference: Established Patterns
 
-### Design Token Modules (UPDATED)
+### Architecture Layers (NEW)
+| Layer | Pattern | Location |
+|-------|---------|----------|
+| **Components** | Reusable UI (ShadowButton, FormInput, LoadingState, ErrorState, etc.) | src/components/ |
+| **Services** | Backend operations (authService, BaseService) | src/services/ |
+| **Navigation** | Type-safe routing (useTypedNavigation, navigationService) | src/navigation/ |
+| **Utils** | Pure functions (dateUtils, validationUtils, formatUtils) | src/utils/ |
+| **Hooks** | Reusable logic (useFormInput, useAnimation, useWeekCalendar) | src/hooks/ |
+| **Theme** | Design tokens (colors, spacing, typography, layout) | src/theme/ |
+| **Constants** | App config (API_TIMEOUT, STORAGE_KEYS, ERROR_MESSAGES) | src/constants/ |
+
+### Component Library (NEW)
+| Component | Purpose | Props |
+|-----------|---------|-------|
+| **ShadowButton** | Primary/secondary/tertiary buttons with shadows | variant, onPress, disabled |
+| **FormInput** | Text input with focus/error states | value, onChangeText, placeholder, error, rightElement |
+| **PasswordInput** | Password field with show/hide toggle | Extends FormInput props |
+| **SocialButton** | OAuth buttons (Google/Facebook) | provider ('google' \| 'facebook'), onPress |
+| **ActionButton** | Simple CTA button | text, onPress, disabled |
+| **LoadingState** | Async loading UI | message?, size?, fullScreen? |
+| **ErrorState** | Error UI with retry | message, onRetry?, fullScreen? |
+| **EmptyState** | No data UI | title?, message, actionText?, onAction?, fullScreen? |
+| **ErrorBoundary** | Crash protection | children, fallback? |
+
+### Navigation System (NEW)
+| Hook/Service | Purpose | Usage |
+|--------------|---------|-------|
+| **useTypedNavigation** | Type-safe navigation | navigation.navigate('HomePage') |
+| **useTypedRoute<T>** | Type-safe route params | const {workoutId} = route.params |
+| **useNavigationActions** | Common shortcuts | goBack(), goToHome(), reset() |
+| **navigationService** | Imperative navigation | navigationService.navigate('HomePage') |
+| **useAuthGuard** | Protect authenticated screens | if (!isAllowed) return null |
+| **useGuestGuard** | Redirect if authenticated | Used in LoginScreen |
+
+### Service Layer (NEW)
+| Service/Utility | Purpose | Usage |
+|-----------------|---------|-------|
+| **authService** | Authentication operations | authService.signIn(credentials) |
+| **BaseService** | Generic CRUD operations | Extend for any table |
+| **apiUtils** | Response/error handling | handleSupabaseQuery(queryFn) |
+| **Type Guards** | Response checking | if (isApiSuccess(result)) {...} |
+| **ApiResult<T>** | Unified response format | {data, error, status} |
+
+### Utilities (NEW)
+| Utility | Functions | Examples |
+|---------|-----------|----------|
+| **dateUtils** | 20+ date functions | formatDateShort, getWeekDates, isToday |
+| **validationUtils** | 15+ validators | validateEmail, validatePasswordStrength |
+| **formatUtils** | 25+ formatters | formatCurrency, formatPhoneNumber, pluralize |
+| **envUtils** | Environment helpers | requireEnv(), getEnv(), isDevelopment() |
+
+### Design Token Modules (UNCHANGED)
 | Module | Purpose |
 |--------|---------|
 | `theme.colors` | Semantic colors (primary, primaryMuted, pureBlack, pureWhite, googleBlue, facebookBlue, shadowBlack) |
@@ -93,97 +165,8 @@ Built complete LoginScreen with gym background, custom Bebas Neue font, multi-la
 | `theme.textShadows` | default/subtle/strong |
 | `theme.viewShadows` | iOS shadows (small/medium/large) |
 | `theme.elevation` | Android elevation values |
-| `theme.buttons` | Sizing, padding, borderRadius, margins, shadowLayers |
-| `theme.layout` | header/logo/form/bottom/icon/backgroundImage constants |
-
-### Layout Token Values (UPDATED)
-| Category | Token | Value | Use Case |
-|----------|-------|-------|----------|
-| **Header** | theme.layout.header.topSpacing | 64dp | Auth screen headers (matches safe zone) |
-| | theme.layout.header.horizontalPadding | 32dp | Left/right header padding |
-| **Top Nav** | theme.layout.topNav.topSpacing | 32dp | Distance from screen top |
-| | theme.layout.topNav.height | 32dp | Navigation bar height |
-| | theme.layout.topNav.paddingHorizontal | 10dp | Icon spacing from edges |
-| | theme.layout.topNav.searchIconSize | 20dp | Search icon size |
-| | theme.layout.topNav.menuIconSize | 28dp | Hamburger menu icon size |
-| | theme.layout.topNav.borderWidth | 1dp | Development visibility border |
-| **Bottom Nav** | theme.layout.bottomNav.height | 100dp | Bottom tab bar height (device nav buttons) |
-| | theme.layout.bottomNav.iconSize | 24dp | Tab icon size |
-| | theme.layout.bottomNav.iconTopSpacing | 6dp | Icon position from bar top |
-| | theme.layout.bottomNav.paddingVertical | 10dp | Top/bottom padding |
-| | theme.layout.bottomNav.paddingHorizontal | 16dp | Left/right padding |
-| **Logo** | theme.layout.logo.size | 40dp | Logo dimensions |
-| | theme.layout.logo.borderRadius | 20dp | Circular logo shape |
-| **Form** | theme.layout.form.inputHeight | 50dp | Standard input height |
-| | theme.layout.form.inputBorderWidth | 2dp | Input border thickness |
-| | theme.layout.form.inputBorderRadius | 8dp | Input corner radius |
-| | theme.layout.form.inputHorizontalMargin | 5dp | Input side margins |
-| | theme.layout.form.buttonHorizontalMargin | 32dp | Button side margins |
-| | theme.layout.form.dividerSpacing | 32dp | Spacing around dividers |
-| **Bottom** | theme.layout.bottom.safeZone | 64dp | Standard bottom clearance |
-| | theme.layout.bottom.buttonGroupPadding | 48dp | Container padding (48+16 margin = 64 visual) |
-| **Icons** | theme.layout.icon.large | 32dp | Chevrons, primary actions |
-| | theme.layout.icon.medium | 24dp | Navigation icons |
-| **Background** | theme.layout.backgroundImage.topSpacing | 32dp | Auth screen background position |
-| | theme.layout.backgroundImage.opacity | 0.5 | Standard background transparency |
-
-### Spacing Token Values (UPDATED)
-| Token | Value | Use Case |
-|-------|-------|----------|
-| `theme.spacing.safeZone` | 64dp | Top/bottom safe clearance for system UI |
-| `theme.spacing.safeZoneHorizontal` | 32dp | Left/right safe clearance |
-| `theme.spacing.textLineGap` | 10dp | Vertical spacing between text lines |
-| `theme.spacing.textGroupSpacing` | 32dp | Spacing between text groups/paragraphs |
-| `theme.spacing.buttonSpacing` | 16dp | Vertical spacing between stacked buttons |
-| `theme.spacing.xl` | 32dp | Large gaps, section separation |
-| `theme.spacing.m` | 16dp | Default element spacing |
-
-### Typography Token Values (UPDATED)
-| Token | Value | Use Case |
-|-------|-------|----------|
-| `theme.typography.fontSize.display` | 48dp | Hero text, main branding (3× baseline) |
-| `theme.typography.fontSize.xxxl` | 32dp | Large headlines, page titles (2× baseline) |
-| `theme.typography.fontSize.xxl` | 28dp | Medium headlines, sub-headers (1.75× baseline) |
-| `theme.typography.fontSize.xl` | 24dp | Small headlines, section titles (1.5× baseline) |
-| `theme.typography.fontSize.l` | 20dp | Button text, emphasized labels (1.25× baseline) |
-| `theme.typography.fontSize.m` | 16dp | Body text, standard UI text (1× baseline) |
-
-### Color Token Values (UPDATED)
-| Token | Value | Use Case |
-|-------|-------|----------|
-| `theme.colors.primary` | #00FF00 | Main brand green, primary buttons, CTAs |
-| `theme.colors.primaryMuted` | #00BF00 | 75% green for softer accents |
-| `theme.colors.pureBlack` | #000000 | True black backgrounds, maximum contrast |
-| `theme.colors.pureWhite` | #FFFFFF | Maximum contrast backgrounds, light elements |
-| `theme.colors.googleBlue` | #4285F4 | Official Google brand color |
-| `theme.colors.facebookBlue` | #1877F2 | Official Facebook brand color |
-| `theme.colors.textOnAction` | #000000 | Text on green buttons |
-| `theme.colors.shadowBlack` | #000000 | All drop shadows and elevation |
-
-### Shadow Layer System (Android)
-| Layer | Top | Opacity | Usage |
-|-------|-----|---------|-------|
-| layer1 | 1dp | 0.4 | Closest, darkest |
-| layer2 | 2dp | 0.25 | Middle |
-| layer3 | 3dp | 0.15 | Farthest, lightest |
-
-**Pattern**: 3 Views stacked, pure black, drop straight down, no horizontal shift
-
-### Icon System
-| Icon | Usage | Size |
-|------|-------|------|
-| LeftChevron | Back/previous nav | 32dp (large) |
-| RightChevron | Forward/next nav | 32dp (large) |
-| EyeOpen | Show password | 15dp (custom) |
-| EyeClosed | Hide password | 15dp (custom) |
-| SearchIcon | Search functionality | 20dp (topNav) |
-| HamburgerIcon | Menu/sidebar toggle | 28dp (topNav) |
-| HomeIcon | Home tab navigation | 24dp (bottomNav) |
-| PlansIcon | Plans tab navigation | 24dp (bottomNav) |
-| StatsIcon | Performance tab | 24dp (bottomNav) |
-| ProfileIcon | Profile tab | 24dp (bottomNav) |
-
-**All accept**: size (number), color (string) props
+| `theme.buttons` | Sizing, padding, borderRadius, margins, shadowLayers, opacity |
+| `theme.layout` | header/logo/form/bottom/icon/backgroundImage/topNav/bottomNav/authNavigation/socialLogin |
 
 ### Architecture Patterns (REQUIRED)
 | Pattern | Rule |
@@ -193,8 +176,10 @@ Built complete LoginScreen with gym background, custom Bebas Neue font, multi-la
 | **TypeScript Strict** | Explicit types - NO `any` (unless absolutely necessary) |
 | **Context Pattern** | Never expose Context directly - Always via custom hook with memoization |
 | **Service Layer** | Never query Supabase from components - Always via service layer |
-| **Navigation** | React Navigation with TypeScript - Type-safe via RootStackParamList |
+| **Navigation** | Use typed hooks (useTypedNavigation) - NOT React Navigation hooks directly |
 | **Forward-Looking Comments** | Comments explain design intent, not historical changes or fixes |
+| **Component Library** | Use existing components before creating new ones |
+| **Barrel Exports** | Import from @/components, @/hooks, @/utils, @/services, @/navigation |
 
 ### Component Structure Sections
 ```typescript
@@ -222,27 +207,35 @@ Built complete LoginScreen with gym background, custom Bebas Neue font, multi-la
 ## Environment & Critical Info
 
 ### Configured
-Supabase (.env) | Metro (8081) | GitHub synced | All deps installed | Android emulator | Gradle 9.2.0 | Fonts (Bebas Neue) | **Design tokens complete** | React Navigation | SVG icons | **64dp safe zone standard**
+Supabase (.env structure) | Metro (8081) | GitHub synced | All deps installed | Android emulator | Gradle 9.2.0 | Fonts (Bebas Neue, Roboto) | **Design tokens complete** | **Component library established** | **Service layer complete** | **Navigation system complete** | **Utils/hooks infrastructure complete** | **Production readiness framework complete**
 
 ### Not Yet Set Up
-DB schema/tables | Supabase Auth config | TS types from DB | Auth logic
+.env with actual credentials | DB schema/tables | Supabase Auth config | TS types from DB | Auth implementation
 
 ### Critical Paths
 - **Project Root**: C:\Dev\Lift321 (ACTIVE DEV)
 - **GitHub**: https://github.com/WillyDrucker/Lift321
 - **Historical Context**: Fresh React Native build informed by previous project learnings (reference code at C:\Dev\Wills321 - untouched)
-- **Branch**: Claude-v1.0.7 (ready for development)
+- **Branch**: main (all refactoring complete)
 
 ### Next Steps
-1. **Test refactored screens** on Android emulator
-2. **Verify token rendering** with new values
-3. **Auth**: AuthContext + service + validation + error states
-4. **Supabase**: Auth providers + policies + user profiles table
-5. **OR App Features**: Workout logging + training plans + history/analytics
-6. **Shared**: Loading indicator + error component + toast notifications
+1. **Configure Environment**: Add actual Supabase credentials to .env
+2. **Test Refactored Code**: Run app on Android device, verify all patterns work
+3. **Build Features**:
+   - Authentication logic using authService
+   - Workout logging functionality
+   - Training plan system
+   - Use LoadingState/ErrorState/EmptyState for async UX
+   - Use ErrorBoundary to wrap feature areas
+4. **Leverage Framework**:
+   - Import components from @/components
+   - Use navigation hooks from @/navigation
+   - Call services from @/services
+   - Use utilities from @/utils
+   - Follow established patterns
 
 ---
 
-**Version**: 1.0.7
-**Last Updated**: 2025-11-14
-**Status**: Ready for Development
+**Version**: 1.0.15
+**Last Updated**: 2025-11-15
+**Status**: Comprehensive Refactoring Complete - Ready for Feature Development

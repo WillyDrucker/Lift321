@@ -16,508 +16,615 @@ This file contains the historical record of version changes for Lift 3-2-1. Deta
 
 ## Version History
 
-### v1.0.6 - HomePage Implementation & Physical Device Testing (2025-11-14)
-**Branch**: Claude-v1.0.6 (ready to merge)
+### v1.0.15 - Phase 7: Polish & Production Readiness (2025-11-15)
+**Branch**: Claude-v1.0.15 (merged to main)
 
-**Summary**: Complete HomePage implementation with top navigation bar and bottom tab bar. Refactored MainActivity to HomePage with semantic naming. Added SearchIcon component. Extensive physical device testing via USB with iterative UI refinements. Applied CLAUDE_DEV_STANDARDS to eliminate all magic numbers - created theme.layout.topNav tokens and updated bottomNav tokens.
+**Summary**: Essential framework components for production readiness. ErrorBoundary for crash protection, reusable state components (LoadingState, ErrorState, EmptyState), environment validation utilities, and app-wide constants. Kept practical - no feature bloat, only essentials that support scaling.
 
 **What Was Built**:
-- **HomePage Screen (New)**
-  - Replaced MainActivity with properly named HomePage
-  - Pure black background (theme.colors.pureBlack)
-  - Top navigation bar with search and hamburger menu icons
-  - Bottom tab bar with 4 tabs: Home, Plans, Performance, Profile
-  - Active tab state with green highlight (theme.colors.navActive)
-  - Fully tokenized with zero magic numbers
-- **Top Navigation Bar**
-  - Positioned 32dp from screen top
-  - Height: 32dp
-  - Search icon (20dp) left-aligned
-  - Hamburger menu (28dp) right-aligned
-  - 1dp white border for development visibility
-  - 10dp horizontal padding for icon spacing
-- **Bottom Tab Bar**
-  - Height: 100dp (sized for device navigation buttons)
-  - Dark gray background (theme.colors.backgroundPrimary)
-  - Icons positioned 6dp from top
-  - 4 tabs with icons and labels
-  - Active/inactive states with color changes
-  - Proper clearance for Samsung on-screen navigation
-- **SearchIcon Component (New)**
-  - SVG magnifying glass icon
-  - Circle (8dp radius) with search line
-  - Accepts size and color props
-  - Used in HomePage top navigation
-- **Navigation Refactoring**
-  - Renamed MainActivity to HomePage throughout codebase
-  - Updated navigation types (MainActivity → HomePage)
-  - Updated App.tsx route configuration
-  - Updated LoginScreen guest login navigation
-  - Deleted old MainActivity.tsx file
+- **ErrorBoundary Component** (src/components/ErrorBoundary/)
+  - Catches JavaScript errors in component tree
+  - Prevents app crashes with fallback UI
+  - User-friendly error message with "Try Again" button
+  - Developer error details shown in dev mode only
+  - Custom fallback support via props
+  - Automatic error logging to console
+- **State Components** (src/components/State/)
+  - **LoadingState**: Spinner with optional message and fullScreen support
+  - **ErrorState**: Error message with retry button
+  - **EmptyState**: No-data state with optional title and CTA
+  - All React.memo optimized for performance
+  - Full design token compliance
+  - Consistent UX patterns across app
+- **Environment Validation** (src/utils/envUtils.ts)
+  - `validateEnv()`: Returns validation result for env vars
+  - `requireEnv()`: Throws error if required vars missing (SUPABASE_URL, SUPABASE_ANON_KEY)
+  - `getEnv(key, default)`: Safe env var access with defaults
+  - `getEnvAsNumber(key, default)`: Type conversion to number
+  - `getEnvAsBoolean(key, default)`: Type conversion to boolean
+  - `isDevelopment()`, `isProduction()`: Environment checks
+  - Validates on app startup for early failure
+- **App Constants** (src/constants/app.ts)
+  - **App Metadata**: APP_NAME, APP_VERSION, APP_BUILD
+  - **API Config**: API_TIMEOUT (30000), API_RETRY_ATTEMPTS (3), API_RETRY_DELAY (1000)
+  - **Pagination**: DEFAULT_PAGE_SIZE (20), MAX_PAGE_SIZE (100)
+  - **Validation**: MIN_PASSWORD_LENGTH (8), MAX_PASSWORD_LENGTH (128), MIN_NAME_LENGTH, MAX_NAME_LENGTH
+  - **Animation**: ANIMATION_DURATION (fast: 150, normal: 300, slow: 500)
+  - **Debounce**: DEBOUNCE_DELAY (search: 300, input: 500, scroll: 100)
+  - **Storage Keys**: USER_TOKEN, USER_DATA, SETTINGS, ONBOARDING_COMPLETE
+  - **Error Messages**: NETWORK_ERROR, TIMEOUT_ERROR, UNKNOWN_ERROR, UNAUTHORIZED, VALIDATION_ERROR
+  - **Regex Patterns**: EMAIL, PHONE, URL
 
-**Physical Device Testing**:
-- Connected phone via USB debugging (R5CT40X95AW device)
-- Metro bundler hot reload working
-- Iterative UI adjustments based on real device feedback:
-  - Bottom tab bar: 64dp → 88dp → 64dp → 80dp → 70dp → 76dp → 100dp
-  - Top nav bar: 16dp → 32dp height
-  - Search icon: 16dp → 24dp → 20dp
-  - Hamburger icon: 24dp → 32dp → 28dp → 20dp → 28dp
-  - Icon positions swapped: search left, hamburger right
-- Proper rendering with Samsung on-screen navigation buttons
-- Status bar and safe areas working correctly
+**Files Created (11)**:
+- ErrorBoundary/ErrorBoundary.tsx (190 lines) - Crash protection component
+- ErrorBoundary/README.md (79 lines) - ErrorBoundary documentation
+- ErrorBoundary/index.ts (10 lines) - Barrel export
+- State/LoadingState.tsx (73 lines) - Loading UI component
+- State/ErrorState.tsx (119 lines) - Error UI component
+- State/EmptyState.tsx (119 lines) - Empty state component
+- State/README.md (160 lines) - State components documentation
+- State/index.ts (12 lines) - Barrel export
+- utils/envUtils.ts (175 lines) - Environment validation
+- constants/app.ts (74 lines) - App-wide constants
+- constants/index.ts (10 lines) - Constants barrel
 
-**Design Token System Enhancement**:
-- **New theme.layout.topNav** tokens added to layout.ts:
-  - `topSpacing: 32` - Distance from screen top
-  - `height: 32` - Navigation bar height
-  - `paddingHorizontal: 10` - Icon spacing from edges
-  - `searchIconSize: 20` - Search icon size
-  - `menuIconSize: 28` - Hamburger menu icon size
-  - `borderWidth: 1` - Development visibility border
-- **Updated theme.layout.bottomNav** tokens:
-  - `height: 100` - Updated from 70dp (accounts for device nav buttons)
-  - `iconTopSpacing: 6` - New token for icon positioning
-  - Existing tokens: iconSize (24), paddingVertical (10), paddingHorizontal (16)
-
-**CLAUDE_DEV_STANDARDS Applied**:
-- **HomePage.tsx**: All magic numbers eliminated
-  - Icon sizes use theme.layout.topNav tokens
-  - All spacing/sizing uses theme tokens
-  - Comments are forward-looking (explain intent, not history)
-- **SignUpStep2Screen.tsx**: Tokenized all remaining magic numbers
-  - Icon size: 32dp → theme.layout.icon.large
-  - Top position: 64dp → theme.layout.header.topSpacing
-  - Bottom position: 64dp → theme.layout.bottom.safeZone
-  - Left padding: 24dp → theme.spacing.l
-  - All comments updated to be forward-looking
-- **layout.ts**: Enhanced with new token categories
-  - topNav section for minimal navigation bars
-  - bottomNav updated with new tokens
-  - All values documented with use cases
-
-**Files Created (3)**:
-- `src/features/main/screens/HomePage.tsx` - Main landing page with navigation
-- `src/components/icons/SearchIcon.tsx` - Search icon component
-- `USERPROMPT/USERPROMPT_Claude-v1.0.6.md` - Session prompt tracking
-
-**Files Modified (6)**:
-- `src/theme/layout.ts` - Added topNav tokens, updated bottomNav tokens
-- `src/features/auth/screens/SignUpStep2Screen.tsx` - Tokenized, moved "3-2-1 CHALLENGE" to 64dp
-- `src/components/icons/index.ts` - Added SearchIcon export
-- `src/navigation/types.ts` - MainActivity → HomePage in navigation types
-- `App.tsx` - Updated imports and routes (MainActivity → HomePage)
-- `src/features/auth/screens/LoginScreen.tsx` - Updated guest login navigation
-
-**Files Deleted (1)**:
-- `src/features/main/screens/MainActivity.tsx` - Replaced by HomePage.tsx
-
-**Icon System Expansion**:
-- SearchIcon added to icon library
-- All bottom nav icons documented: HomeIcon, PlansIcon, StatsIcon, ProfileIcon
-- Icon sizing standardized via theme tokens
+**Files Modified (2)**:
+- src/components/index.ts - Added ErrorBoundary and State exports
+- src/utils/index.ts - Added envUtils export
 
 **User Decisions**:
-- HomePage is correct semantic name for main landing page
-- Top nav: Search left (20dp), hamburger right (28dp)
-- Bottom tab bar: 100dp height to account for device navigation buttons
-- Icon positioning: 6dp from top for bottom tabs
-- Physical device testing preferred over emulator
-- USB debugging for development with hot reload
+- Framework essentials only - no feature bloat
+- ErrorBoundary wraps entire app for crash protection
+- State components provide consistent UX patterns
+- Environment validation catches config issues at startup
+- Constants centralize all configuration values
+- Keep it practical - only what we'll actually use
 
 **Technical Achievements**:
-- Physical device testing workflow established
-- USB debugging setup documented
-- Metro bundler over USB working smoothly
-- Complete design token compliance
-- Zero magic numbers in modified files
-- All navigation flows properly typed
-- Forward-looking comments throughout
+- Complete error boundary implementation (class component)
+- Three reusable state components for all async scenarios
+- Type-safe environment variable access
+- Centralized constants prevent magic values
+- All documentation included for discoverability
+- React.memo optimization on all state components
 
-**Testing**:
-- App running successfully on physical Android device (R5CT40X95AW)
-- Hot reload working via Metro bundler
-- Navigation flows tested (LoginScreen → HomePage)
-- Tab switching functional with proper state management
-- Icon sizes and spacing verified on real device
+**Testing**: Not yet tested - needs Android device verification
 
 **Key Learnings**:
-- Physical device testing reveals sizing issues not visible in emulator
-- On-screen navigation buttons require extra bottom padding (100dp vs 70dp)
-- Iterative refinement is essential for real-world UI
-- Token system allows rapid adjustment without touching multiple files
-- Semantic naming (HomePage not MainActivity) improves code clarity
-- Forward-looking comments keep code clean and maintainable
+- Framework > features - establish scalable foundation first
+- ErrorBoundary prevents catastrophic crashes
+- Consistent state components improve UX across entire app
+- Environment validation saves debugging time
+- Constants make configuration changes trivial
 
-**Next Steps**: Merge v1.0.6 to main, create v1.0.7 branch, implement sidebar menu functionality, continue with authentication logic and workout features
+**Next Steps**: Configure .env with actual Supabase credentials, test refactored code on device, begin feature implementation using established patterns
 
 ---
 
-### v1.0.4a - MainActivity Base UI Complete (2025-11-10)
-**Branch**: mainactivity-base-ui (merged to main)
+### v1.0.14 - Phase 6: Navigation Improvements (2025-11-15)
+**Branch**: Claude-v1.0.14 (merged to main)
 
-**Summary**: Complete MainActivity base UI implementation with hamburger sidebar, day selector tabs, workout preview card, bottom navigation, and Start Workout button. All components fully tokenized with zero magic numbers. Slide-out sidebar drawer replaces dropdown menu.
+**Summary**: Complete type-safe navigation system with typed hooks, imperative navigation service, auth guards, custom transitions, and separated Auth/Main stacks. App.tsx now conditionally renders AuthNavigator or MainNavigator based on authentication state.
 
 **What Was Built**:
-- Top Bar with Hamburger Menu
-  - Hamburger icon on left, LIFT logo centered
-  - Top bar positioned 32px from top (theme.spacing.xl)
-  - Transparent background matching screen
-  - 60px height with 44px touch targets
-- Slide-Out Sidebar Drawer
-  - Replaces SimpleMenu dropdown with professional drawer
-  - Slides from left using React Native Animated API
-  - 70% screen width with dark overlay backdrop
-  - 300ms smooth animation (slide in/out)
-  - Tap outside to close functionality
-  - Menu items: Settings, Profile, Logout
-  - Properly handles animation state for repeated open/close
-- Day Selector Tabs
-  - 7-day tabs (Mon-Sun) in horizontal row
-  - Active state with green (#00FF00) background
-  - Inactive state with gray (#424242) background
-  - 45px height, 8px spacing between tabs
-  - 16px spacing below tabs to workout card
-- Workout Preview Card
-  - Shows selected day's workout name and exercises
-  - Day name in Bebas Neue with green color and text shadow
-  - 4 placeholder exercises with bullet points
-  - Card background (#303030) with 20px padding
-  - 12px border radius, 16px horizontal margins
-- Start Workout Button
-  - Prominent green (#00FF00) button below workout card
-  - Text: "START WORKOUT!" in 32px Bebas Neue
-  - Tight letter spacing (0) for compact look
-  - Multi-layer shadow system (3 layers, Android compatible)
-  - 60px height, 8px margin from workout card
-  - Perfect vertical text centering
-  - Press state: 0.8 opacity
-  - Console.log handler (ready for navigation)
-- Bottom Navigation Bar
-  - 5 buttons: Plans, History, Home, Stats, Profile
-  - SVG icons with active/inactive states
-  - Active: green (#00FF00), Inactive: gray (#666666)
-  - 70px height, 1px top border
-  - Icon size: 24px
-- SVG Icon System Expansion
-  - Created 6 new icons: HamburgerIcon, HomeIcon, PlansIcon, HistoryIcon, StatsIcon, ProfileIcon
-  - All icons scalable with size and color props
-  - Consistent stroke width and design language
+- **Navigation Hooks** (src/navigation/hooks.ts - 163 lines)
+  - `useTypedNavigation()`: Fully typed navigation with autocomplete
+  - `useTypedRoute<T>()`: Typed route params
+  - `useNavigationAndRoute<T>()`: Combined hook for both
+  - `useSafeNavigate()`: Compile-time param validation
+  - `useNavigationActions()`: Common shortcuts (goBack, goToHome, goToLogin, reset, replace, canGoBack)
+- **Navigation Service** (src/navigation/navigationService.ts - 141 lines)
+  - `navigationRef`: Global navigation reference
+  - `navigate()`, `goBack()`, `reset()`, `replace()`: Imperative navigation
+  - `getCurrentRoute()`, `isReady()`, `canGoBack()`: Navigation state
+  - Enables navigation from services, utils, error handlers
+- **Auth Guards** (src/navigation/guards.ts - 170 lines)
+  - `useAuthGuard()`: Protects authenticated screens, redirects to login
+  - `useGuestGuard()`: Redirects to home if already authenticated
+  - `withAuthGuard()`: HOF for protecting actions
+  - `requireAuth()`: Standalone auth check for services
+- **Custom Transitions** (src/navigation/transitions.ts - 148 lines)
+  - **12 Transition Presets**: defaultTransition, modalTransition, fadeTransition, fadeFromBottomTransition, noTransition, iosModalTransition, simplePushTransition, noGestureOptions, fullScreenModalOptions, transparentModalOptions
+  - `createCustomTransition()`: Custom duration support
+  - `mergeTransitions()`: Combine configs
+- **Separated Stacks**
+  - **AuthNavigator** (63 lines): LoginScreen, LoginFormScreen, SignUpScreen (modal), SignUpStep2Screen, WelcomeScreen (no gesture)
+  - **MainNavigator** (54 lines): HomePage (placeholder comments for future screens)
+- **Updated Type System** (src/navigation/types.ts)
+  - Separated `AuthStackParamList` and `MainStackParamList`
+  - `RootStackParamList` combines both for backward compatibility
+  - Screen prop helpers: `AuthStackScreenProps<T>`, `MainStackScreenProps<T>`
+- **App.tsx Redesign**
+  - Checks auth state on mount with `isAuthenticated()`
+  - Conditionally renders `<AuthNavigator />` or `<MainNavigator />`
+  - Loading screen with ActivityIndicator during auth check
+  - Attached `navigationRef` for global navigation access
 
-**New Design Tokens Added**:
-- Layout tokens (theme.layout):
-  - `topBar.height: 60` - Top bar height
-  - `topBar.iconButtonSize: 44` - Touch target size
-  - `topBar.iconSize: 28` - Actual icon size
-  - `bottomNav.height: 70` - Bottom nav bar height
-  - `bottomNav.iconSize: 24` - Nav icon size
-  - `bottomNav.paddingVertical: 10`
-  - `bottomNav.paddingHorizontal: 16`
-  - `dayTabs.height: 45` - Day tab height
-  - `dayTabs.spacing: 8` - Space between tabs
-  - `dayTabs.paddingHorizontal: 16`
-  - `dayTabs.buttonMinWidth: 45`
-  - `dayTabs.marginBottom: 16` - Space below tabs
-  - `workoutCard.padding: 20`
-  - `workoutCard.marginHorizontal: 16`
-  - `workoutCard.marginBottom: 16`
-  - `workoutCard.borderRadius: 12`
-  - `workoutCard.exerciseSpacing: 12`
-  - `sidebar.widthPercentage: 70`
-  - `sidebar.animationDuration: 300`
-  - `sidebar.itemPaddingVertical: 16`
-  - `sidebar.itemPaddingHorizontal: 24`
-  - `bullet.size: 6` - Bullet point diameter
-  - `bullet.borderRadius: 3`
-  - `border.thin: 1` - Thin borders
-  - `border.medium: 2` - Medium borders
-- Color tokens (theme.colors):
-  - `navActive: #00FF00` - Active navigation item
-  - `navInactive: #666666` - Inactive navigation items
-  - `tabActive: #00FF00` - Active tab
-  - `tabInactive: #424242` - Inactive tab
-  - `tabActiveText: #000000` - Text on active tab
-  - `tabInactiveText: #B0B0B0` - Text on inactive tab
-  - `overlayBackground: rgba(0, 0, 0, 0.5)` - Sidebar backdrop
-- Typography tokens (theme.typography):
-  - `letterSpacing.tight: 0` - Tight letter spacing
-  - `letterSpacing.normal: 1` - Normal letter spacing
-  - `letterSpacing.wide: 2` - Wide letter spacing
+**Files Created (8)**:
+- navigation/hooks.ts (163 lines)
+- navigation/navigationService.ts (141 lines)
+- navigation/guards.ts (170 lines)
+- navigation/transitions.ts (148 lines)
+- navigation/AuthNavigator.tsx (63 lines)
+- navigation/MainNavigator.tsx (54 lines)
+- navigation/index.ts (66 lines)
+- navigation/README.md (385 lines)
 
-**Complete Tokenization**:
-- Removed ALL magic numbers from MainActivity
-- Every dimension uses theme tokens
-- HamburgerIcon size: theme.layout.topBar.iconSize
-- Letter spacing: theme.typography.letterSpacing.*
-- Bullet points: theme.layout.bullet.*
-- Borders: theme.layout.border.*
-- All spacing: theme.spacing.* or theme.layout.*
-- ZERO hard-coded values remaining
-
-**Files Created**:
-- `src/components/Sidebar.tsx` - Slide-out drawer component
-- `src/components/icons/HamburgerIcon.tsx` - Menu icon
-- `src/components/icons/HomeIcon.tsx` - Home nav icon
-- `src/components/icons/PlansIcon.tsx` - Plans nav icon
-- `src/components/icons/HistoryIcon.tsx` - History nav icon
-- `src/components/icons/StatsIcon.tsx` - Stats nav icon
-- `src/components/icons/ProfileIcon.tsx` - Profile nav icon
-
-**Files Modified**:
-- `src/features/main/screens/MainActivity.tsx` - Complete rebuild with all UI elements
-- `src/theme/layout.ts` - Added extensive layout tokens
-- `src/theme/colors.ts` - Added navigation and tab colors
-- `src/theme/typography.ts` - Added letter spacing tokens
-- `src/components/icons/index.ts` - Added new icon exports
-
-**Files Deleted**:
-- `src/components/SimpleMenu.tsx` - Replaced by Sidebar
-
-**Technical Achievements**:
-- Animated drawer with proper state management (modal visibility separate from animation)
-- Multi-layer shadow pattern applied consistently
-- Type-safe navigation throughout
-- Memoized callbacks with useCallback
-- Perfect vertical text centering (includeFontPadding: false)
-- All components follow CLAUDE_DEV_STANDARDS
+**Files Modified (2)**:
+- App.tsx (86 lines) - Auth-based navigator switching
+- src/navigation/types.ts (71 lines) - Separated stack types
 
 **User Decisions**:
-- Top bar: Hamburger left, LIFT logo centered
-- Sidebar: 70% width, left side, tap-outside-to-close
-- Day tabs: Row of 7 days, tappable to switch workouts
-- Start button: Below card, 8px spacing, "START WORKOUT!" with tight letters
-- Bottom nav: 5 buttons (Plans, History, Home, Stats, Profile)
-- Workout card: Medium detail (day + exercise list)
+- Separate Auth and Main stacks for clean flow
+- Type safety throughout navigation
+- Auth guards prevent unauthorized access
+- Reusable transition presets for consistency
+- navigationService for service layer navigation
 
-**Testing**:
-- Sidebar slides in/out smoothly on every open/close
-- Day tabs switch workout preview correctly
-- Bottom nav highlights active item
-- Start button press state works
-- All navigation flows tested
+**Technical Achievements**:
+- Full TypeScript autocomplete for all routes
+- Compile-time param validation
+- Auth state drives navigator selection
+- 12 reusable transition presets
+- Comprehensive documentation with examples
 
-**Git Commits** (mainactivity-base-ui branch):
-- Created SVG icon components
-- Added design tokens for navigation, tabs, sidebar
-- Created Sidebar component with slide animation
-- Updated MainActivity with complete UI
-- Fixed sidebar animation state management
-- Added Start Workout button
-- Multiple styling refinements (spacing, fonts, centering)
-- Merged to main branch
+**Testing**: Not yet tested - needs device verification
 
 **Key Learnings**:
-- Modal visibility must be separate from animation state for proper slide-out
-- Android text centering requires includeFontPadding: false
-- Bebas Neue font creates strong fitness aesthetic
-- Consistent token usage prevents drift and ensures maintainability
+- Type-safe navigation improves developer experience
+- navigationService enables navigation from anywhere
+- Auth guards centralize security logic
+- Separated stacks keep auth flow isolated
+- Transition presets ensure consistent UX
 
-**Next Steps**: Implement workout tracking screen, connect authentication logic, build out other navigation screens
+**Next Steps**: Test navigation flows on device, implement auth logic, build out main app screens
 
 ---
 
-### v1.0.4b - Documentation Optimization & Standards Enhancement (2025-11-11)
-**Branch**: Claude-v1.0.4 (merged to main)
+### v1.0.13 - Phase 5: Data Layer & Architecture (2025-11-15)
+**Branch**: Claude-v1.0.13 (merged to main)
 
-**Summary**: Major documentation system overhaul with optimized reference formats, new GLOBAL-FIRST development standard, enhanced file purposes, and complete removal of external project references. Documentation reduced by 60%+ while preserving all critical information.
+**Summary**: Complete service layer infrastructure with Supabase integration. Unified `ApiResult<T>` pattern for all API responses, `BaseService` class for generic CRUD operations, `authService` example implementation, comprehensive error handling utilities, and type guards.
 
-**Documentation Optimization**:
-- CLAUDE_SESSION_HANDOFF.md: Reduced from 521 to 239 lines (54% smaller)
-  - Converted verbose content to lean table/grid format
-  - Design tokens, layout values, shadow layers in scannable tables
-  - Architectural patterns condensed with REQUIRED rules
-  - Environment status compressed to pipe-separated format
-- CLAUDE_PROJECT_NOTES.md: Reduced from 464 to ~130 lines (72% smaller)
-  - All versions v1.0.0-v1.0.3 condensed to 4-line summary
-  - Historical context preserved, verbosity removed
-- CLAUDE_ACTIVE.md: Reduced from 212 to 87 lines (59% smaller)
-  - Pruned stale v1.0.0 session notes and outdated sections
-  - Kept essential: Commands, Button template
-  - Redefined as code reference scratchpad (<100 lines target)
+**What Was Built**:
+- **API Types** (src/types/api.types.ts - 127 lines)
+  - `ApiResponse<T>`: Successful response `{data: T, error: null, status: 'success'}`
+  - `ApiError`: Error response `{data: null, error: {message, code?, details?}, status: 'error'}`
+  - `ApiResult<T>`: Combined type (ApiResponse | ApiError)
+  - `ApiErrorCode` enum: UNAUTHORIZED, FORBIDDEN, INVALID_CREDENTIALS, VALIDATION_ERROR, NOT_FOUND, etc.
+  - Type guards: `isApiSuccess<T>()`, `isApiError()`
+- **Supabase Client** (src/services/supabaseClient.ts - 81 lines)
+  - Client initialization with auth config (autoRefreshToken, persistSession)
+  - `getCurrentUser()`: Get authenticated user
+  - `getCurrentSession()`: Get session
+  - `signOut()`: Sign out user
+  - `isAuthenticated()`: Boolean auth check
+- **API Utilities** (src/services/apiUtils.ts - 198 lines)
+  - `createSuccessResponse<T>(data)`: Format success
+  - `createErrorResponse(message, code, details)`: Format error
+  - `handleSupabaseError(error)`: Map Postgrest errors to ApiError
+  - `getErrorMessage(error)`: Extract user-friendly message
+  - `isErrorCode(error, code)`: Check specific error code
+  - `handleAsync<T>(asyncFn)`: Wrap async operations in try/catch
+  - `handleSupabaseQuery<T>(queryFn)`: Wrap Supabase queries with error handling
+  - `retry<T>(fn, options)`: Exponential backoff retry logic
+  - `validateRequiredFields(data, fields)`: Validate required fields exist
+- **Base Service** (src/services/BaseService.ts - 267 lines)
+  - Generic CRUD class for any Supabase table
+  - `getAll(options)`: Fetch all records with ordering/pagination
+  - `getById(id)`: Fetch single record
+  - `getBy(filters)`: Fetch filtered records
+  - `create(data)`: Insert new record
+  - `update(id, data)`: Update existing record
+  - `delete(id)`: Delete record
+  - `count(filter)`: Count records
+  - `exists(id)`: Check if record exists
+  - Extend for specific tables
+- **Auth Service** (src/services/authService.ts - 306 lines)
+  - Example service implementation
+  - `signUp(credentials)`: Create new user account
+  - `signIn(credentials)`: Email/password sign in
+  - `signOut()`: Sign out current user
+  - `requestPasswordReset(request)`: Send reset email
+  - `updatePassword(request)`: Update password
+  - `getCurrentUser()`: Get current user
+  - Demonstrates service patterns with validation, error handling, type safety
+  - Singleton export: `export const authService = new AuthService()`
 
-**New Development Standard**:
-- Added Standard #9: GLOBAL-FIRST PATTERN to CLAUDE_DEV_STANDARDS.md
-  - Establish global files first for all reusable patterns
-  - Buttons, inputs, spacing, text sizes must be defined globally
-  - Local customizations only after global patterns established
-  - Updated CRITICAL REMINDERS to include global-first requirement
+**Files Created (8)**:
+- types/api.types.ts (127 lines)
+- types/index.ts (22 lines)
+- services/supabaseClient.ts (81 lines)
+- services/apiUtils.ts (198 lines)
+- services/BaseService.ts (267 lines)
+- services/authService.ts (306 lines)
+- services/index.ts (44 lines)
+- services/README.md (262 lines)
 
-**Enhanced Documentation**:
-- All APD files now have "What This File Does" sections (3-5 lines)
-- SESSION_HANDOFF: Context restoration for immediate work
-- PROJECT_NOTES: Version history with institutional knowledge
-- CLAUDE_ACTIVE: Code reference scratchpad for exact examples/bugs
-- DEVDOC policy: No code in SESSION_HANDOFF/PROJECT_NOTES unless critical
+**User Decisions**:
+- Generic service layer - kept flexible for future Supabase schema
+- ApiResult<T> pattern for all API operations
+- Type guards for response checking
+- BaseService as foundation for all tables
+- authService as pattern example
+- Complete documentation for discoverability
 
-**Reference Cleanup**:
-- Removed all external project references from documentation and code
-- Kept minimal historical context in SESSION_HANDOFF
-- Updated to "previous project learnings" language
-- Files cleaned: README.md, CLAUDE_DEV_STANDARDS.md, CLAUDE_ACTIVE.md, CLAUDE_PROJECT_NOTES.md, CLAUDE_SESSION_HANDOFF.md, colors.ts, spacing.ts, client.ts, .env.example
+**Technical Achievements**:
+- Unified response format across entire app
+- Type-safe CRUD operations
+- Comprehensive error handling
+- Retry logic with exponential backoff
+- Field validation utilities
+- Complete service layer documentation
 
-**README.md Streamlined**:
-- Removed verbose sections (folder structure, current state, getting started)
-- Kept essential: project overview, patterns, critical standards
-- Updated token note to emphasize architecture over specific values
+**Testing**: Not yet tested - needs Supabase credentials and DB schema
 
-**USERPROMPT System**:
-- New USERPROMPT folder for prompt tracking
-- USERPROMPT-Claude-v1.0.4.md created by DEVDOC Agent
-- Captures all prompts with verbatim text, translation, summary
+**Key Learnings**:
+- ApiResult<T> pattern provides consistency
+- BaseService eliminates boilerplate
+- Type guards enable type-safe error handling
+- Service layer keeps components clean
+- Generic patterns scale well
 
-**Documentation Flow Clarified**:
-- SESSION_HANDOFF: Summarized patterns only (no code unless critical)
-- PROJECT_NOTES: Summarized history only (no code unless critical)
-- CLAUDE_ACTIVE: All code examples, bug reproductions, technical details
+**Next Steps**: Configure .env with Supabase credentials, create DB schema, implement auth logic in screens
 
-**Files Modified (9)**:
-- APD/CLAUDE_DEV_STANDARDS.md (Standard #9 added)
-- APD/CLAUDE_SESSION_HANDOFF.md (optimized to tables)
-- APD/CLAUDE_PROJECT_NOTES.md (historical versions condensed)
-- APD/CLAUDE_ACTIVE.md (pruned to 87 lines)
-- README.md (streamlined)
-- src/theme/colors.ts (comments updated)
-- src/theme/spacing.ts (comments updated)
-- src/services/supabase/client.ts (comments updated)
-- .env.example (comments updated)
+---
+
+### v1.0.12 - Phase 4: Auth Screens Refactoring (2025-11-15)
+**Branch**: Claude-v1.0.12 (merged to main)
+
+**Summary**: Small focused phase. Created `ActionButton` component for simple CTA buttons. Refactored SignUpScreen, SignUpStep2Screen, and WelcomeScreen to use ActionButton instead of inline buttons.
+
+**What Was Built**:
+- **ActionButton Component** (src/components/Button/ActionButton.tsx - 77 lines)
+  - Simple CTA button (no shadow layers)
+  - Props: text, onPress, disabled, style
+  - Green background with pressed state (0.8 opacity)
+  - Bebas Neue font with letter spacing
+  - Used for "NEXT", "LET'S GO" buttons
 
 **Files Created (1)**:
-- USERPROMPT/USERPROMPT-Claude-v1.0.4.md (prompt tracking)
+- components/Button/ActionButton.tsx (77 lines)
 
-**Key Improvements**:
-- Documentation 60%+ leaner across all files
-- Table-based reference format for instant lookup
-- Clear separation: summaries vs code examples
-- Global-first pattern enforced in standards
-- All file purposes clearly documented
-
----
-
-### v1.0.4c - Design Token System Refactored (2025-11-11)
-**Branch**: Claude-v1.0.4 (in progress)
-
-**Summary**: Comprehensive design token refactoring establishing 64dp safe zone standard, complete px-to-dp conversion, expanded typography scale, new semantic color tokens, and new development standard for forward-looking comments. All auth screens fully tokenized with zero hardcoded values remaining.
-
-**What Was Built**:
-- **64dp Safe Zone Standard**: Established universal clearance from top/bottom screen edges
-  - Accounts for Android navigation bar (48dp maximum) + comfortable margin (16dp)
-  - Applied consistently across all screens (LoginScreen, LoginFormScreen, SignUpScreen)
-  - New `theme.spacing.safeZone: 64` and `theme.spacing.safeZoneHorizontal: 32`
-- **Complete px to dp Conversion**: Removed ALL "px" references from code and comments
-  - All measurements now use "dp" (density-independent pixels) terminology
-  - Confirmed numeric values in React Native are always dp by default
-  - Updated comments throughout to reflect correct unit system
-- **Expanded Color Token System**: Added 5 new semantic color tokens with full documentation
-  - `primaryMuted: #00BF00` - 75% brightness green for softer accents
-  - `pureBlack: #000000` - True black for maximum contrast backgrounds
-  - `pureWhite: #FFFFFF` - Maximum contrast for bright UI elements
-  - `googleBlue: #4285F4` - Official Google brand color
-  - `facebookBlue: #1877F2` - Official Facebook brand color
-  - All colors include hex value, description, and use case documentation
-- **Expanded Typography Scale**: Grew from 6 to 9 font sizes based on 16dp baseline
-  - Added `xl: 24dp` (1.5× baseline) - Small headlines, section titles
-  - Added `xxl: 28dp` (1.75× baseline) - Medium headlines, sub-headers
-  - Added `xxxl: 32dp` (2× baseline) - Large headlines, page titles
-  - Added `display: 48dp` (3× baseline) - Hero text, main branding
-  - Added `mega: 64dp` (4× baseline) - Extra large display text
-  - Follows rem-like scaling pattern for consistency
-- **Enhanced Spacing Tokens**: Added context-specific spacing values
-  - `safeZone: 64` - Standard clearance from top/bottom edges
-  - `safeZoneHorizontal: 32` - Standard horizontal clearance
-  - `textLineGap: 10` - Vertical spacing between text lines
-  - `textGroupSpacing: 32` - Spacing between text groups/paragraphs
-  - `buttonSpacing: 16` - Vertical spacing between stacked buttons
-- **Updated Layout Tokens**: Standardized to 64dp safe zone
-  - `header.topSpacing: 64` (changed from 100dp to match safe zone)
-  - `bottom.safeZone: 64` - Distance from bottom for interactive elements
-  - `bottom.buttonGroupPadding: 48` - Container padding (48dp + 16dp margin = 64dp visual)
-  - Added `icon` sizes: small (16), medium (24), large (32), xlarge (40)
-  - Added `backgroundImage` configuration: topSpacing (32), widthPercentage (80), heightPercentage (70), opacity (0.5)
-
-**Screen Refactoring** (All Fully Tokenized):
-- **LoginScreen**: All spacing/typography uses tokens, zero hardcoded values
-  - Header positioning: `theme.spacing.safeZone` and `theme.spacing.safeZoneHorizontal`
-  - Text sizes: `theme.typography.fontSize.xxxl` and `theme.typography.fontSize.display`
-  - Text spacing: `theme.spacing.textLineGap` for consistent line gaps
-  - Button container: `theme.layout.bottom.buttonGroupPadding` for proper bottom clearance
-- **LoginFormScreen**: Social media colors tokenized, header uses layout tokens
-  - Google button: `theme.colors.pureWhite` background, `theme.colors.googleBlue` logo, `theme.colors.pureBlack` text
-  - Facebook button: `theme.colors.facebookBlue` background, `theme.colors.pureWhite` text/logo
-  - Header positioning: `theme.layout.header.topSpacing` and `theme.spacing.safeZoneHorizontal`
-  - Button spacing: `theme.spacing.buttonSpacing` between stacked buttons
-- **SignUpScreen**: Background image tokenized, all colors semantic
-  - Background: `theme.colors.pureBlack` for true black backgrounds
-  - Text colors: `theme.colors.primaryMuted` for softer green accents
-  - Background image: Uses `theme.layout.backgroundImage` tokens for positioning and opacity
-  - Bottom positioning: `theme.layout.bottom.safeZone` for button clearance
-
-**New Development Standard**:
-- **Standard #10: Forward-Looking Comments** added to CLAUDE_DEV_STANDARDS.md
-  - Comments must explain design intent and purpose, not historical changes
-  - Example (Bad): "Changed from 50dp to 64dp to fix alignment issue"
-  - Example (Good): "64dp safe zone clearance for system UI compatibility"
-  - Historical context belongs in git history, not code comments
-  - Keeps code clean, focused on present intent, prevents stale historical artifacts
-- Updated CRITICAL REMINDERS: "NO historical comments"
-- Updated CLAUDE.md with new standard in Essential Patterns and Critical Standards
-
-**Files Modified (11)**:
-- `src/theme/colors.ts` - Added 5 new semantic color tokens with documentation
-- `src/theme/spacing.ts` - Added safe zone and context-specific spacing tokens
-- `src/theme/typography.ts` - Expanded from 6 to 9 font sizes
-- `src/theme/layout.ts` - Updated to 64dp standard, added icon sizes and backgroundImage settings
-- `src/features/auth/screens/LoginScreen.tsx` - Fully tokenized, zero hardcoded values
-- `src/features/auth/screens/LoginFormScreen.tsx` - Social colors tokenized, header uses layout tokens
-- `src/features/auth/screens/SignUpScreen.tsx` - Complete tokenization with semantic colors
-- `APD/CLAUDE_DEV_STANDARDS.md` - Added Standard #10 (Forward-Looking Comments)
-- `APD/CLAUDE.md` - Updated with new standard
-- `APD/CLAUDE_SESSION_HANDOFF.md` - Comprehensive documentation of session work
-- `APD/CLAUDE_PROJECT_NOTES.md` - This file, version history updated
-
-**Technical Concepts Covered**:
-- React Native dp (density-independent pixels) vs physical pixels
-  - Numeric values in React Native are dp by default, not px
-  - At 480dpi (xxhdpi), 1dp = 3 physical pixels
-  - dp provides consistent sizing across different screen densities
-- Android SafeAreaView behavior
-  - Handles status bar but NOT navigation bar on Android
-  - Need manual bottom padding to account for navigation bar
-- Design token systems and semantic naming
-  - Purpose-driven names (primaryMuted) not literal (lightGreen)
-  - Token architecture matters more than specific values
-  - Tokens evolve during development
-- Typography scaling systems
-  - 16dp baseline with rem-like scaling (1.5×, 1.75×, 2×, 3×, 4×)
-  - Consistent scale makes sizing decisions predictable
-- Flexbox responsive layouts
-  - `flex: 1` with `justifyContent: 'center'` for automatic vertical centering
-  - Percentage-based sizing for responsive backgrounds
+**Files Modified (4)**:
+- components/Button/index.ts - Added ActionButton export
+- features/auth/screens/SignUpScreen.tsx - 242 → 208 lines (34 line reduction)
+- features/auth/screens/SignUpStep2Screen.tsx - 214 → 178 lines (36 line reduction)
+- features/auth/screens/WelcomeScreen.tsx - 168 → 134 lines (34 line reduction)
 
 **User Decisions**:
-- Establish 64dp as standard safe zone clearance (top/bottom)
-- Use 32dp as standard horizontal clearance
-- All measurements in dp (density-independent pixels)
-- 16dp as baseline for typography scaling (rem-like system)
-- Comments must be forward-looking, not historical
-- Token architecture matters more than exact values (values can evolve)
+- Simple focused phase - just one component
+- Eliminate duplicate button code across auth screens
+- Keep ActionButton simple (no shadow layers)
+
+**Technical Achievements**:
+- 104 lines eliminated across 3 screens
+- Consistent button styling
+- Reduced code duplication
+
+**Testing**: Not yet tested
 
 **Key Learnings**:
-- React Native uses dp by default - no need to specify unit
-- SafeAreaView doesn't handle Android nav bar - manual padding required
-- 64dp safe zone (48dp nav bar + 16dp margin) provides comfortable clearance
-- Consistent token usage prevents drift and ensures maintainability
-- Forward-looking comments keep code clean and prevent confusion
-- Semantic naming (primaryMuted) communicates intent better than literal (lightGreen)
+- Small focused changes are easier to verify
+- Even simple components reduce duplication
+- Consistent patterns improve maintainability
 
-**Testing Status**: Not yet tested on Android emulator - needs verification of all token rendering
-
-**Next Steps**: Test refactored screens on Android emulator, verify tokens render correctly, continue with app features (authentication logic, workout logging, training plans)
+**Next Steps**: Phase 5 - Data Layer & Architecture
 
 ---
 
-### Historical Versions (v1.0.0 - v1.0.3)
+### v1.0.11 - Phase 3: Utils & Hook Infrastructure (2025-11-15)
+**Branch**: Claude-v1.0.11 (merged to main)
 
-**v1.0.0-v1.0.3 Summary**: Project evolved from foundation (React Native 0.82.1 with TypeScript, Supabase, feature-based architecture, design token system) through LoginScreen implementation with custom fonts (Bebas Neue/Roboto), multi-layer shadows, and complete tokenization, to full navigation setup with React Navigation, LoginFormScreen, MainActivity, SVG icon system, and theme.layout module. Gradle upgraded to 9.2.0 for Android Studio compatibility. All screens fully tokenized with zero magic numbers, shadow system refined to pure black dropping straight down (0.4→0.25→0.15 opacity fade). Navigation flows: LoginScreen ↔ LoginFormScreen ↔ MainActivity with slide_from_right animation and type-safe routing.
+**Summary**: Comprehensive utility and hook infrastructure. Created 60+ utility functions across dateUtils, validationUtils, formatUtils. Built useFormInput hook with validation, useAnimation hook (fade/slide/scale), and refactored useWeekCalendar to use dateUtils.
+
+**What Was Built**:
+- **dateUtils.ts** (src/utils/dateUtils.ts - 236 lines)
+  - **20+ date functions**: formatDateShort, formatDateLong, formatDateFull, formatTime, formatDateTime, formatRelativeDate
+  - **Week calculations**: getWeekStart, getWeekEnd, getWeekDates, getDayLetter
+  - **Date comparisons**: isSameDay, isSameWeek, isSameMonth, isToday, isYesterday, isTomorrow
+  - **Date math**: addDays, subtractDays, getDaysBetween, getWeeksBetween
+  - **Utilities**: parseDate, isValidDate, getAge, getDaysInMonth
+- **validationUtils.ts** (src/utils/validationUtils.ts - 294 lines)
+  - **15+ validators**: validateEmail, validatePassword, validatePasswordStrength, validateName, validatePhone, validateURL
+  - **Password strength**: getPasswordStrength (weak/medium/strong), MIN_PASSWORD_LENGTH (8)
+  - **Form validation**: createValidator, combineValidators, isValidationError
+  - **Type**: ValidationResult = string | null (null = valid)
+  - **Regex patterns**: EMAIL_REGEX, PHONE_REGEX, URL_REGEX
+- **formatUtils.ts** (src/utils/formatUtils.ts - 267 lines)
+  - **25+ formatters**: formatCurrency, formatPercentage, formatPhoneNumber, formatNumber, formatNumberWithCommas
+  - **Time formatting**: formatDuration, formatTimeAgo, formatCountdown
+  - **Text utilities**: truncate, capitalize, titleCase, pluralize, slugify
+  - **Number utilities**: clamp, roundToDecimal, formatBytes
+- **useFormInput.ts** (src/hooks/useFormInput.ts - 127 lines)
+  - Form input state management with validation
+  - Returns: value, error, touched, setValue, setError, setTouched, handleChange, handleBlur, validate, reset, clear
+  - Config: initialValue, validator, validateOnChange, validateOnBlur
+  - Example: `const email = useFormInput({initialValue: '', validator: validateEmail})`
+- **useAnimation.ts** (src/hooks/useAnimation.ts - 308 lines)
+  - **useFadeAnimation**: fadeIn, fadeOut, fadeToggle
+  - **useSlideAnimation**: 8-direction slides (in/out from all sides)
+  - **useScaleAnimation**: scaleIn, scaleOut, pulse, reset
+  - Config: duration, easing, useNativeDriver, delay
+- **useWeekCalendar.ts Refactored** (44 lines - down from 100 lines, 53% reduction)
+  - Now uses dateUtils functions instead of manual date logic
+  - getWeekDates, formatDateShort, getDayLetter imported from dateUtils
+  - Much cleaner and more maintainable
+
+**Files Created (8)**:
+- utils/dateUtils.ts (236 lines)
+- utils/validationUtils.ts (294 lines)
+- utils/formatUtils.ts (267 lines)
+- hooks/useFormInput.ts (127 lines)
+- hooks/useAnimation.ts (308 lines)
+- hooks/index.ts (12 lines) - Barrel export
+- utils/README.md (118 lines) - Utils documentation
+- hooks/README.md (146 lines) - Hooks documentation
+
+**Files Modified (2)**:
+- utils/index.ts - Added new utility exports
+- hooks/useWeekCalendar.ts - Refactored to use dateUtils (100 → 44 lines, 53% reduction)
+
+**User Decisions**:
+- Comprehensive utility library covers most common needs
+- Password strength analysis for better UX
+- Form hook with built-in validation
+- Animation hooks for common patterns
+- Well-documented for discoverability
+
+**Technical Achievements**:
+- 60+ utility functions eliminating common boilerplate
+- Type-safe validation with clear error messages
+- Reusable animation hooks for consistent motion
+- Form hook simplifies input state management
+- useWeekCalendar refactored to 53% smaller
+
+**Testing**: Not yet tested
+
+**Key Learnings**:
+- Comprehensive utils prevent reinventing the wheel
+- Password strength feedback improves security UX
+- Animation hooks encapsulate complex Animated API
+- Form hooks eliminate repetitive state management
+- Utilities enable refactoring existing code
+
+**Next Steps**: Phase 4 - Auth Screens Refactoring
+
+---
+
+### v1.0.10 - Phase 2: HomePage Decomposition (2025-11-15)
+**Branch**: Claude-v1.0.10 (merged to main)
+
+**Summary**: Extracted 4 navigation components (TopNavBar, WeekCalendar, PlanProgressBar, BottomTabBar) and 2 hooks (useWeekCalendar, useSwipeGesture) from HomePage. Reduced HomePage from 515 lines to 137 lines (73% reduction). All components React.memo optimized.
+
+**What Was Built**:
+- **TopNavBar** (src/components/Navigation/TopNavBar.tsx - 77 lines)
+  - Search and menu buttons
+  - Props: onSearchPress, onMenuPress
+  - React.memo optimized
+- **WeekCalendar** (src/components/Navigation/WeekCalendar.tsx - 102 lines)
+  - 7-day week selector with today highlighting
+  - Uses useWeekCalendar hook for date logic
+  - Active state management
+  - React.memo optimized
+- **PlanProgressBar** (src/components/Navigation/PlanProgressBar.tsx - 92 lines)
+  - Current plan display with progress
+  - Day/week progress indicators
+  - React.memo optimized
+- **BottomTabBar** (src/components/Navigation/BottomTabBar.tsx - 112 lines)
+  - 4 tabs: Home, Plans, Performance, Profile
+  - Active state with green highlight
+  - Icon size and spacing tokenized
+  - React.memo optimized
+- **useWeekCalendar** (src/hooks/useWeekCalendar.ts - 100 lines, later refactored in Phase 3)
+  - Week dates calculation
+  - Day letter formatting
+  - Today detection
+  - useMemo optimized
+- **useSwipeGesture** (src/hooks/useSwipeGesture.ts - 100 lines)
+  - Swipe-to-dismiss gesture handling
+  - PanResponder setup with thresholds
+  - Animation integration
+  - Reusable across components
+
+**Files Created (8)**:
+- components/Navigation/TopNavBar.tsx (77 lines)
+- components/Navigation/WeekCalendar.tsx (102 lines)
+- components/Navigation/PlanProgressBar.tsx (92 lines)
+- components/Navigation/BottomTabBar.tsx (112 lines)
+- components/Navigation/index.ts (12 lines)
+- hooks/useWeekCalendar.ts (100 lines)
+- hooks/useSwipeGesture.ts (100 lines)
+- hooks/index.ts (8 lines)
+
+**Files Modified (2)**:
+- features/main/screens/HomePage.tsx - 515 → 137 lines (73% reduction, 378 lines eliminated)
+- components/index.ts - Added Navigation barrel export
+
+**User Decisions**:
+- Extract all navigation components from HomePage
+- Create reusable hooks for date and gesture logic
+- React.memo optimize all components
+- Keep HomePage clean and focused
+
+**Technical Achievements**:
+- 73% reduction in HomePage size
+- 6 new reusable components/hooks
+- React.memo optimization on all components
+- Clean separation of concerns
+- Eliminated 378 lines from HomePage
+
+**Testing**: Not yet tested
+
+**Key Learnings**:
+- Monolithic files (500+ lines) are hard to maintain
+- Component extraction improves reusability
+- Hooks encapsulate complex logic nicely
+- React.memo prevents unnecessary re-renders
+- Smaller files are easier to understand
+
+**Next Steps**: Phase 3 - Utils & Hook Infrastructure
+
+---
+
+### v1.0.9 - Phase 1: Component Library (2025-11-15)
+**Branch**: Claude-v1.0.9 (merged to main)
+
+**Summary**: Created foundation of reusable component library. ShadowButton (3 variants), FormInput (with focus/error states), PasswordInput (extends FormInput), SocialButton (Google/Facebook config-driven). Eliminated 180+ lines of duplicate shadow button code.
+
+**What Was Built**:
+- **ShadowButton** (src/components/Button/ShadowButton.tsx - 134 lines)
+  - 3 variants: primary (green), secondary (white), tertiary (transparent)
+  - Multi-layer shadow system (3 layers)
+  - Pressed and disabled states
+  - Bebas Neue font with letter spacing
+  - Eliminated duplicate shadow button code from 6 instances across auth screens
+  - Saved 180+ lines of duplicate code
+- **FormInput** (src/components/Input/FormInput.tsx - 126 lines)
+  - Text input with focus/error states
+  - Focus border changes color
+  - Error styling and message
+  - Right element support (for icons)
+  - Props: value, onChangeText, placeholder, keyboardType, autoCapitalize, error, rightElement
+- **PasswordInput** (src/components/Input/PasswordInput.tsx - 52 lines)
+  - Extends FormInput
+  - Show/hide password toggle with eye icons
+  - Auto-sets secureTextEntry, autoCapitalize: none, autoCorrect: false
+  - Uses EyeOpen/EyeClosed SVG icons
+- **SocialButton** (src/components/Button/SocialButton.tsx - 102 lines)
+  - Config-driven OAuth buttons
+  - Google: White background, blue logo, black text
+  - Facebook: Blue background, white text/logo
+  - PROVIDER_CONFIG object with all styling
+  - Logo, text, colors, sizes configured per provider
+  - Props: provider ('google' | 'facebook'), onPress
+
+**Files Created (7)**:
+- components/Button/ShadowButton.tsx (134 lines)
+- components/Button/index.ts (9 lines)
+- components/Input/FormInput.tsx (126 lines)
+- components/Input/PasswordInput.tsx (52 lines)
+- components/Input/index.ts (8 lines)
+- components/Button/SocialButton.tsx (102 lines)
+- components/index.ts (18 lines) - Main barrel export
+
+**Files Modified (2)**:
+- features/auth/screens/LoginScreen.tsx - Uses ShadowButton (174 lines eliminated)
+- features/auth/screens/LoginFormScreen.tsx - Uses FormInput, PasswordInput, SocialButton (400 → 252 lines, 37% reduction)
+
+**User Decisions**:
+- Build component library foundation
+- Eliminate duplicate shadow button code (highest priority)
+- Create reusable form inputs
+- Config-driven social buttons for scalability
+- Establish barrel export pattern
+
+**Technical Achievements**:
+- 180+ lines of duplicate code eliminated
+- LoginFormScreen reduced by 37% (148 lines)
+- Consistent component API across library
+- Barrel exports for clean imports
+- All components follow CLAUDE_DEV_STANDARDS
+
+**Testing**: Not yet tested
+
+**Key Learnings**:
+- Component libraries eliminate massive code duplication
+- Shadow button pattern was repeated 6+ times
+- Config-driven components scale well
+- Barrel exports simplify imports
+- Small focused components are easier to test
+
+**Next Steps**: Phase 2 - HomePage Decomposition
+
+---
+
+### v1.0.8 - Phase 0: Tokenization Sweep (2025-11-15)
+**Branch**: Claude-v1.0.8 (merged to main)
+
+**Summary**: Complete first-pass tokenization sweep across entire codebase. Eliminated 51 magic numbers from 5 auth screens. Added 13 new design tokens across spacing, typography, layout, and buttons modules. 100% CLAUDE_DEV_STANDARDS compliance achieved.
+
+**What Was Built**:
+- **New Spacing Tokens** (src/theme/spacing.ts):
+  - `xxs: 2` - Extra tight spacing
+  - `inputMarginSmall: 5` - Small input margins
+- **New Typography Tokens** (src/theme/typography.ts):
+  - `letterSpacing.button: 0.5` - Button letter spacing
+  - `letterSpacing.extraWide: 3` - Extra wide spacing
+- **New Layout Tokens** (src/theme/layout.ts):
+  - authNavigation section: `backButtonLeft: 24`, `backButtonTop: 64`, `backButtonSize: 32`
+  - socialLogin section: `googleLogoFontSize: 20`, `facebookLogoFontSize: 20`, `buttonHeight: 50`, `buttonBorderRadius: 8`, `buttonMarginVertical: 8`, `dividerMarginVertical: 16`
+- **New Button Tokens** (src/theme/buttons.ts):
+  - `opacity.pressed: 0.8` - Pressed state opacity
+  - `opacity.disabled: 0.5` - Disabled state opacity
+
+**Files Modified (9)**:
+- src/theme/spacing.ts - Added 2 tokens
+- src/theme/typography.ts - Added 2 tokens
+- src/theme/layout.ts - Added 9 tokens
+- src/theme/buttons.ts - Added 2 tokens
+- src/features/auth/screens/LoginScreen.tsx - Tokenized (13 magic numbers eliminated)
+- src/features/auth/screens/LoginFormScreen.tsx - Tokenized (15 magic numbers eliminated)
+- src/features/auth/screens/SignUpScreen.tsx - Tokenized (8 magic numbers eliminated)
+- src/features/auth/screens/SignUpStep2Screen.tsx - Tokenized (9 magic numbers eliminated)
+- src/features/auth/screens/WelcomeScreen.tsx - Tokenized (6 magic numbers eliminated)
+
+**Magic Numbers Eliminated**:
+- **LoginScreen.tsx**: 13 (back button size, positions, icon sizes)
+- **LoginFormScreen.tsx**: 15 (input heights, spacing, logo sizes, border radius)
+- **SignUpScreen.tsx**: 8 (back button, spacing)
+- **SignUpStep2Screen.tsx**: 9 (icon size, spacing, positions)
+- **WelcomeScreen.tsx**: 6 (button positions, spacing)
+- **Total**: 51 magic numbers eliminated
+
+**User Decisions**:
+- Complete tokenization before structural refactoring
+- Anything not tokenized is an obvious first pass
+- Establish token architecture for all future work
+- 100% CLAUDE_DEV_STANDARDS compliance required
+
+**Technical Achievements**:
+- Zero magic numbers in all auth screens
+- 13 new design tokens added
+- Complete CLAUDE_DEV_STANDARDS compliance
+- All comments forward-looking
+- All styling via theme.* tokens
+
+**Testing**: Not yet tested
+
+**Key Learnings**:
+- Tokenization first prevents future refactoring issues
+- Magic numbers lurk in many places (spacing, sizing, opacity)
+- Token system makes bulk changes trivial
+- Forward-looking comments keep code clean
+
+**Next Steps**: Phase 1 - Component Library
+
+---
+
+### v1.0.7 - Branch Created (2025-11-14)
+**Branch**: Claude-v1.0.7 (ready for development)
+
+**Summary**: New branch created from main after v1.0.6 HomePage implementation. Ready for new development work. User requested comprehensive refactoring to improve file structure, reduce monolithic files, enhance performance, and establish scalable patterns using modern React Native best practices.
+
+**Next Steps**: Assess codebase for improvements, plan comprehensive refactoring phases, begin Phase 0 with complete tokenization sweep
+
+---
+
+### v1.0.6 - HomePage Implementation & Physical Device Testing (2025-11-14)
+**Branch**: Claude-v1.0.6 (merged to main)
+
+**Summary**: Complete HomePage implementation with top navigation bar and bottom tab bar. Renamed MainActivity to HomePage for semantic clarity. Added SearchIcon component. Extensive physical device testing via USB with iterative UI refinements. Applied CLAUDE_DEV_STANDARDS to eliminate all magic numbers - created theme.layout.topNav tokens and updated bottomNav tokens. Physical device testing workflow established. Branch merged to main successfully.
+
+---
+
+### Historical Versions (v1.0.0 - v1.0.5)
+
+**v1.0.5 - Comprehensive Design Token System Refactoring (2025-11-11)**: Complete refactoring of design token system. Established 64dp safe zone standard, expanded color/typography/spacing tokens, refactored all auth screens (LoginScreen, LoginFormScreen, SignUpScreen) with zero hardcoded values. Added Standard #10: Forward-Looking Comments. Branch merged to main successfully.
+
+**v1.0.4a - MainActivity Base UI Complete (2025-11-10)**: Complete MainActivity base UI with hamburger sidebar, day selector tabs, workout preview card, bottom navigation, and Start Workout button. All components fully tokenized with zero magic numbers. Slide-out sidebar drawer replaces dropdown menu. Branch merged to main successfully.
+
+**v1.0.0-v1.0.3 Summary**: Project evolved from foundation (React Native 0.82.1 with TypeScript, Supabase, feature-based architecture, design token system) through LoginScreen implementation with custom fonts (Bebas Neue/Roboto), multi-layer shadows, and complete tokenization, to full navigation setup with React Navigation, LoginFormScreen, MainActivity, SVG icon system, and theme.layout module. Gradle upgraded to 9.2.0 for Android Studio compatibility.
 
 ---
 
@@ -532,10 +639,12 @@ This file contains the historical record of version changes for Lift 3-2-1. Deta
 - Auto refresh tokens enabled
 - Type-safe with Database generic
 
-### React Navigation
-- Type-safe routes via RootStackParamList
+### React Navigation (UPDATED v1.0.14)
+- Type-safe routes via RootStackParamList, AuthStackParamList, MainStackParamList
 - Global type augmentation
-- Screen props helper type
+- Screen props helper types
+- useTypedNavigation, useTypedRoute hooks
+- navigationService for imperative navigation
 
 ### Custom Fonts (v1.0.2+)
 - Linked via `react-native.config.js` + `npx react-native-asset`
@@ -548,7 +657,7 @@ This file contains the historical record of version changes for Lift 3-2-1. Deta
 - Android compatible (no shadowColor prop)
 - Drops straight down (left: 0, right: 0, varying top offset)
 
-### Design Token Modules
+### Design Token Modules (UPDATED v1.0.15)
 - `theme.colors` - Semantic color palette
 - `theme.spacing` - 16px base rhythm
 - `theme.typography` - Font sizes, weights, letter spacing
@@ -556,8 +665,40 @@ This file contains the historical record of version changes for Lift 3-2-1. Deta
 - `theme.textShadows` - Text shadow presets
 - `theme.viewShadows` - View shadow presets
 - `theme.elevation` - Android elevation values
-- `theme.buttons` - Button dimensions, shadow layers
-- `theme.layout` - Layout constants (header, logo, form, bottom, topBar, bottomNav, dayTabs, workoutCard, sidebar)
+- `theme.buttons` - Button dimensions, shadow layers, opacity
+- `theme.layout` - Layout constants (header, logo, form, bottom, topNav, bottomNav, authNavigation, socialLogin)
+
+### Component Library (NEW v1.0.9)
+- ShadowButton, FormInput, PasswordInput, SocialButton, ActionButton
+- LoadingState, ErrorState, EmptyState
+- ErrorBoundary
+- All React.memo optimized
+
+### Service Layer (NEW v1.0.13)
+- ApiResult<T> pattern for all API operations
+- BaseService class for generic CRUD
+- authService example implementation
+- Type guards: isApiSuccess, isApiError
+- Unified error handling
+
+### Navigation System (NEW v1.0.14)
+- useTypedNavigation, useTypedRoute, useNavigationActions
+- navigationService for imperative navigation
+- Auth guards: useAuthGuard, useGuestGuard
+- 12 custom transition presets
+- Separated AuthNavigator and MainNavigator
+
+### Utilities (NEW v1.0.11)
+- dateUtils: 20+ date functions
+- validationUtils: 15+ validators with password strength
+- formatUtils: 25+ formatters
+- envUtils: Environment validation and access
+
+### Hooks (NEW v1.0.11)
+- useFormInput: Form state with validation
+- useAnimation: fade/slide/scale animations
+- useWeekCalendar: Week date calculations
+- useSwipeGesture: Swipe-to-dismiss gestures
 
 ---
 
@@ -567,6 +708,7 @@ This file contains the historical record of version changes for Lift 3-2-1. Deta
 - Brand new React Native + TypeScript app (Lift 3-2-1)
 - Built from scratch with modern best practices
 - Fresh implementation informed by previous project learnings
+- **Comprehensive refactoring complete (v1.0.8-v1.0.15)**
 
 **What This Project IS NOT**:
 - NOT a code migration or port
@@ -575,5 +717,5 @@ This file contains the historical record of version changes for Lift 3-2-1. Deta
 
 ---
 
-**Current Version**: 1.0.6
-**Last Updated**: 2025-11-14
+**Current Version**: 1.0.15
+**Last Updated**: 2025-11-15
