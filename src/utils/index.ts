@@ -15,3 +15,6 @@ export * from './validationUtils';
 
 // === FORMAT UTILITIES ===
 export * from './formatUtils';
+
+// === ENVIRONMENT UTILITIES ===
+export * from './envUtils';

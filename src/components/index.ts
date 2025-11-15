@@ -24,3 +24,9 @@ export * from './Navigation';
 export {WelcomeBox} from './WelcomeBox';
 export {RecommendedWorkoutBox} from './RecommendedWorkoutBox';
 export {Sidebar} from './Sidebar';
+
+// === ERROR HANDLING ===
+export {ErrorBoundary} from './ErrorBoundary';
+
+// === STATE COMPONENTS ===
+export {LoadingState, ErrorState, EmptyState} from './State';
