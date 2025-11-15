@@ -26,18 +26,18 @@ export const TopNavBar: React.FC<TopNavBarProps> = React.memo(
   ({onSearchPress, onMenuPress}) => {
     return (
       <View style={styles.container}>
-        {/* Search Icon - Left aligned */}
-        <Pressable onPress={onSearchPress} style={styles.searchButton}>
-          <SearchIcon
-            size={theme.layout.topNav.searchIconSize}
+        {/* Hamburger Menu - Left aligned */}
+        <Pressable onPress={onMenuPress} style={styles.menuButton}>
+          <HamburgerIcon
+            size={theme.layout.topNav.menuIconSize}
             color={theme.colors.textPrimary}
           />
         </Pressable>
 
-        {/* Hamburger Menu - Right aligned */}
-        <Pressable onPress={onMenuPress} style={styles.menuButton}>
-          <HamburgerIcon
-            size={theme.layout.topNav.menuIconSize}
+        {/* Search Icon - Right aligned */}
+        <Pressable onPress={onSearchPress} style={styles.searchButton}>
+          <SearchIcon
+            size={theme.layout.topNav.searchIconSize}
             color={theme.colors.textPrimary}
           />
         </Pressable>
