@@ -11,7 +11,6 @@ import React from 'react';
 import {
   Image,
   ImageBackground,
-  Pressable,
   StatusBar,
   StyleSheet,
   Text,
@@ -19,6 +18,7 @@ import {
 } from 'react-native';
 import {theme} from '@/theme';
 import type {RootStackScreenProps} from '@/navigation/types';
+import {ShadowButton} from '@/components';
 
 // === TYPES ===
 
@@ -84,60 +84,23 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
 
           {/* Bottom buttons */}
           <View style={styles.buttonContainer}>
-            <View style={styles.buttonWrapper}>
-              <View style={styles.shadowLayer3} />
-              <View style={styles.shadowLayer2} />
-              <View style={styles.shadowLayer1} />
-              <Pressable
-                style={({pressed}) => [
-                  styles.button,
-                  styles.primaryButton,
-                  pressed && styles.buttonPressed,
-                ]}
-                onPress={handleCreateAccount}
-              >
-                <Text style={styles.primaryButtonText}>
-                  CREATE NEW ACCOUNT
-                </Text>
-              </Pressable>
-            </View>
+            <ShadowButton variant="primary" onPress={handleCreateAccount}>
+              <Text style={styles.primaryButtonText}>
+                CREATE NEW ACCOUNT
+              </Text>
+            </ShadowButton>
 
-            <View style={styles.buttonWrapper}>
-              <View style={styles.shadowLayer3} />
-              <View style={styles.shadowLayer2} />
-              <View style={styles.shadowLayer1} />
-              <Pressable
-                style={({pressed}) => [
-                  styles.button,
-                  styles.secondaryButton,
-                  pressed && styles.buttonPressed,
-                ]}
-                onPress={handleLogin}
-              >
-                <Text style={styles.secondaryButtonText}>
-                  I HAVE AN ACCOUNT
-                </Text>
-              </Pressable>
-            </View>
+            <ShadowButton variant="secondary" onPress={handleLogin}>
+              <Text style={styles.secondaryButtonText}>
+                I HAVE AN ACCOUNT
+              </Text>
+            </ShadowButton>
 
-            <View style={styles.buttonWrapper}>
-              <View style={styles.shadowLayer3} />
-              <View style={styles.shadowLayer2} />
-              <View style={styles.shadowLayer1} />
-              <Pressable
-                style={({pressed}) => [
-                  styles.button,
-                  styles.tertiaryButton,
-                  pressed && styles.buttonPressed,
-                ]}
-                onPress={handleGuestLogin}
-              >
-                <Text style={styles.tertiaryButtonText}>
-                  LOGIN AS{' '}
-                  <Text style={styles.guestText}>GUEST</Text>
-                </Text>
-              </Pressable>
-            </View>
+            <ShadowButton variant="tertiary" onPress={handleGuestLogin}>
+              <Text style={styles.tertiaryButtonText}>
+                LOGIN AS <Text style={styles.guestText}>GUEST</Text>
+              </Text>
+            </ShadowButton>
           </View>
         </View>
       </ImageBackground>
@@ -276,65 +239,6 @@ const styles = StyleSheet.create({
     paddingLeft: theme.spacing.safeZoneHorizontal,
     paddingRight: theme.spacing.safeZoneHorizontal,
     paddingBottom: theme.layout.bottom.buttonGroupPadding,
-  },
-
-  buttonWrapper: {
-    marginBottom: theme.spacing.buttonSpacing,
-    position: 'relative',
-  },
-
-  shadowLayer1: {
-    position: 'absolute',
-    top: theme.buttons.shadowLayers.layer1.top,
-    left: theme.buttons.shadowLayers.layer1.left,
-    right: theme.buttons.shadowLayers.layer1.right,
-    height: theme.buttons.height.medium,
-    backgroundColor: `rgba(0, 0, 0, ${theme.buttons.shadowLayers.layer1.opacity})`,
-    borderRadius: theme.buttons.borderRadius.medium,
-  },
-
-  shadowLayer2: {
-    position: 'absolute',
-    top: theme.buttons.shadowLayers.layer2.top,
-    left: theme.buttons.shadowLayers.layer2.left,
-    right: theme.buttons.shadowLayers.layer2.right,
-    height: theme.buttons.height.medium,
-    backgroundColor: `rgba(0, 0, 0, ${theme.buttons.shadowLayers.layer2.opacity})`,
-    borderRadius: theme.buttons.borderRadius.medium,
-  },
-
-  shadowLayer3: {
-    position: 'absolute',
-    top: theme.buttons.shadowLayers.layer3.top,
-    left: theme.buttons.shadowLayers.layer3.left,
-    right: theme.buttons.shadowLayers.layer3.right,
-    height: theme.buttons.height.medium,
-    backgroundColor: `rgba(0, 0, 0, ${theme.buttons.shadowLayers.layer3.opacity})`,
-    borderRadius: theme.buttons.borderRadius.medium,
-  },
-
-  button: {
-    height: theme.buttons.height.medium,
-    borderRadius: theme.buttons.borderRadius.medium,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-
-  primaryButton: {
-    backgroundColor: theme.colors.primary,
-  },
-
-  secondaryButton: {
-    backgroundColor: theme.colors.backgroundSecondary,
-  },
-
-  tertiaryButton: {
-    backgroundColor: theme.colors.backgroundTertiary,
-  },
-
-  buttonPressed: {
-    opacity: theme.buttons.opacity.pressed,
   },
 
   primaryButtonText: {

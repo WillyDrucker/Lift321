@@ -15,13 +15,12 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  TextInput,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import {theme} from '@/theme';
 import type {RootStackScreenProps} from '@/navigation/types';
-import {LeftChevron, EyeOpen, EyeClosed} from '@/components/icons';
+import {LeftChevron, FormInput, PasswordInput, SocialButton} from '@/components';
 
 // === TYPES ===
 
@@ -33,13 +32,10 @@ export const LoginFormScreen: React.FC<LoginFormScreenProps> = ({
   navigation,
 }) => {
   // === STATE ===
-  // Form input values and UI state management
+  // Form input values
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isEmailFocused, setIsEmailFocused] = useState(false);
-  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   // === EVENT HANDLERS ===
   // Handle user interactions and form submissions
@@ -73,10 +69,6 @@ export const LoginFormScreen: React.FC<LoginFormScreenProps> = ({
     // TODO: Implement Facebook OAuth
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
   // === RENDER ===
   // Main component JSX structure
 
@@ -97,62 +89,26 @@ export const LoginFormScreen: React.FC<LoginFormScreenProps> = ({
           </Pressable>
         </View>
 
-        <TouchableWithoutFeedback
-          onPress={() => {
-            Keyboard.dismiss();
-            setIsEmailFocused(false);
-            setIsPasswordFocused(false);
-          }}
-        >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.centeredContainer}>
             {/* Input Fields */}
             <View style={styles.formContainer}>
           {/* Email Input */}
-          <TextInput
-            style={[
-              styles.input,
-              isEmailFocused && styles.inputFocused,
-            ]}
-            placeholder="Email"
-            placeholderTextColor={theme.colors.textDisabled}
+          <FormInput
             value={email}
             onChangeText={setEmail}
-            onFocus={() => setIsEmailFocused(true)}
-            onBlur={() => setIsEmailFocused(false)}
+            placeholder="Email"
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
           />
 
           {/* Password Input */}
-          <View style={styles.passwordContainer}>
-            <TextInput
-              style={[
-                styles.input,
-                styles.passwordInput,
-                isPasswordFocused && styles.inputFocused,
-              ]}
-              placeholder="Password"
-              placeholderTextColor={theme.colors.textDisabled}
-              value={password}
-              onChangeText={setPassword}
-              onFocus={() => setIsPasswordFocused(true)}
-              onBlur={() => setIsPasswordFocused(false)}
-              secureTextEntry={!showPassword}
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-            <Pressable
-              onPress={togglePasswordVisibility}
-              style={styles.eyeButton}
-            >
-              {showPassword ? (
-                <EyeOpen size={15} color={theme.colors.textPrimary} />
-              ) : (
-                <EyeClosed size={15} color={theme.colors.textPrimary} />
-              )}
-            </Pressable>
-          </View>
+          <PasswordInput
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Password"
+          />
 
           {/* Forgot Password */}
           <Pressable onPress={handleForgotPassword}>
@@ -177,33 +133,9 @@ export const LoginFormScreen: React.FC<LoginFormScreenProps> = ({
             <View style={styles.dividerLine} />
           </View>
 
-          {/* Google Button */}
-          <Pressable
-            style={({pressed}) => [
-              styles.socialButton,
-              styles.googleButton,
-              pressed && styles.buttonPressed,
-            ]}
-            onPress={handleGoogleLogin}
-          >
-            <Text style={styles.googleLogo}>G</Text>
-            <Text style={styles.googleButtonText}>CONTINUE WITH GOOGLE</Text>
-          </Pressable>
-
-          {/* Facebook Button */}
-          <Pressable
-            style={({pressed}) => [
-              styles.socialButton,
-              styles.facebookButton,
-              pressed && styles.buttonPressed,
-            ]}
-            onPress={handleFacebookLogin}
-          >
-            <Text style={styles.facebookLogo}>f</Text>
-            <Text style={styles.facebookButtonText}>
-              CONTINUE WITH FACEBOOK
-            </Text>
-          </Pressable>
+          {/* Social Login Buttons */}
+          <SocialButton provider="google" onPress={handleGoogleLogin} />
+          <SocialButton provider="facebook" onPress={handleFacebookLogin} />
         </View>
           </View>
         </TouchableWithoutFeedback>
@@ -256,41 +188,7 @@ const styles = StyleSheet.create({
 
   formContainer: {
     width: '100%',
-  },
-
-  input: {
-    height: theme.layout.form.inputHeight,
-    borderWidth: theme.layout.form.inputBorderWidth,
-    borderColor: theme.colors.borderMuted,
-    borderRadius: theme.layout.form.inputBorderRadius,
-    paddingHorizontal: theme.spacing.m,
-    fontSize: theme.typography.fontSize.m,
-    fontFamily: theme.typography.fontFamily.primary,
-    color: theme.colors.textPrimary,
-    marginBottom: theme.spacing.inputMarginSmall,
-    marginHorizontal: theme.spacing.inputMarginSmall,
-  },
-
-  inputFocused: {
-    borderColor: theme.colors.borderFocus,
-  },
-
-  passwordContainer: {
-    position: 'relative',
     marginBottom: theme.spacing.m,
-  },
-
-  passwordInput: {
-    marginBottom: 0,
-    paddingRight: theme.layout.form.passwordInputPaddingRight,
-  },
-
-  eyeButton: {
-    position: 'absolute',
-    right: theme.layout.form.eyeIconButtonRight,
-    top: 0,
-    bottom: 0,
-    justifyContent: 'center',
   },
 
   forgotPassword: {
@@ -350,51 +248,4 @@ const styles = StyleSheet.create({
     marginHorizontal: theme.spacing.m,
   },
 
-  // === SOCIAL BUTTON STYLES ===
-
-  socialButton: {
-    height: theme.layout.form.inputHeight,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: theme.layout.form.inputBorderRadius,
-    marginHorizontal: theme.layout.form.buttonHorizontalMargin,
-  },
-
-  googleButton: {
-    backgroundColor: theme.colors.pureWhite,
-    marginBottom: theme.spacing.buttonSpacing,
-  },
-
-  googleLogo: {
-    fontSize: theme.layout.socialLogin.googleLogoFontSize,
-    fontWeight: 'bold',
-    color: theme.colors.googleBlue,
-    marginRight: theme.spacing.s,
-  },
-
-  googleButtonText: {
-    fontSize: theme.typography.fontSize.m,
-    fontFamily: theme.typography.fontFamily.primary,
-    fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.pureBlack,
-  },
-
-  facebookButton: {
-    backgroundColor: theme.colors.facebookBlue,
-  },
-
-  facebookLogo: {
-    fontSize: theme.layout.socialLogin.facebookLogoFontSize,
-    fontWeight: 'bold',
-    color: theme.colors.pureWhite,
-    marginRight: theme.spacing.s,
-  },
-
-  facebookButtonText: {
-    fontSize: theme.typography.fontSize.m,
-    fontFamily: theme.typography.fontFamily.primary,
-    fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.pureWhite,
-  },
 });

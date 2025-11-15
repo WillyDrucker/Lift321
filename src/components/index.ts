@@ -11,6 +11,12 @@
 // === ICONS ===
 export * from './icons';
 
+// === BUTTONS ===
+export * from './Button';
+
+// === INPUTS ===
+export * from './Input';
+
 // === UI COMPONENTS ===
 export {WelcomeBox} from './WelcomeBox';
 export {RecommendedWorkoutBox} from './RecommendedWorkoutBox';
