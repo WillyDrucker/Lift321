@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 import {theme} from '@/theme';
 import type {RootStackScreenProps} from '@/navigation/types';
-import {LeftChevron} from '@/components/icons';
+import {LeftChevron, ActionButton} from '@/components';
 
 const {height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -71,9 +71,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
 
         {/* Let's Go Button - 64dp from bottom, right side */}
         <View style={styles.nextButtonContainer}>
-          <Pressable onPress={handleLetsGo} style={styles.nextButton}>
-            <Text style={styles.nextButtonText}>LET'S GO!</Text>
-          </Pressable>
+          <ActionButton onPress={handleLetsGo} text="LET'S GO!" />
         </View>
       </View>
     </>
@@ -146,22 +144,5 @@ const styles = StyleSheet.create({
     left: theme.layout.authNavigation.nextButtonLeft,
     right: theme.spacing.safeZoneHorizontal,
     zIndex: 10,
-  },
-  nextButton: {
-    height: theme.buttons.height.medium,
-    width: '100%',
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.buttons.borderRadius.medium,
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...theme.viewShadows.medium,
-    elevation: theme.elevation.medium,
-  },
-  nextButtonText: {
-    fontSize: theme.typography.fontSize.l,
-    fontFamily: theme.typography.fontFamily.primary,
-    fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.textOnAction,
-    letterSpacing: theme.typography.letterSpacing.button,
   },
 });
