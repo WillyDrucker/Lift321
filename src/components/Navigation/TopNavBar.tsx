@@ -25,23 +25,38 @@ export type TopNavBarProps = {
 export const TopNavBar: React.FC<TopNavBarProps> = React.memo(
   ({onSearchPress, onMenuPress}) => {
     return (
-      <View style={styles.container}>
-        {/* Hamburger Menu - Left aligned */}
-        <Pressable onPress={onMenuPress} style={styles.menuButton}>
-          <HamburgerIcon
-            size={theme.layout.topNav.menuIconSize}
-            color={theme.colors.textPrimary}
-          />
-        </Pressable>
+      <>
+        {/* Status bar background extension */}
+        <View style={styles.statusBarBackground} />
 
-        {/* Search Icon - Right aligned */}
-        <Pressable onPress={onSearchPress} style={styles.searchButton}>
-          <SearchIcon
-            size={theme.layout.topNav.searchIconSize}
-            color={theme.colors.textPrimary}
-          />
-        </Pressable>
-      </View>
+        <View style={styles.container}>
+          {/* Hamburger Menu - Left aligned */}
+          <Pressable
+            onPress={onMenuPress}
+            style={({pressed}) => [
+              styles.menuButton,
+              pressed && styles.pressed,
+            ]}>
+            <HamburgerIcon
+              size={theme.layout.topNav.menuIconSize}
+              color={theme.colors.textPrimary}
+            />
+          </Pressable>
+
+          {/* Search Icon - Right aligned */}
+          <Pressable
+            onPress={onSearchPress}
+            style={({pressed}) => [
+              styles.searchButton,
+              pressed && styles.pressed,
+            ]}>
+            <SearchIcon
+              size={theme.layout.topNav.searchIconSize}
+              color={theme.colors.textPrimary}
+            />
+          </Pressable>
+        </View>
+      </>
     );
   },
 );
@@ -52,13 +67,22 @@ TopNavBar.displayName = 'TopNavBar';
 // StyleSheet definitions using global theme tokens
 
 const styles = StyleSheet.create({
+  statusBarBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: theme.layout.topNav.topSpacing,
+    backgroundColor: theme.colors.backgroundPrimary,
+  },
+
   container: {
     position: 'absolute',
     top: theme.layout.topNav.topSpacing,
     left: 0,
     right: 0,
     height: theme.layout.topNav.height,
-    backgroundColor: theme.colors.pureBlack,
+    backgroundColor: theme.colors.backgroundPrimary,
     borderWidth: theme.layout.topNav.borderWidth,
     borderColor: theme.colors.textPrimary,
     flexDirection: 'row',
@@ -73,5 +97,10 @@ const styles = StyleSheet.create({
 
   searchButton: {
     padding: 0,
+  },
+
+  pressed: {
+    opacity: theme.layout.interaction.pressedOpacity,
+    transform: [{scale: theme.layout.interaction.pressedScale}],
   },
 });

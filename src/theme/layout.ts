@@ -14,8 +14,9 @@ export const layout = {
   // Standard positioning for headers across different screen types
   header: {
     topSpacing: 64, // Distance from top of screen (auth screens) - matches safe zone
-    appTopSpacing: 16, // Distance from top for in-app headers (main screens)
+    appTopSpacing: 32, // Distance from top for in-app headers (main screens)
     horizontalPadding: 32, // Left/right padding for header content (matches safe zone horizontal)
+    backButtonLeft: 16, // Left position of back button in default screen layout
   },
 
   // === LOGO DIMENSIONS ===
@@ -70,11 +71,11 @@ export const layout = {
 
   // === BOTTOM NAVIGATION BAR ===
   bottomNav: {
-    height: 100, // Bottom navigation bar height (sized for device navigation buttons)
+    height: 68, // Bottom navigation bar height (base height for gesture nav)
     iconSize: 24, // Navigation icon size
     iconTopSpacing: 6, // Icon position from top of bar
-    paddingVertical: 10, // Top/bottom padding inside nav bar
     paddingHorizontal: 16, // Left/right padding inside nav bar
+    paddingBottom: 8, // Bottom padding for spacing above system nav area
   },
 
   // === DAY SELECTOR TABS ===
@@ -134,6 +135,7 @@ export const layout = {
     swipeDismissThreshold: 100, // Distance required to trigger dismiss action
     swipeAnimationDistance: 400, // Full animation travel distance for dismissal
     duration: 200, // Standard animation duration in milliseconds
+    quickFadeDuration: 150, // Quick fade transition for navigation (in milliseconds)
     tripleTapTimeout: 500, // Time window for triple-tap detection in milliseconds
   },
 
@@ -194,10 +196,30 @@ export const layout = {
 
   // === SIDEBAR DRAWER ===
   sidebar: {
-    widthPercentage: 70, // Sidebar width as percentage of screen
-    animationDuration: 300, // Slide animation duration in ms
+    widthPercentage: 80, // Sidebar width as percentage of screen (increased to prevent background showing)
+    animationDuration: 150, // Slide animation duration in ms (reduced for snappier feel)
     itemPaddingVertical: 16, // Vertical padding for menu items
     itemPaddingHorizontal: 24, // Horizontal padding for menu items
+    headerPaddingTop: 48, // Top padding for header section
+    headerPaddingBottom: 24, // Bottom padding for header section
+    logoMarginBottom: 12, // Space between logo and username
+    usernameMarginBottom: 24, // Space between username and first menu item
+    // Gesture thresholds
+    gestureActivationThreshold: 5, // Minimum movement (px) to activate swipe gesture
+    gestureDirectionThreshold: 10, // Minimum movement (px) to determine swipe direction
+    swipeDismissThresholdPercentage: 0.3, // Percentage of width required to trigger dismiss
+    swipeVelocityThreshold: 0.5, // Minimum velocity to trigger quick dismiss
+    // Spring animation physics (less bouncy)
+    springTension: 80, // Spring animation tension (lower = less bouncy)
+    springFriction: 12, // Spring animation friction (higher = more damping, less bounce)
+  },
+
+  // === INTERACTION FEEDBACK ===
+  // Standard values for touch interaction visual feedback
+  interaction: {
+    pressedOpacity: 0.6, // Opacity reduction for pressed state
+    pressedScale: 0.9, // Scale reduction for pressed state
+    tripleTapCount: 3, // Number of taps required for triple-tap gesture
   },
 
   // === BACKGROUND IMAGE SETTINGS ===

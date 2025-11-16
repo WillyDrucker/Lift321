@@ -11,8 +11,9 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {HomePage} from '@/features/main/screens/HomePage';
+import {SettingsScreen} from '@/features/main/screens/SettingsScreen';
 import type {MainStackParamList} from './types';
-import {defaultTransition} from './transitions';
+import {defaultTransition, quickFadeTransition} from './transitions';
 
 // === TYPES ===
 
@@ -41,6 +42,11 @@ export const MainNavigator: React.FC<MainNavigatorProps> = () => {
       }}
     >
       <Stack.Screen name="HomePage" component={HomePage} />
+      <Stack.Screen
+        name="SettingsScreen"
+        component={SettingsScreen}
+        options={quickFadeTransition}
+      />
 
       {/* Placeholder screens - to be implemented */}
       {/* <Stack.Screen name="WorkoutList" component={WorkoutListScreen} /> */}

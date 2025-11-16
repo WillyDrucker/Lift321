@@ -24,6 +24,7 @@ export type AuthStackParamList = {
 // Main application screens (authenticated users only)
 export type MainStackParamList = {
   HomePage: undefined;
+  SettingsScreen: undefined;
   WorkoutList: undefined;
   WorkoutSession: {workoutId: string};
   PlanList: undefined;

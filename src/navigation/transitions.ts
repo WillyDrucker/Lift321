@@ -9,6 +9,7 @@
 // ==========================================================================
 
 import type {NativeStackNavigationOptions} from '@react-navigation/native-stack';
+import {theme} from '@/theme';
 
 // === TRANSITION PRESETS ===
 
@@ -39,6 +40,16 @@ export const modalTransition: NativeStackNavigationOptions = {
  */
 export const fadeTransition: NativeStackNavigationOptions = {
   animation: 'fade',
+  gestureEnabled: false,
+};
+
+/**
+ * Quick fade transition
+ * Very fast fade for instant-feel navigation (Settings, etc.)
+ */
+export const quickFadeTransition: NativeStackNavigationOptions = {
+  animation: 'fade',
+  animationDuration: theme.layout.animation.quickFadeDuration,
   gestureEnabled: false,
 };
 

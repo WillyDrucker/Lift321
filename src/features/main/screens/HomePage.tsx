@@ -9,7 +9,13 @@
 // ==========================================================================
 
 import React, {useState, useRef} from 'react';
-import {Animated, SafeAreaView, StatusBar, StyleSheet} from 'react-native';
+import {
+  Animated,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  View,
+} from 'react-native';
 import {theme} from '@/theme';
 import type {RootStackScreenProps} from '@/navigation/types';
 import {
@@ -19,6 +25,7 @@ import {
   BottomTabBar,
   WelcomeBox,
   RecommendedWorkoutBox,
+  Sidebar,
   type TabItem,
 } from '@/components';
 import {useSwipeGesture} from '@/hooks';
@@ -36,6 +43,7 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
   const [activeTab, setActiveTab] = useState<TabItem>('home');
   const [selectedDay, setSelectedDay] = useState<string>('');
   const [welcomeVisible, setWelcomeVisible] = useState<boolean>(true);
+  const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
   const [menuTapCount, setMenuTapCount] = useState<number>(0);
   const tapTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -57,28 +65,35 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
     workoutBoxAnimatedTop: workoutBoxTop,
   });
 
+
   // === EVENT HANDLERS ===
   // User interaction callbacks
 
   const handleMenuPress = () => {
-    // Triple-tap detection for showing welcome box
-    setMenuTapCount(prev => prev + 1);
+    const newCount = menuTapCount + 1;
+    setMenuTapCount(newCount);
 
     if (tapTimerRef.current) {
       clearTimeout(tapTimerRef.current);
     }
 
-    tapTimerRef.current = setTimeout(() => {
-      if (menuTapCount + 1 === 3) {
-        console.log('Triple tap detected - showing welcome box');
-        resetPosition();
-        setWelcomeVisible(true);
-      }
+    // Check for triple-tap immediately
+    if (newCount === theme.layout.interaction.tripleTapCount) {
+      console.log('Triple tap detected - showing welcome box');
+      resetPosition();
+      setWelcomeVisible(true);
       setMenuTapCount(0);
-    }, theme.layout.animation.tripleTapTimeout);
+    } else {
+      // Open sidebar immediately on first tap
+      if (newCount === 1) {
+        setSidebarVisible(true);
+      }
 
-    console.log('Menu pressed');
-    // TODO: Open sidebar menu
+      // Reset counter after timeout
+      tapTimerRef.current = setTimeout(() => {
+        setMenuTapCount(0);
+      }, theme.layout.animation.tripleTapTimeout);
+    }
   };
 
   const handleSearchPress = () => {
@@ -98,6 +113,34 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
     // TODO: Implement navigation to different sections
   };
 
+  const handleSidebarSelect = async (
+    option: 'profile' | 'settings' | 'help' | 'logout',
+  ) => {
+    console.log('Sidebar option selected:', option);
+
+    switch (option) {
+      case 'profile':
+        console.log('Navigate to Profile screen');
+        // TODO: Implement profile screen
+        break;
+      case 'settings':
+        navigation.navigate('SettingsScreen');
+        break;
+      case 'help':
+        console.log('Navigate to Help screen');
+        // TODO: Implement help screen
+        break;
+      case 'logout':
+        console.log('Logout - clearing auth state');
+        // Clear guest mode and sign out
+        const {disableGuestMode, signOut} = await import('@/services');
+        await disableGuestMode();
+        await signOut();
+        // Auth change will automatically trigger navigation to AuthNavigator
+        break;
+    }
+  };
+
   // === RENDER ===
   // Main component JSX structure
 
@@ -105,7 +148,8 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
     <>
       <StatusBar
         barStyle="light-content"
-        backgroundColor={theme.colors.pureBlack}
+        backgroundColor={theme.colors.backgroundPrimary}
+        translucent={false}
       />
       <SafeAreaView style={styles.container}>
         {/* Top Navigation */}
@@ -113,6 +157,9 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
           onSearchPress={handleSearchPress}
           onMenuPress={handleMenuPress}
         />
+
+        {/* Divider Bar */}
+        <View style={styles.divider} />
 
         {/* Week Calendar */}
         <WeekCalendar
@@ -149,6 +196,13 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
           onTabPress={handleTabPress}
         />
       </SafeAreaView>
+
+      {/* Sidebar Menu */}
+      <Sidebar
+        visible={sidebarVisible}
+        onClose={() => setSidebarVisible(false)}
+        onSelect={handleSidebarSelect}
+      />
     </>
   );
 };
@@ -160,5 +214,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.pureBlack,
+  },
+
+  divider: {
+    position: 'absolute',
+    top: theme.layout.topNav.topSpacing + theme.layout.topNav.height,
+    left: 0,
+    right: 0,
+    height: theme.layout.border.thin,
+    backgroundColor: theme.colors.borderDefault,
   },
 });

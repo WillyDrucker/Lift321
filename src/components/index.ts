@@ -25,6 +25,9 @@ export {WelcomeBox} from './WelcomeBox';
 export {RecommendedWorkoutBox} from './RecommendedWorkoutBox';
 export {Sidebar} from './Sidebar';
 
+// === LAYOUT ===
+export {DefaultScreenLayout} from './Layout/DefaultScreenLayout';
+
 // === ERROR HANDLING ===
 export {ErrorBoundary} from './ErrorBoundary';
 

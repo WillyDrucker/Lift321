@@ -5,30 +5,33 @@
 // Slides from left with dark overlay backdrop.
 //
 // Dependencies: theme tokens, React Native Animated API
-// Used by: MainActivity hamburger menu
+// Used by: HomePage hamburger menu
 // ==========================================================================
 
 import React, {useEffect, useRef, useState} from 'react';
 import {
   Animated,
   Dimensions,
+  Image,
   Modal,
+  PanResponder,
   Pressable,
   StyleSheet,
   Text,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import {theme} from '@/theme';
 
 // === TYPES ===
 
-type MenuOption = 'settings' | 'profile' | 'logout';
+type MenuOption = 'profile' | 'settings' | 'help' | 'logout';
 
 type SidebarProps = {
   visible: boolean;
   onClose: () => void;
   onSelect: (option: MenuOption) => void;
+  slideAnim?: Animated.Value;
+  overlayOpacity?: Animated.Value;
 };
 
 // === COMPONENT ===
@@ -37,132 +40,310 @@ export const Sidebar: React.FC<SidebarProps> = ({
   visible,
   onClose,
   onSelect,
+  slideAnim: externalSlideAnim,
+  overlayOpacity: externalOverlayOpacity,
 }) => {
   // === STATE ===
-  // Animation value for slide-in/out
-  // Modal visibility separate from animation state
-
-  const slideAnim = useRef(new Animated.Value(-1)).current;
+  const internalSlideAnim = useRef(new Animated.Value(-1)).current;
+  const internalOverlayOpacity = useRef(new Animated.Value(0)).current;
+  const slideAnim = externalSlideAnim || internalSlideAnim;
+  const overlayOpacity = externalOverlayOpacity || internalOverlayOpacity;
   const [modalVisible, setModalVisible] = useState(false);
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isAnimatingRef = useRef(false);
   const screenWidth = Dimensions.get('window').width;
   const sidebarWidth = (screenWidth * theme.layout.sidebar.widthPercentage) / 100;
 
-  // === HOOKS ===
-  // Trigger animation when visibility changes
+  // Swipe-to-close gesture handler
+  const swipePanResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponderCapture: () => false,
+      onMoveShouldSetPanResponder: (evt, gestureState) => {
+        // Activate if swiping left with significant movement
+        return Math.abs(gestureState.dx) > theme.layout.sidebar.gestureActivationThreshold;
+      },
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => {
+        // Capture gesture if clearly swiping left
+        return gestureState.dx < -theme.layout.sidebar.gestureDirectionThreshold;
+      },
+      onPanResponderGrant: () => {
+        // Grant responder - gesture started
+      },
+      onPanResponderMove: (evt, gestureState) => {
+        // Update slide position as user swipes (follows finger in both directions)
+        const progress = Math.max(-1, Math.min(0, gestureState.dx / sidebarWidth));
+        slideAnim.setValue(progress);
+        // Also fade overlay proportionally
+        overlayOpacity.setValue(Math.max(0, Math.min(1, 1 + progress)));
+      },
+      onPanResponderRelease: (evt, gestureState) => {
+        // Close if swiped more than threshold percentage of sidebar width or with velocity
+        const swipeDistance = Math.abs(gestureState.dx);
+        const swipeVelocity = Math.abs(gestureState.vx);
 
+        if (
+          swipeDistance > sidebarWidth * theme.layout.sidebar.swipeDismissThresholdPercentage ||
+          swipeVelocity > theme.layout.sidebar.swipeVelocityThreshold
+        ) {
+          // Quick close animation
+          Animated.parallel([
+            Animated.timing(slideAnim, {
+              toValue: -1,
+              duration: theme.layout.sidebar.animationDuration,
+              useNativeDriver: true,
+            }),
+            Animated.timing(overlayOpacity, {
+              toValue: 0,
+              duration: theme.layout.sidebar.animationDuration,
+              useNativeDriver: true,
+            }),
+          ]).start(() => onClose());
+        } else {
+          // Snap back to open position with faster spring
+          Animated.parallel([
+            Animated.spring(slideAnim, {
+              toValue: 0,
+              useNativeDriver: true,
+              tension: theme.layout.sidebar.springTension,
+              friction: theme.layout.sidebar.springFriction,
+            }),
+            Animated.spring(overlayOpacity, {
+              toValue: 1,
+              useNativeDriver: true,
+              tension: theme.layout.sidebar.springTension,
+              friction: theme.layout.sidebar.springFriction,
+            }),
+          ]).start();
+        }
+      },
+      onPanResponderTerminate: () => {
+        // Another component has taken over - snap back quickly
+        Animated.parallel([
+          Animated.spring(slideAnim, {
+            toValue: 0,
+            useNativeDriver: true,
+            tension: theme.layout.sidebar.springTension,
+            friction: theme.layout.sidebar.springFriction,
+          }),
+          Animated.spring(overlayOpacity, {
+            toValue: 1,
+            useNativeDriver: true,
+            tension: theme.layout.sidebar.springTension,
+            friction: theme.layout.sidebar.springFriction,
+          }),
+        ]).start();
+      },
+    }),
+  ).current;
+
+  // === HOOKS ===
   useEffect(() => {
     if (visible) {
-      // Show modal first, then slide in
+      // Clear any pending close timeout
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+        closeTimeoutRef.current = null;
+      }
+
+      // Stop any running animations before starting new one
+      slideAnim.stopAnimation();
+      overlayOpacity.stopAnimation();
+
       setModalVisible(true);
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: theme.layout.sidebar.animationDuration,
-        useNativeDriver: true,
-      }).start();
-    } else {
-      // Slide out, then hide modal
-      Animated.timing(slideAnim, {
-        toValue: -1,
-        duration: theme.layout.sidebar.animationDuration,
-        useNativeDriver: true,
-      }).start(() => {
-        // Hide modal after animation completes
-        setModalVisible(false);
+      isAnimatingRef.current = true;
+
+      // Animate to open position with spring for smooth feel
+      Animated.parallel([
+        Animated.spring(slideAnim, {
+          toValue: 0,
+          useNativeDriver: true,
+          tension: theme.layout.sidebar.springTension,
+          friction: theme.layout.sidebar.springFriction,
+          velocity: 2,
+        }),
+        Animated.spring(overlayOpacity, {
+          toValue: 1,
+          useNativeDriver: true,
+          tension: theme.layout.sidebar.springTension,
+          friction: theme.layout.sidebar.springFriction,
+        }),
+      ]).start(() => {
+        isAnimatingRef.current = false;
       });
+    } else {
+      // Stop any running animations
+      slideAnim.stopAnimation();
+      overlayOpacity.stopAnimation();
+
+      isAnimatingRef.current = true;
+
+      // Start close animation with spring
+      Animated.parallel([
+        Animated.spring(slideAnim, {
+          toValue: -1,
+          useNativeDriver: true,
+          tension: theme.layout.sidebar.springTension,
+          friction: theme.layout.sidebar.springFriction,
+        }),
+        Animated.spring(overlayOpacity, {
+          toValue: 0,
+          useNativeDriver: true,
+          tension: theme.layout.sidebar.springTension,
+          friction: theme.layout.sidebar.springFriction,
+        }),
+      ]).start(() => {
+        isAnimatingRef.current = false;
+      });
+
+      // Hide modal after animation completes (spring is ~200ms)
+      closeTimeoutRef.current = setTimeout(() => {
+        setModalVisible(false);
+        closeTimeoutRef.current = null;
+      }, 200);
     }
-  }, [visible, slideAnim]);
+  }, [visible, slideAnim, overlayOpacity]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // === EVENT HANDLERS ===
-  // Handle menu item selection
-
   const handleSelect = (option: MenuOption) => {
     onSelect(option);
     onClose();
   };
 
   // === RENDER ===
-  // Modal with animated sidebar
+  if (!modalVisible) {
+    return null;
+  }
 
   return (
-    <Modal
-      visible={modalVisible}
-      transparent
-      animationType="none"
-      onRequestClose={onClose}>
+    <Modal visible={modalVisible} transparent animationType="none" onRequestClose={onClose}>
       {/* Backdrop - tap to close */}
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.overlay}>
-          {/* Sidebar - prevent tap-through */}
-          <TouchableWithoutFeedback>
-            <Animated.View
-              style={[
-                styles.sidebar,
-                {
-                  width: sidebarWidth,
-                  transform: [
-                    {
-                      translateX: slideAnim.interpolate({
-                        inputRange: [-1, 0],
-                        outputRange: [-sidebarWidth, 0],
-                      }),
-                    },
-                  ],
-                },
-              ]}>
-              {/* Menu Items */}
-              <Pressable
-                style={({pressed}) => [
-                  styles.menuItem,
-                  pressed && styles.menuItemPressed,
-                ]}
-                onPress={() => handleSelect('settings')}>
-                <Text style={styles.menuText}>Settings</Text>
-              </Pressable>
+      <Pressable style={styles.container} onPress={onClose}>
+        <Animated.View style={[styles.overlay, {opacity: overlayOpacity}]} />
+      </Pressable>
 
-              <View style={styles.divider} />
+      {/* Sidebar - drag to close */}
+      <Animated.View
+        style={[
+          styles.sidebar,
+          {
+            width: sidebarWidth + 100, // Add 100px to compensate for left padding
+            transform: [
+              {
+                translateX: slideAnim.interpolate({
+                  inputRange: [-1, 0],
+                  outputRange: [-sidebarWidth, 0],
+                }),
+              },
+            ],
+          },
+        ]}>
+        {/* Draggable overlay for gestures */}
+        <View {...swipePanResponder.panHandlers} style={styles.gestureOverlay}>
+          {/* Header Section */}
+          <View style={styles.header}>
+            {/* Logo */}
+            <Image
+              source={require('@/assets/images/logo.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
 
-              <Pressable
-                style={({pressed}) => [
-                  styles.menuItem,
-                  pressed && styles.menuItemPressed,
-                ]}
-                onPress={() => handleSelect('profile')}>
-                <Text style={styles.menuText}>Profile</Text>
-              </Pressable>
+            {/* Username */}
+            <Text style={styles.username}>Username</Text>
+          </View>
 
-              <View style={styles.divider} />
+          {/* Menu Items */}
+          <Pressable
+            style={({pressed}) => [styles.menuItem, pressed && styles.menuItemPressed]}
+            onPress={() => handleSelect('profile')}>
+            <Text style={styles.menuText}>Profile</Text>
+          </Pressable>
 
-              <Pressable
-                style={({pressed}) => [
-                  styles.menuItem,
-                  pressed && styles.menuItemPressed,
-                ]}
-                onPress={() => handleSelect('logout')}>
-                <Text style={styles.menuText}>Logout</Text>
-              </Pressable>
-            </Animated.View>
-          </TouchableWithoutFeedback>
+          <View style={styles.divider} />
+
+          <Pressable
+            style={({pressed}) => [styles.menuItem, pressed && styles.menuItemPressed]}
+            onPress={() => handleSelect('settings')}>
+            <Text style={styles.menuText}>Settings</Text>
+          </Pressable>
+
+          <View style={styles.divider} />
+
+          <Pressable
+            style={({pressed}) => [styles.menuItem, pressed && styles.menuItemPressed]}
+            onPress={() => handleSelect('help')}>
+            <Text style={styles.menuText}>Help</Text>
+          </Pressable>
+
+          <View style={styles.divider} />
+
+          <Pressable
+            style={({pressed}) => [styles.menuItem, pressed && styles.menuItemPressed]}
+            onPress={() => handleSelect('logout')}>
+            <Text style={styles.menuText}>Logout</Text>
+          </Pressable>
         </View>
-      </TouchableWithoutFeedback>
+      </Animated.View>
     </Modal>
   );
 };
 
 // === STYLES ===
-// StyleSheet definitions using global theme tokens
 
 const styles = StyleSheet.create({
-  overlay: {
+  container: {
     flex: 1,
+  },
+
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: theme.colors.overlayBackground,
-    justifyContent: 'flex-start',
   },
 
   sidebar: {
+    position: 'absolute',
+    left: -100, // Extend 100px to the left to prevent background showing during spring
+    top: 0,
+    bottom: 0,
     height: '100%',
+    paddingLeft: 100, // Add padding to compensate for negative left position
     backgroundColor: theme.colors.backgroundCard,
-    paddingTop: theme.spacing.xxl,
     ...theme.viewShadows.large,
+  },
+
+  gestureOverlay: {
+    flex: 1,
+  },
+
+  header: {
+    paddingTop: theme.layout.sidebar.headerPaddingTop,
+    paddingBottom: theme.layout.sidebar.headerPaddingBottom,
+    paddingHorizontal: theme.layout.sidebar.itemPaddingHorizontal,
+    alignItems: 'center',
+  },
+
+  logo: {
+    width: theme.layout.logo.size,
+    height: theme.layout.logo.size,
+    marginBottom: theme.layout.sidebar.logoMarginBottom,
+  },
+
+  username: {
+    fontSize: theme.typography.fontSize.m,
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: theme.typography.fontWeight.medium,
+    color: theme.colors.textPrimary,
+    marginBottom: theme.layout.sidebar.usernameMarginBottom,
   },
 
   menuItem: {

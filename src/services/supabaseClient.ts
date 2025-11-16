@@ -27,19 +27,43 @@ export const AUTH_CHANGE_EVENT = 'AUTH_STATE_CHANGED';
 // === CLIENT INITIALIZATION ===
 
 /**
- * Supabase client instance
- * Configured with auth persistence and automatic token refresh
+ * Check if Supabase credentials are configured
+ * Allows development without credentials using mock client
  */
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    // Auto refresh token when it expires
-    autoRefreshToken: true,
-    // Persist auth session in async storage
-    persistSession: true,
-    // Detect session from URL (for OAuth flows)
-    detectSessionInUrl: false,
-  },
-});
+const hasValidCredentials = () => {
+  return (
+    SUPABASE_URL &&
+    SUPABASE_ANON_KEY &&
+    SUPABASE_URL !== 'your-project-url-here' &&
+    SUPABASE_ANON_KEY !== 'your-anon-key-here' &&
+    SUPABASE_URL.startsWith('http')
+  );
+};
+
+/**
+ * Supabase client instance
+ * - Uses real client if credentials are configured
+ * - Uses mock client for development without credentials
+ */
+export const supabase = hasValidCredentials()
+  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        // Auto refresh token when it expires
+        autoRefreshToken: true,
+        // Persist auth session in async storage
+        persistSession: true,
+        // Detect session from URL (for OAuth flows)
+        detectSessionInUrl: false,
+      },
+    })
+  : // Mock client for development without Supabase credentials
+    ({
+      auth: {
+        getUser: async () => ({data: {user: null}, error: null}),
+        getSession: async () => ({data: {session: null}, error: null}),
+        signOut: async () => ({error: null}),
+      },
+    } as any);
 
 // === HELPER FUNCTIONS ===
 

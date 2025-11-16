@@ -8,8 +8,9 @@
 // Used by: HomePage (will be used across app when navigation is implemented)
 // ==========================================================================
 
-import React from 'react';
-import {Pressable, StyleSheet, Text, View} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {Pressable, StyleSheet, Text, View, Dimensions} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {theme} from '@/theme';
 import {HomeIcon, PlansIcon, StatsIcon, ProfileIcon} from '@/components/icons';
 
@@ -41,8 +42,16 @@ const TAB_CONFIG: TabConfig[] = [
 
 export const BottomTabBar: React.FC<BottomTabBarProps> = React.memo(
   ({activeTab, onTabPress}) => {
+    const insets = useSafeAreaInsets();
+
+    // Calculate dynamic height based on bottom inset
+    // Gesture nav: small inset (~20-30px), Button nav: larger inset (~48px)
+    const dynamicHeight = insets.bottom > 30
+      ? theme.layout.bottomNav.height + 32  // Button navigation (add extra space for buttons)
+      : theme.layout.bottomNav.height;      // Gesture navigation (standard)
+
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, {height: dynamicHeight}]}>
         {TAB_CONFIG.map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -82,13 +91,13 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     flexDirection: 'row',
-    height: theme.layout.bottomNav.height,
+    // Height is dynamic - set via inline style based on safe area insets
     backgroundColor: theme.colors.backgroundPrimary,
-    paddingVertical: theme.layout.bottomNav.paddingVertical,
     paddingHorizontal: theme.layout.bottomNav.paddingHorizontal,
     justifyContent: 'space-around',
     alignItems: 'flex-start',
     paddingTop: theme.layout.bottomNav.iconTopSpacing,
+    paddingBottom: theme.layout.bottomNav.paddingBottom,
     borderTopWidth: 1,
     borderTopColor: theme.colors.navActive,
   },
