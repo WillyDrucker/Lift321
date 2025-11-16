@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   },
 
   backButton: {
-    padding: 0,
+    // No padding - icon sizing handles touch target
   },
 
   backButtonPressed: {

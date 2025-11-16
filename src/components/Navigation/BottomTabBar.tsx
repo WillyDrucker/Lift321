@@ -46,9 +46,9 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = React.memo(
 
     // Calculate dynamic height based on bottom inset
     // Gesture nav: small inset (~20-30px), Button nav: larger inset (~48px)
-    const dynamicHeight = insets.bottom > 30
-      ? theme.layout.bottomNav.height + 32  // Button navigation (add extra space for buttons)
-      : theme.layout.bottomNav.height;      // Gesture navigation (standard)
+    const dynamicHeight = insets.bottom > theme.layout.bottomNav.gestureNavThreshold
+      ? theme.layout.bottomNav.height + theme.layout.bottomNav.buttonNavExtraHeight
+      : theme.layout.bottomNav.height;
 
     return (
       <View style={[styles.container, {height: dynamicHeight}]}>
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     paddingTop: theme.layout.bottomNav.iconTopSpacing,
     paddingBottom: theme.layout.bottomNav.paddingBottom,
-    borderTopWidth: 1,
+    borderTopWidth: theme.layout.border.thin,
     borderTopColor: theme.colors.navActive,
   },
 

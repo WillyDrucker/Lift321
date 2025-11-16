@@ -76,6 +76,9 @@ export const layout = {
     iconTopSpacing: 6, // Icon position from top of bar
     paddingHorizontal: 16, // Left/right padding inside nav bar
     paddingBottom: 8, // Bottom padding for spacing above system nav area
+    // Dynamic height calculation thresholds
+    gestureNavThreshold: 30, // Bottom inset threshold to detect gesture vs button nav (pixels)
+    buttonNavExtraHeight: 32, // Extra height added for button navigation mode (pixels)
   },
 
   // === DAY SELECTOR TABS ===
