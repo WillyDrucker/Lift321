@@ -12,8 +12,10 @@ import React, {useState, useRef} from 'react';
 import {
   Animated,
   SafeAreaView,
+  ScrollView,
   StatusBar,
   StyleSheet,
+  Text,
   View,
 } from 'react-native';
 import {theme} from '@/theme';
@@ -24,7 +26,8 @@ import {
   PlanProgressBar,
   BottomTabBar,
   WelcomeBox,
-  RecommendedWorkoutBox,
+  WorkoutCardsScroller,
+  CustomWorkoutCardsScroller,
   Sidebar,
   type TabItem,
 } from '@/components';
@@ -44,13 +47,8 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
   const [selectedDay, setSelectedDay] = useState<string>('');
   const [welcomeVisible, setWelcomeVisible] = useState<boolean>(true);
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
-  const [menuTapCount, setMenuTapCount] = useState<number>(0);
-  const tapTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Animated value for workout box positioning
-  const workoutBoxTop = useRef(
-    new Animated.Value(theme.layout.recommendedWorkout.topPositionWithWelcome),
-  ).current;
+  // No animated positioning needed for flow layout - cards stack naturally
 
   // Plan progress data (static for now)
   const planName = 'Lift 3-2-1';
@@ -60,9 +58,8 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
   // === HOOKS ===
   // Swipe gesture for welcome box dismissal
 
-  const {translateX, opacity, panHandlers, resetPosition} = useSwipeGesture({
+  const {translateX, opacity, panHandlers} = useSwipeGesture({
     onDismiss: () => setWelcomeVisible(false),
-    workoutBoxAnimatedTop: workoutBoxTop,
   });
 
 
@@ -70,30 +67,7 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
   // User interaction callbacks
 
   const handleMenuPress = () => {
-    const newCount = menuTapCount + 1;
-    setMenuTapCount(newCount);
-
-    if (tapTimerRef.current) {
-      clearTimeout(tapTimerRef.current);
-    }
-
-    // Check for triple-tap immediately
-    if (newCount === theme.layout.interaction.tripleTapCount) {
-      console.log('Triple tap detected - showing welcome box');
-      resetPosition();
-      setWelcomeVisible(true);
-      setMenuTapCount(0);
-    } else {
-      // Open sidebar immediately on first tap
-      if (newCount === 1) {
-        setSidebarVisible(true);
-      }
-
-      // Reset counter after timeout
-      tapTimerRef.current = setTimeout(() => {
-        setMenuTapCount(0);
-      }, theme.layout.animation.tripleTapTimeout);
-    }
+    setSidebarVisible(true);
   };
 
   const handleSearchPress = () => {
@@ -152,43 +126,62 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
         translucent={false}
       />
       <SafeAreaView style={styles.container}>
-        {/* Top Navigation */}
-        <TopNavBar
-          onSearchPress={handleSearchPress}
-          onMenuPress={handleMenuPress}
-        />
+        {/* Scrollable Content Area */}
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Welcome Box */}
+          <WelcomeBox
+            userName="Willy"
+            message="We're glad you're here and value your time. Let's get started. Select a workout below."
+            visible={welcomeVisible}
+            translateX={translateX}
+            opacity={opacity}
+            panHandlers={panHandlers}
+          />
 
-        {/* Divider Bar */}
-        <View style={styles.divider} />
+          {/* Primary Workouts Section Header */}
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionHeaderText}>Primary Workouts</Text>
+          </View>
 
-        {/* Week Calendar */}
-        <WeekCalendar
-          selectedDay={selectedDay}
-          onDayPress={handleDayPress}
-        />
+          {/* Workout Cards Scroller */}
+          <WorkoutCardsScroller />
 
-        {/* Plan Progress */}
-        <PlanProgressBar
-          planName={planName}
-          completedWorkouts={completedWorkouts}
-          totalWorkouts={totalWorkouts}
-        />
+          {/* Specialized Workouts Section Header */}
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionHeaderText}>Specialized Workouts</Text>
+          </View>
 
-        {/* Welcome Box */}
-        <WelcomeBox
-          userName="Willy"
-          message="We're glad you're here and value your time. Let's get started. Select a workout below."
-          visible={welcomeVisible}
-          translateX={translateX}
-          opacity={opacity}
-          panHandlers={panHandlers}
-        />
+          {/* Custom Workout Cards Scroller */}
+          <CustomWorkoutCardsScroller />
+        </ScrollView>
 
-        {/* Recommended Workout */}
-        <RecommendedWorkoutBox
-          workoutTitle="Chest (Push)"
-          animatedTop={workoutBoxTop}
-        />
+        {/* Fixed Top Navigation (renders above ScrollView) */}
+        <View style={styles.topBarsContainer}>
+          <TopNavBar
+            onSearchPress={handleSearchPress}
+            onMenuPress={handleMenuPress}
+          />
+
+          {/* Divider Bar */}
+          <View style={styles.divider} />
+
+          {/* Week Calendar */}
+          <WeekCalendar
+            selectedDay={selectedDay}
+            onDayPress={handleDayPress}
+          />
+
+          {/* Plan Progress */}
+          <PlanProgressBar
+            planName={planName}
+            completedWorkouts={completedWorkouts}
+            totalWorkouts={totalWorkouts}
+          />
+        </View>
 
         {/* Bottom Navigation */}
         <BottomTabBar
@@ -216,12 +209,38 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.pureBlack,
   },
 
-  divider: {
+  topBarsContainer: {
     position: 'absolute',
-    top: theme.layout.topNav.topSpacing + theme.layout.topNav.height,
+    top: 0,
     left: 0,
     right: 0,
+    zIndex: 10, // Fixed bars layer above scrollable content
+    backgroundColor: theme.colors.pureBlack, // Opaque background prevents content bleed-through
+  },
+
+  divider: {
     height: theme.layout.border.thin,
     backgroundColor: theme.colors.borderDefault,
+  },
+
+  scrollView: {
+    flex: 1,
+  },
+
+  scrollContent: {
+    paddingTop: theme.layout.planProgress.topPosition + theme.layout.planProgress.height, // Scrollable content starts below fixed progress bar
+    paddingBottom: theme.layout.bottomNav.height + theme.spacing.l, // Bottom clearance for tab bar plus comfortable spacing
+  },
+
+  sectionHeader: {
+    marginTop: 0, // Combined with element above marginBottom for 10dp total spacing
+    marginBottom: theme.spacing.xs,
+    marginLeft: theme.layout.recommendedWorkout.leftMargin, // Align with workout cards
+  },
+
+  sectionHeaderText: {
+    fontSize: theme.typography.fontSize.m,
+    fontFamily: theme.typography.fontFamily.primary,
+    color: theme.colors.pureWhite,
   },
 });

@@ -16,6 +16,100 @@ This file contains the historical record of version changes for Lift 3-2-1. Deta
 
 ## Version History
 
+### v1.1.2 - HomePage Workout Cards & Scrolling (2025-11-16)
+**Branch**: Claude-v1.1.2
+
+**Summary**: Implemented complete workout cards system with horizontal scrolling for both primary body part workouts and specialized workout modes. Converted HomePage from absolute positioning to flow layout with proper vertical scrolling. Fixed z-index layering to keep navigation bars fixed while content scrolls underneath. Applied visual enhancements with uppercase green titles for body parts and section headers. All code now compliant with CLAUDE_DEV_STANDARDS (no magic numbers, forward-looking comments).
+
+**What Was Built**:
+- **CustomWorkoutCardsScroller Component** (src/components/CustomWorkoutCardsScroller.tsx):
+  - Horizontal scrollable container for specialized workout modes
+  - 4 workout types: Custom, Work-As-You-Go, SuperSet, Partner Mode
+  - Same card dimensions and peek behavior as primary workouts (330dp first/last, 320dp middle, 10dp peek)
+  - Snap-to-position scrolling with calculated offsets
+  - React.memo optimized
+
+- **Workout Card System Updates** (src/components/WorkoutCard.tsx):
+  - Extended to support both BodyPart and CustomWorkout types
+  - Body part titles: 32dp uppercase green text (theme.typography.fontSize.xxxl + theme.colors.actionSuccess)
+  - Specialized workout titles: 16dp white text with specific names
+  - Null handling for missing images (graceful degradation)
+  - Centered vertically, left-aligned horizontally
+  - Helper functions: getWorkoutTitle(), getWorkoutImage(), isBodyPart()
+
+- **Scrolling Architecture** (src/features/main/screens/HomePage.tsx):
+  - Converted from absolute positioning to flow layout
+  - Vertical ScrollView contains all page content
+  - Fixed z-index layering pattern: ScrollView renders first, topBarsContainer overlays with z-index 10
+  - topBarsContainer: absolute positioned, opaque background prevents bleed-through
+  - Content scrolls behind fixed bars correctly
+  - Section headers: "Primary Workouts" and "Specialized Workouts" at 16dp
+  - Proper spacing using theme tokens (10dp between elements)
+
+- **Visual Enhancements**:
+  - Body part cards: "CHEST", "ARMS", "SHOULDERS", "BACK & TRIS", "LEGS" in uppercase green
+  - Removed (Push)/(Pull) indicators from titles
+  - Section headers with consistent 10dp spacing from elements above
+  - WelcomeBox uses flow layout with proper margins
+
+- **Workout Images**:
+  - Added custom.png, work-as-you-go.png, superset.png, partner-mode.png
+  - All 9 workout cards now have images (5 body parts + 4 specialized)
+  - Conditional rendering handles missing images gracefully
+
+- **CLAUDE_DEV_STANDARDS Compliance**:
+  - Eliminated all magic numbers: 4→theme.spacing.xs, 10→theme.layout.recommendedWorkout.cardSpacing, 16→theme.typography.fontSize.m, 20→theme.spacing.l, 32→theme.typography.fontSize.xxxl
+  - Updated all comments to be forward-looking (explain design intent, not history)
+  - Consistent section headers across all files
+  - All styling via theme tokens
+
+**Why This Approach**:
+- **Flow Layout Over Absolute**: Natural document flow enables vertical scrolling without complex position calculations
+- **Z-Index Layering**: ScrollView renders first (z-index 0), fixed bars overlay (z-index 10) with opaque background
+- **Section Headers**: Clear visual separation between primary and specialized workouts
+- **Uppercase Green Titles**: Strong visual hierarchy and brand consistency with green accent color
+- **Theme Token Compliance**: Eliminates magic numbers, ensures consistency, simplifies future design changes
+- **Peek Pattern**: 10dp visible portion of next card indicates scrollability
+
+**Problems Solved**:
+1. **Missing Images Crash**: App crashed when work-as-you-go.png and superset.png didn't exist. Fixed with null handling and conditional rendering.
+2. **Scroll Area Boundaries**: Content was scrolling over fixed navigation bars. Fixed by changing divider from absolute to flow layout and adding proper z-index.
+3. **Vertical Scroll Not Working**: ScrollView had flex:1 but divider's absolute positioning disrupted layout. Removed absolute positioning from divider.
+4. **Content Overlap**: WelcomeBox and cards rendering above navigation. Fixed by wrapping fixed bars in topBarsContainer with higher z-index and opaque background.
+5. **Magic Numbers**: Multiple hard-coded values (4dp, 10dp, 16dp, 20dp, 32dp, 64dp). Replaced all with theme tokens.
+
+**What Changed**:
+- **New Files**:
+  - src/components/CustomWorkoutCardsScroller.tsx (79 lines)
+  - src/assets/images/workouts/custom.png
+  - src/assets/images/workouts/work-as-you-go.png
+  - src/assets/images/workouts/superset.png
+  - src/assets/images/workouts/partner-mode.png
+
+- **Modified Files**:
+  - src/components/WorkoutCard.tsx: Added CustomWorkout type support, visual styling, null image handling
+  - src/components/WorkoutCardsScroller.tsx: Converted to flow layout, updated comments
+  - src/components/WelcomeBox.tsx: Converted to flow layout with margins instead of absolute positioning
+  - src/features/main/screens/HomePage.tsx: Added ScrollView, topBarsContainer, section headers, z-index layering
+  - src/components/index.ts: Exported CustomWorkoutCardsScroller
+  - src/hooks/useSwipeGesture.ts: Simplified to only animate WelcomeBox
+
+**Key Learnings**:
+- Flow layout with z-index layering cleaner than absolute positioning for complex scrollable pages
+- React Native ScrollView needs proper flex constraints - absolute positioned siblings disrupt layout
+- Section headers improve UX by creating clear visual hierarchy
+- Theme token discipline prevents magic number proliferation
+- Conditional rendering (workoutImage &&) handles missing assets gracefully
+- Forward-looking comments age better than historical/fix comments
+
+**Next Steps**:
+- Implement onPress handlers for workout cards to navigate to detail screens
+- Connect to JSON workout data (src/data/exercises.json, src/data/workoutPlans.json)
+- Build workout detail screens with exercise lists
+- Add workout tracking functionality
+
+---
+
 ### v1.1.0 - Environment Setup & Guest Login (2025-11-15)
 **Branch**: Claude-v1.1.0
 
