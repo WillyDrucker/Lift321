@@ -23,6 +23,9 @@ export * from './Navigation';
 // === UI COMPONENTS ===
 export {WelcomeBox} from './WelcomeBox';
 export {RecommendedWorkoutBox} from './RecommendedWorkoutBox';
+export {WorkoutCard} from './WorkoutCard';
+export {WorkoutCardsScroller} from './WorkoutCardsScroller';
+export {CustomWorkoutCardsScroller} from './CustomWorkoutCardsScroller';
 export {Sidebar} from './Sidebar';
 
 // === LAYOUT ===

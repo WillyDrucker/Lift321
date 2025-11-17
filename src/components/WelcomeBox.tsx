@@ -63,10 +63,10 @@ export const WelcomeBox: React.FC<WelcomeBoxProps> = ({
 
 const styles = StyleSheet.create({
   welcomeBox: {
-    position: 'absolute',
-    top: theme.layout.welcomeBox.topPosition,
-    left: theme.layout.welcomeBox.leftMargin,
-    right: theme.layout.welcomeBox.rightMargin,
+    marginLeft: theme.layout.welcomeBox.leftMargin,
+    marginRight: theme.layout.welcomeBox.rightMargin,
+    marginTop: theme.layout.recommendedWorkout.cardSpacing, // Consistent spacing from progress bar
+    marginBottom: theme.layout.recommendedWorkout.cardSpacing, // Consistent spacing before section headers
     backgroundColor: theme.colors.backgroundPrimary,
     borderTopLeftRadius: theme.layout.welcomeBox.borderRadius,
     borderBottomLeftRadius: theme.layout.welcomeBox.borderRadius,

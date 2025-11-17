@@ -19,61 +19,70 @@ This file contains only critical architectural patterns and current session stat
 
 ---
 
-## Current Version: 1.1.0
+## Current Version: 1.1.2
 
-**Branch**: Claude-v1.1.0
-**Status**: Environment Setup Complete & Guest Login Implemented
-**Last Updated**: 2025-11-15
+**Branch**: Claude-v1.1.2
+**Status**: HomePage Workout Cards & Scrolling System Complete
+**Last Updated**: 2025-11-16
 
 ---
 
 ## Session State
 
 ### Current Work
-- Environment variables fully configured with Supabase credentials
-- Guest login system implemented and working
-- App successfully running on Android device
-- GitHub issues tracking system established (18 issues created)
-- Ready for feature development
+- HomePage fully functional with vertical and horizontal scrolling
+- Custom workout cards system implemented
+- All workout card images integrated
+- CLAUDE_DEV_STANDARDS applied to all new code
+- Ready for next feature development
 
 ### Completed This Session
-**v1.1.0 - Environment Setup & Guest Login** (2025-11-15):
-1. **Environment Configuration**:
-   - Installed react-native-config package
-   - Created .env file with Supabase credentials (URL and anon key)
-   - Configured Android gradle to read .env file
-   - Added react-native-url-polyfill for Supabase compatibility
-   - Removed unnecessary console warnings
+**v1.1.2 - HomePage Workout Cards & Scrolling** (2025-11-16):
+1. **Custom Workout Cards System**:
+   - Created CustomWorkoutCardsScroller component
+   - Implemented 4 specialized workout types: Custom, Work-As-You-Go, SuperSet Mode, Partner Mode
+   - Added all workout images: custom.png, work-as-you-go.png, superset.png, partner-mode.png
+   - Same dimensions and peek behavior as primary workout cards
 
-2. **Guest Login Implementation**:
-   - Created enableGuestMode(), disableGuestMode(), isGuestMode() functions
-   - Modified isAuthenticated() to check guest mode via AsyncStorage
-   - Implemented AUTH_CHANGE_EVENT using DeviceEventEmitter
-   - Updated App.tsx to listen for auth changes and re-check authentication
-   - Updated LoginScreen to enable guest mode instead of direct navigation
-   - Guest login now properly switches from AuthNavigator to MainNavigator
+2. **Scrolling Architecture**:
+   - Converted from absolute positioning to flow layout
+   - Implemented vertical ScrollView containing all page content
+   - Fixed z-index layering: ScrollView renders first, fixed bars overlay with z-index
+   - Top bars (TopNav, Calendar, Progress) fixed with opaque background
+   - Bottom tab bar remains fixed
+   - Content scrolls behind fixed bars correctly
 
-3. **GitHub Project Management**:
-   - Created 8 EPICs (never to close): Login System, Create Account, Home Page, Plan Page, Performance Page, Profile Page, Hamburger Menu, Normal Workout/Superset
-   - Created 10 feature/task issues with descriptions
-   - Established issue tracking foundation for future development
+3. **Visual Enhancements**:
+   - Body part titles: 32dp uppercase green text, vertically centered
+   - Section headers: "Primary Workouts" and "Specialized Workouts" at 16dp
+   - Proper spacing: 10dp between elements using theme tokens
+   - Updated WorkoutCard to support both body part and custom workout types
+
+4. **Code Standards**:
+   - Eliminated all magic numbers - replaced with theme tokens
+   - Updated all comments to be forward-looking (design intent, not history)
+   - Maintained consistent section headers across all files
+   - Full CLAUDE_DEV_STANDARDS compliance
 
 ### Next Session Should
-1. **Build Features**: Begin implementing features tracked in GitHub issues
-2. **Authentication**: Implement actual Supabase auth using authService
-3. **Testing**: Continue testing on physical Android device
-4. **Feature Development**: Use established patterns to build workout tracking features
+1. **Continue HomePage Features**: Add workout plan data, exercise details, workout tracking
+2. **Navigation**: Implement navigation from workout cards to workout screens
+3. **Data Layer**: Connect to JSON workout data (already exists in src/data/)
+4. **Testing**: Continue testing scrolling and card interactions on device
 
 ### User Decisions Made
-- Environment setup prioritized to get app running
-- Guest mode implemented for testing without authentication
-- GitHub issues created for project tracking
-- .env file properly gitignored to protect credentials
-- Focus on getting working app before building all features
+- Custom workout cards renamed to "Specialized Workouts"
+- Body part titles should be uppercase green 32dp text
+- Section headers at 16dp with 10dp spacing
+- Scroll area constrained between plan progress bar and bottom tab bar
+- All cards use flow layout (not absolute positioning)
 
 ---
 
 ## Previous Sessions (Recent)
+
+### v1.1.2 - HomePage Workout Cards & Scrolling (2025-11-16)
+Implemented complete workout cards system with CustomWorkoutCardsScroller (4 specialized modes), converted HomePage to flow layout with vertical scrolling, fixed z-index layering for fixed navigation bars, added all workout images, applied visual styling (32dp uppercase green titles for body parts, 16dp section headers), eliminated all magic numbers with theme tokens, updated all comments to be forward-looking. HomePage now fully scrollable with primary and specialized workout cards.
 
 ### v1.1.0 - Environment Setup & Guest Login (2025-11-15)
 Configured complete environment: react-native-config installed, .env with Supabase credentials, Android gradle dotenv configuration, URL polyfill added. Implemented guest login system with AsyncStorage persistence and AUTH_CHANGE_EVENT for real-time auth updates. Fixed navigation error where "LOGIN AS GUEST" couldn't navigate to HomePage (HomePage only exists in MainNavigator). Created 18 GitHub issues: 8 EPICs and 10 features/tasks. App now fully functional on Android device.
@@ -106,6 +115,11 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 
 ## Known Issues
 
+### Scrolling & Layout (NEW)
+- ✅ Fixed: Flow layout approach ensures proper vertical scrolling
+- ✅ Fixed: z-index layering prevents content from rendering above fixed bars
+- Pattern: ScrollView renders first, fixed navigation bars overlay with higher z-index + opaque background
+
 ### Android Shadows / Metro Cache / Native Modules
 - Native shadows unreliable → Use multi-layer View pattern
 - New assets/modules → Restart Metro with --reset-cache, rebuild Android
@@ -119,18 +133,44 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 
 ## Quick Reference: Established Patterns
 
-### Architecture Layers (NEW)
+### HomePage Architecture (NEW)
+| Component | Purpose | Position |
+|-----------|---------|----------|
+| **ScrollView** | Main content container | Fills screen, renders first |
+| **topBarsContainer** | Fixed navigation overlay | Absolute position, z-index 10, opaque background |
+| **TopNavBar** | Search and menu buttons | Inside topBarsContainer |
+| **WeekCalendar** | Day selection | Inside topBarsContainer |
+| **PlanProgressBar** | Workout plan progress | Inside topBarsContainer |
+| **WelcomeBox** | User greeting (dismissible) | Inside ScrollView |
+| **Section Headers** | "Primary Workouts" / "Specialized Workouts" | Inside ScrollView, 16dp text |
+| **WorkoutCardsScroller** | Horizontal body part cards | Inside ScrollView |
+| **CustomWorkoutCardsScroller** | Horizontal specialized workout cards | Inside ScrollView |
+| **BottomTabBar** | Main navigation tabs | Absolute position (existing pattern) |
+
+### Workout Card System (NEW)
+| Card Type | Title Format | Examples |
+|-----------|--------------|----------|
+| **Body Part** | Uppercase green 32dp, body part name only | CHEST, ARMS, SHOULDERS, BACK & TRIS, LEGS |
+| **Specialized** | White text, specific names | Custom Workout, Work-As-You-Go, SuperSet Mode, Partner Mode |
+
+### Card Scrolling Pattern (NEW)
+- **First/Last Cards**: 330dp width for proper edge spacing
+- **Middle Cards**: 320dp width for consistent 10dp peek
+- **Snap Offsets**: Calculated positions for smooth card-to-card scrolling
+- **Peek Pattern**: 10dp of next card visible to indicate scrollability
+
+### Architecture Layers
 | Layer | Pattern | Location |
 |-------|---------|----------|
-| **Components** | Reusable UI (ShadowButton, FormInput, LoadingState, ErrorState, etc.) | src/components/ |
+| **Components** | Reusable UI (ShadowButton, FormInput, WorkoutCard, etc.) | src/components/ |
 | **Services** | Backend operations (authService, BaseService) | src/services/ |
 | **Navigation** | Type-safe routing (useTypedNavigation, navigationService) | src/navigation/ |
 | **Utils** | Pure functions (dateUtils, validationUtils, formatUtils) | src/utils/ |
-| **Hooks** | Reusable logic (useFormInput, useAnimation, useWeekCalendar) | src/hooks/ |
+| **Hooks** | Reusable logic (useFormInput, useAnimation, useWeekCalendar, useSwipeGesture) | src/hooks/ |
 | **Theme** | Design tokens (colors, spacing, typography, layout) | src/theme/ |
 | **Constants** | App config (API_TIMEOUT, STORAGE_KEYS, ERROR_MESSAGES) | src/constants/ |
 
-### Component Library (NEW)
+### Component Library
 | Component | Purpose | Props |
 |-----------|---------|-------|
 | **ShadowButton** | Primary/secondary/tertiary buttons with shadows | variant, onPress, disabled |
@@ -138,12 +178,16 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 | **PasswordInput** | Password field with show/hide toggle | Extends FormInput props |
 | **SocialButton** | OAuth buttons (Google/Facebook) | provider ('google' \| 'facebook'), onPress |
 | **ActionButton** | Simple CTA button | text, onPress, disabled |
+| **WorkoutCard** | Workout display card | workoutType, index, totalCards |
+| **WorkoutCardsScroller** | Horizontal body part cards container | - |
+| **CustomWorkoutCardsScroller** | Horizontal specialized cards container | - |
+| **WelcomeBox** | Dismissible welcome message | userName, message, visible, translateX, opacity, panHandlers |
 | **LoadingState** | Async loading UI | message?, size?, fullScreen? |
 | **ErrorState** | Error UI with retry | message, onRetry?, fullScreen? |
 | **EmptyState** | No data UI | title?, message, actionText?, onAction?, fullScreen? |
 | **ErrorBoundary** | Crash protection | children, fallback? |
 
-### Navigation System (NEW)
+### Navigation System
 | Hook/Service | Purpose | Usage |
 |--------------|---------|-------|
 | **useTypedNavigation** | Type-safe navigation | navigation.navigate('HomePage') |
@@ -153,7 +197,7 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 | **useAuthGuard** | Protect authenticated screens | if (!isAllowed) return null |
 | **useGuestGuard** | Redirect if authenticated | Used in LoginScreen |
 
-### Service Layer (NEW)
+### Service Layer
 | Service/Utility | Purpose | Usage |
 |-----------------|---------|-------|
 | **authService** | Authentication operations | authService.signIn(credentials) |
@@ -162,7 +206,7 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 | **Type Guards** | Response checking | if (isApiSuccess(result)) {...} |
 | **ApiResult<T>** | Unified response format | {data, error, status} |
 
-### Utilities (NEW)
+### Utilities
 | Utility | Functions | Examples |
 |---------|-----------|----------|
 | **dateUtils** | 20+ date functions | formatDateShort, getWeekDates, isToday |
@@ -170,17 +214,17 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 | **formatUtils** | 25+ formatters | formatCurrency, formatPhoneNumber, pluralize |
 | **envUtils** | Environment helpers | requireEnv(), getEnv(), isDevelopment() |
 
-### Design Token Modules (UNCHANGED)
+### Design Token Modules
 | Module | Purpose |
 |--------|---------|
-| `theme.colors` | Semantic colors (primary, primaryMuted, pureBlack, pureWhite, googleBlue, facebookBlue, shadowBlack) |
+| `theme.colors` | Semantic colors (primary, primaryMuted, pureBlack, pureWhite, actionSuccess, googleBlue, facebookBlue, shadowBlack) |
 | `theme.spacing` | xs/s/m/l/xl/xxl + safeZone/safeZoneHorizontal/textLineGap/buttonSpacing (16dp rhythm) |
 | `theme.typography` | Fonts (brand/primary), sizes (xs/s/m/l/xl/xxl/xxxl/display/mega), weights |
 | `theme.textShadows` | default/subtle/strong |
 | `theme.viewShadows` | iOS shadows (small/medium/large) |
 | `theme.elevation` | Android elevation values |
 | `theme.buttons` | Sizing, padding, borderRadius, margins, shadowLayers, opacity |
-| `theme.layout` | header/logo/form/bottom/icon/backgroundImage/topNav/bottomNav/authNavigation/socialLogin |
+| `theme.layout` | header/logo/form/bottom/icon/topNav/bottomNav/recommendedWorkout/welcomeBox/planProgress/weekCalendar/authNavigation/socialLogin |
 
 ### Architecture Patterns (REQUIRED)
 | Pattern | Rule |
@@ -194,6 +238,7 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 | **Forward-Looking Comments** | Comments explain design intent, not historical changes or fixes |
 | **Component Library** | Use existing components before creating new ones |
 | **Barrel Exports** | Import from @/components, @/hooks, @/utils, @/services, @/navigation |
+| **Flow Layout First** | Prefer natural document flow over absolute positioning when possible |
 
 ### Component Structure Sections
 ```typescript
@@ -221,23 +266,23 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 ## Environment & Critical Info
 
 ### Configured
-✅ Supabase (.env with credentials) | ✅ react-native-config | ✅ URL polyfill | Metro (8081) | GitHub synced | All deps installed | Android device testing | Gradle 9.2.0 | Fonts (Bebas Neue, Roboto) | **Design tokens complete** | **Component library established** | **Service layer complete** | **Navigation system complete** | **Utils/hooks infrastructure complete** | **Production readiness framework complete** | **Guest login system** | **GitHub issues (18 created)**
+✅ Supabase (.env with credentials) | ✅ react-native-config | ✅ URL polyfill | Metro (8081) | GitHub synced | All deps installed | Android device testing | Gradle 9.2.0 | Fonts (Bebas Neue, Roboto) | **Design tokens complete** | **Component library established** | **Service layer complete** | **Navigation system complete** | **Utils/hooks infrastructure complete** | **Production readiness framework complete** | **Guest login system** | **GitHub issues (18 created)** | **HomePage workout cards & scrolling complete** | **JSON workout data layer**
 
 ### Not Yet Set Up
-DB schema/tables | Supabase Auth config | TS types from DB | Actual authentication implementation (authService exists but not integrated)
+DB schema/tables | Supabase Auth config | TS types from DB | Actual authentication implementation (authService exists but not integrated) | Workout card navigation | Exercise detail screens
 
 ### Critical Paths
 - **Project Root**: C:\Dev\Lift321 (ACTIVE DEV)
 - **GitHub**: https://github.com/WillyDrucker/Lift321
 - **GitHub Issues**: 8 EPICs + 10 features/tasks tracking future work
 - **Historical Context**: Fresh React Native build informed by previous project learnings (reference code at C:\Dev\Wills321 - untouched)
-- **Branch**: Claude-v1.1.0 (environment setup complete)
+- **Branch**: Claude-v1.1.2 (workout cards & scrolling complete)
 
 ### Next Steps
-1. **Build Features**: Begin implementing features from GitHub issues
-2. **Authentication**: Integrate authService with LoginFormScreen and SignUpScreen
-3. **Database**: Create Supabase tables schema for workouts, plans, users
-4. **Continue Testing**: Verify all patterns on physical Android device
+1. **Workout Card Navigation**: Implement onPress handlers to navigate to workout detail screens
+2. **Connect Data Layer**: Use existing JSON workout data (src/data/exercises.json, src/data/workoutPlans.json)
+3. **Build Workout Screens**: Create workout detail, exercise list, and tracking screens
+4. **Continue Testing**: Verify scrolling performance and interactions on device
 5. **Leverage Framework**:
    - Import components from @/components
    - Use navigation hooks from @/navigation
@@ -247,6 +292,6 @@ DB schema/tables | Supabase Auth config | TS types from DB | Actual authenticati
 
 ---
 
-**Version**: 1.1.0
-**Last Updated**: 2025-11-15
-**Status**: Environment Setup Complete & Guest Login Implemented - App Running on Device
+**Version**: 1.1.2
+**Last Updated**: 2025-11-16
+**Status**: HomePage Workout Cards & Scrolling Complete - Ready for Next Features

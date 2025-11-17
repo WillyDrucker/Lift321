@@ -145,8 +145,8 @@ export const layout = {
   // === WELCOME BOX ===
   // Swipeable welcome message box for new sessions
   welcomeBox: {
-    topPosition: 136, // Position below plan progress bar (96dp + 24dp + 16dp spacing)
-    leftMargin: 6, // Left margin from screen edge
+    topPosition: 130, // Position below plan progress bar (96dp + 24dp + 10dp spacing)
+    leftMargin: 10, // Left margin from screen edge
     rightMargin: 0, // Right margin (flush to edge for swipe affordance)
     borderRadius: 8, // Corner radius for left side only
     paddingLeft: 16, // Left inner padding
@@ -162,14 +162,24 @@ export const layout = {
   // === RECOMMENDED WORKOUT BOX ===
   // Daily recommended workout card with animated positioning
   recommendedWorkout: {
-    topPositionWithWelcome: 238, // Position when welcome box visible (136dp + 86dp welcome + 16dp spacing)
-    topPositionWithoutWelcome: 136, // Position when welcome dismissed (same as welcome position)
-    leftMargin: 32, // Left margin from screen edge
-    rightMargin: 32, // Right margin from screen edge
+    topPositionWithWelcome: 226, // Position when welcome box visible (130dp + 86dp welcome + 10dp spacing)
+    topPositionWithoutWelcome: 130, // Position when welcome dismissed (same as welcome position)
+    leftMargin: 10, // Left margin from screen edge (first card)
+    rightMargin: 0, // Right margin from screen edge (last card's marginRight provides 10dp spacing)
+    peekAmount: 10, // Amount of next/prev card visible (partial card visibility pattern)
     height: 256, // Fixed card height
     borderRadius: 8, // Corner radius
     paddingLeft: 16, // Left inner padding
     paddingTop: 16, // Top inner padding
+    cardWidth: 330, // Individual card width (360dp - 10dp left - 10dp peek - 10dp spacing)
+    cardSpacing: 10, // Gap between cards (marginRight on each card)
+  },
+
+  // === CUSTOM WORKOUT CARDS ===
+  // Custom workout mode cards (same dimensions and spacing as recommended workout)
+  customWorkout: {
+    topPositionWithWelcome: 492, // Position below main workout cards (226dp + 256dp + 10dp spacing)
+    topPositionWithoutWelcome: 396, // Position when welcome dismissed (130dp + 256dp + 10dp spacing)
   },
 
   // === DAY CALENDAR ADJUSTMENTS ===

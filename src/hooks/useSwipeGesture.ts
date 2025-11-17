@@ -16,7 +16,6 @@ import {theme} from '@/theme';
 
 export type SwipeGestureConfig = {
   onDismiss: () => void;
-  workoutBoxAnimatedTop: Animated.Value;
 };
 
 export type SwipeGestureReturn = {
@@ -30,7 +29,6 @@ export type SwipeGestureReturn = {
 
 export const useSwipeGesture = ({
   onDismiss,
-  workoutBoxAnimatedTop,
 }: SwipeGestureConfig): SwipeGestureReturn => {
   const translateX = useRef(new Animated.Value(0)).current;
   const opacity = useRef(new Animated.Value(1)).current;
@@ -38,10 +36,7 @@ export const useSwipeGesture = ({
   const resetPosition = useCallback(() => {
     translateX.setValue(0);
     opacity.setValue(1);
-    workoutBoxAnimatedTop.setValue(
-      theme.layout.recommendedWorkout.topPositionWithWelcome,
-    );
-  }, [translateX, opacity, workoutBoxAnimatedTop]);
+  }, [translateX, opacity]);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -71,11 +66,6 @@ export const useSwipeGesture = ({
               toValue: 0,
               duration: theme.layout.animation.duration,
               useNativeDriver: true,
-            }),
-            Animated.timing(workoutBoxAnimatedTop, {
-              toValue: theme.layout.recommendedWorkout.topPositionWithoutWelcome,
-              duration: theme.layout.animation.duration,
-              useNativeDriver: false, // Can't use native driver for layout properties
             }),
           ]).start(() => {
             onDismiss();
