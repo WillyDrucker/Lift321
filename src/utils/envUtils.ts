@@ -8,7 +8,13 @@
 // Used by: App initialization, services
 // ==========================================================================
 
-import Config from 'react-native-config';
+import {SUPABASE_URL, SUPABASE_ANON_KEY} from '@env';
+
+// Create Config-like object for compatibility
+const Config: Record<string, string | undefined> = {
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY,
+};
 
 // === TYPES ===
 

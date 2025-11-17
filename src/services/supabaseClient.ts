@@ -9,14 +9,14 @@
 // ==========================================================================
 
 import {createClient} from '@supabase/supabase-js';
-import Config from 'react-native-config';
+import {SUPABASE_URL, SUPABASE_ANON_KEY} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {DeviceEventEmitter} from 'react-native';
 
 // === CONFIGURATION ===
 
-const SUPABASE_URL = Config.SUPABASE_URL || '';
-const SUPABASE_ANON_KEY = Config.SUPABASE_ANON_KEY || '';
+const supabaseUrl = SUPABASE_URL || '';
+const supabaseAnonKey = SUPABASE_ANON_KEY || '';
 
 // Guest mode storage key
 const GUEST_MODE_KEY = '@lift321:guest_mode';
@@ -32,11 +32,11 @@ export const AUTH_CHANGE_EVENT = 'AUTH_STATE_CHANGED';
  */
 const hasValidCredentials = () => {
   return (
-    SUPABASE_URL &&
-    SUPABASE_ANON_KEY &&
-    SUPABASE_URL !== 'your-project-url-here' &&
-    SUPABASE_ANON_KEY !== 'your-anon-key-here' &&
-    SUPABASE_URL.startsWith('http')
+    supabaseUrl &&
+    supabaseAnonKey &&
+    supabaseUrl !== 'your-project-url-here' &&
+    supabaseAnonKey !== 'your-anon-key-here' &&
+    supabaseUrl.startsWith('http')
   );
 };
 
@@ -46,7 +46,7 @@ const hasValidCredentials = () => {
  * - Uses mock client for development without credentials
  */
 export const supabase = hasValidCredentials()
-  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  ? createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
         // Auto refresh token when it expires
         autoRefreshToken: true,
