@@ -139,28 +139,38 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
           />
         </View>
 
+        {/* Fixed Workout Title Bar */}
+        <View style={styles.workoutTitleBar}>
+          {/* Workout Title */}
+          <Text style={styles.workoutTitleText}>{workoutType}</Text>
+
+          {/* Let's Go Button with Shadow */}
+          <View style={styles.letsGoButtonContainer}>
+            {/* Shadow Layer 3 - Darkest, furthest */}
+            <View style={[styles.letsGoButtonShadow, styles.shadowLayer3]} />
+            {/* Shadow Layer 2 - Medium darkness */}
+            <View style={[styles.letsGoButtonShadow, styles.shadowLayer2]} />
+            {/* Shadow Layer 1 - Lightest, closest */}
+            <View style={[styles.letsGoButtonShadow, styles.shadowLayer1]} />
+            {/* Actual Button */}
+            <TouchableOpacity
+              style={styles.letsGoButton}
+              onPress={() => console.log('Let\'s Go pressed')}
+              activeOpacity={0.8}>
+              <Text style={styles.letsGoButtonText}>LET'S GO!</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
         {/* Scrollable Content Area */}
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}>
-          {/* Workout Overview Title Card */}
-          <View style={styles.workoutTitleCard}>
-            <View style={styles.workoutTitleSelector}>
-              {/* Workout Title */}
-              <Text style={styles.workoutTitleText}>{workoutType}</Text>
-            </View>
-          </View>
-
           {/* Workout Overview Plan Card */}
           <View style={styles.workoutPlanCard}>
-            {/* Current Plan Selector */}
-            <TouchableOpacity
-              style={styles.workoutPlanCurrentSelector}
-              onPress={() => console.log('Current plan pressed')}
-              activeOpacity={1}>
-              <Text style={styles.workoutPlanCurrentText}>CURRENT PLAN</Text>
-            </TouchableOpacity>
+            {/* Current Plan Label */}
+            <Text style={styles.workoutPlanCurrentText}>CURRENT PLAN</Text>
 
             {/* Plan Name Selector */}
             <TouchableOpacity
@@ -172,15 +182,17 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
               </Text>
             </TouchableOpacity>
 
-            {/* Week Progress Selector */}
-            <TouchableOpacity
-              style={styles.workoutPlanWeekSelector}
-              onPress={() => console.log('Week selector pressed')}
-              activeOpacity={1}>
-              <Text style={styles.workoutPlanWeekText}>
-                WEEK <Text style={styles.workoutPlanWeekGreen}>2 </Text>OF<Text style={styles.workoutPlanWeekGreen}> 15</Text>
+            {/* Progress Bar */}
+            <View style={styles.progressBarWrapper}>
+              <Text style={styles.progressBarWeekText}>
+                WEEK <Text style={styles.progressBarWeekGreen}>2 </Text>OF<Text style={styles.progressBarWeekGreen}> 15</Text>
               </Text>
-            </TouchableOpacity>
+              <View style={styles.progressBarContainer}>
+                <View style={styles.progressBarBackground}>
+                  <View style={[styles.progressBarFill, {width: '8.33%'}]} />
+                </View>
+              </View>
+            </View>
 
             {/* Plan Focus Selectors */}
             <View style={styles.workoutPlanFocusContainer}>
@@ -218,13 +230,24 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
 
           {/* Workout Overview Session Card */}
           <View style={styles.workoutSessionCard}>
-            {/* Current Session Selector */}
-            <TouchableOpacity
-              style={styles.workoutSessionCurrentSelector}
-              onPress={() => console.log('Current session pressed')}
-              activeOpacity={1}>
-              <Text style={styles.workoutSessionCurrentText}>CURRENT SESSION</Text>
-            </TouchableOpacity>
+            {/* Current Session Text */}
+            <Text style={styles.workoutSessionCurrentText}>CURRENT SESSION</Text>
+
+            {/* Duration Selector */}
+            <View style={styles.workoutSessionDurationSelector}>
+              <Text style={styles.workoutSessionDurationLabel}>
+                DURATION: <Text style={[
+                  styles.workoutSessionDurationValue,
+                  selectedSession === 'standard' && {color: theme.colors.actionSuccess},
+                  selectedSession === 'express' && {color: '#77ff00'},
+                  selectedSession === 'maintenance' && {color: '#ffff00'},
+                ]}>
+                  {selectedSession === 'standard' && '31 MINUTES'}
+                  {selectedSession === 'express' && '25 MINUTES'}
+                  {selectedSession === 'maintenance' && '19 MINUTES'}
+                </Text>
+              </Text>
+            </View>
 
             {/* Session Type Selectors */}
             <View style={styles.workoutSessionTypesContainer}>
@@ -262,13 +285,8 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
 
           {/* Workout Overview Equipment Card */}
           <View style={styles.workoutEquipmentCard}>
-            {/* Current Equipment Selector */}
-            <TouchableOpacity
-              style={styles.workoutEquipmentCurrentSelector}
-              onPress={() => console.log('Current equipment pressed')}
-              activeOpacity={1}>
-              <Text style={styles.workoutEquipmentCurrentText}>CURRENT EQUIPMENT</Text>
-            </TouchableOpacity>
+            {/* Current Equipment Text */}
+            <Text style={styles.workoutEquipmentCurrentText}>CURRENT EQUIPMENT</Text>
 
             {/* Equipment Type Selectors */}
             <View style={styles.workoutEquipmentTypesContainer}>
@@ -376,60 +394,114 @@ const styles = StyleSheet.create({
 
   scrollContent: {
     flexGrow: 1,
-    paddingTop: theme.layout.topNav.topSpacing + theme.layout.topNav.height + theme.spacing.s, // Clear full navigation bar with standard margin
+    paddingTop: theme.layout.topNav.topSpacing + theme.layout.topNav.height + 66 + theme.spacing.s, // Start from bottom of title bar (64dp nav + 66dp bar + 8dp)
     paddingBottom: theme.layout.bottomNav.height + theme.spacing.s, // Clear bottom navigation with standard margin
     paddingLeft: theme.spacing.s, // Standard screen edge margin
     paddingRight: theme.spacing.s, // Standard screen edge margin
   },
 
-  // === WORKOUT TITLE CARD ===
-  workoutTitleCard: {
+  // === WORKOUT TITLE BAR ===
+  workoutTitleBar: {
+    position: 'absolute', // Fixed position below top nav
+    top: theme.layout.topNav.topSpacing + theme.layout.topNav.height, // 64dp (32 status + 32 nav)
+    left: 0,
+    right: 0,
+    height: 66, // 8dp top + 50dp button + 8dp bottom = perfectly balanced
     backgroundColor: theme.colors.backgroundPrimary,
-    borderRadius: theme.spacing.s, // Standard card border radius
-    padding: theme.spacing.s, // Standard card internal padding
-    marginBottom: theme.spacing.s, // Standard card separation
+    borderBottomWidth: theme.layout.border.thin, // Green border on bottom
+    borderBottomColor: theme.colors.actionSuccess, // Green border
+    flexDirection: 'row', // Horizontal layout for title and button
+    alignItems: 'center', // Center items vertically
+    justifyContent: 'space-between', // Space between title and button
+    paddingLeft: theme.spacing.s, // 8dp from left edge
+    paddingRight: theme.spacing.s, // 8dp from right edge
+    zIndex: 5, // Below top nav (10) but above content
   },
 
-  workoutTitleSelector: {
-    height: 50, // Standard selector height for touch targets
-    backgroundColor: theme.colors.pureBlack,
-    borderRadius: theme.spacing.s, // Standard selector border radius
+  workoutTitleText: {
+    fontSize: theme.typography.fontSize.xxxl, // 32dp
+    fontFamily: theme.typography.fontFamily.workoutCard, // Zuume-ExtraBold
+    color: theme.colors.actionSuccess,
+    textTransform: 'uppercase',
+    includeFontPadding: false, // Eliminate Android font padding for precise alignment
+    transform: [{scaleX: 1.2}, {translateY: 1}], // 20% wider + 1dp down for optical centering
+    marginLeft: 14, // 8dp bar padding + 6dp scaleX compensation + 8dp spacing = 16dp visual alignment
+  },
+
+  // === LET'S GO BUTTON ===
+  letsGoButtonContainer: {
+    width: 100, // Same as Begin button
+    height: 50, // Fits in 66dp bar with 8dp spacing
+  },
+
+  letsGoButtonShadow: {
+    position: 'absolute',
+    width: 100,
+    height: 50,
+    backgroundColor: theme.colors.shadowBlack,
+    borderRadius: 8,
+  },
+
+  letsGoButton: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 100,
+    height: 50,
+    backgroundColor: theme.colors.actionSuccess, // Green background
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },
 
-  workoutTitleText: {
-    fontSize: theme.typography.fontSize.xxxl,
-    fontFamily: theme.typography.fontFamily.primary,
-    fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.actionSuccess,
+  letsGoButtonText: {
+    fontSize: theme.typography.fontSize.l, // 20dp - Same as Begin button
+    fontFamily: theme.typography.fontFamily.primary, // Roboto
+    fontWeight: theme.typography.fontWeight.bold, // Bold
+    color: theme.colors.pureBlack, // Black text on green
     textTransform: 'uppercase',
-    textAlign: 'center',
+  },
+
+  // Shadow layers for drop shadow effect
+  shadowLayer3: {
+    bottom: -6, // Furthest shadow layer
+    right: 0,
+    opacity: 0.15,
+  },
+
+  shadowLayer2: {
+    bottom: -4, // Middle shadow layer
+    right: 0,
+    opacity: 0.25,
+  },
+
+  shadowLayer1: {
+    bottom: -2, // Closest shadow layer
+    right: 0,
+    opacity: 0.4,
   },
 
   // === WORKOUT PLAN CARD ===
   workoutPlanCard: {
     backgroundColor: theme.colors.backgroundPrimary,
     borderRadius: theme.spacing.s, // Standard card border radius
-    padding: theme.spacing.s, // Standard card internal padding
+    paddingLeft: theme.spacing.s, // Standard card internal padding
+    paddingRight: theme.spacing.s, // Standard card internal padding
+    paddingBottom: theme.spacing.s, // Standard card internal padding
     marginBottom: theme.spacing.s, // Standard card separation
-  },
-
-  workoutPlanCurrentSelector: {
-    height: 50, // Standard selector height for touch targets
-    backgroundColor: theme.colors.pureBlack,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: theme.spacing.s, // Standard selector border radius
-    marginBottom: 1, // Minimal spacing between stacked selectors
   },
 
   workoutPlanCurrentText: {
     fontSize: theme.typography.fontSize.xl, // Large text for primary labels
+    lineHeight: theme.typography.fontSize.xl, // Match font size to eliminate extra line spacing
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.backgroundTertiary, // Subdued label color for hierarchy
+    color: theme.colors.backgroundTertiary, // Same as selector background
     textTransform: 'uppercase',
+    textAlign: 'center', // Center the text horizontally
+    includeFontPadding: false, // Remove Android font padding for precise spacing
+    marginTop: 13, // Compensate for 3dp font metrics to achieve visual 16dp
+    marginBottom: 13, // Compensate for 3dp font metrics to achieve visual 16dp
   },
 
   workoutPlanNameSelector: {
@@ -438,9 +510,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: theme.spacing.s, // Standard selector border radius
-    borderWidth: theme.layout.border.thin,
-    borderColor: theme.colors.actionSuccess, // Highlight border for active selection
-    marginBottom: 1, // Minimal spacing between stacked selectors
+    borderWidth: theme.layout.border.thin, // 1dp green border
+    borderColor: theme.colors.actionSuccess, // Green border
   },
 
   workoutPlanNameText: {
@@ -456,27 +527,43 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeight.bold,
   },
 
-  workoutPlanWeekSelector: {
-    height: 50, // Standard selector height for touch targets
-    backgroundColor: theme.colors.pureBlack,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: theme.spacing.s, // Standard selector border radius
-    borderWidth: theme.layout.border.thin,
-    borderColor: 'transparent', // No border for non-interactive display
-    marginBottom: 1, // Minimal spacing between stacked selectors
+  progressBarWrapper: {
+    marginTop: theme.spacing.s, // 8dp from LIFT 3-2-1 selector
+    marginBottom: theme.spacing.s, // 8dp from plan focus selectors below
+    flexDirection: 'row', // Horizontal layout for text and bar
+    alignItems: 'center', // Center items vertically
+    gap: 16, // 16dp between text and bar
   },
 
-  workoutPlanWeekText: {
-    fontSize: theme.typography.fontSize.xl, // Large text for primary selectors
+  progressBarWeekText: {
+    fontSize: 12, // 12dp text size
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.textPrimary,
+    color: theme.colors.navInactive, // Match progress bar background color
     textTransform: 'uppercase',
+    // No marginLeft - card padding provides 8dp from edge
   },
 
-  workoutPlanWeekGreen: {
-    color: theme.colors.actionSuccess, // Highlight color for key values
+  progressBarWeekGreen: {
+    color: theme.colors.actionSuccess, // Green for numbers
+  },
+
+  progressBarContainer: {
+    flex: 1, // Take remaining space
+    // No marginRight - card padding provides 8dp from edge
+  },
+
+  progressBarBackground: {
+    height: theme.layout.progressBar.height,
+    backgroundColor: theme.colors.navInactive,
+    borderRadius: theme.layout.progressBar.borderRadius, // Rounded edges
+    overflow: 'hidden',
+  },
+
+  progressBarFill: {
+    height: theme.layout.progressBar.height,
+    backgroundColor: theme.colors.navActive, // Same green as home page
+    borderRadius: theme.layout.progressBar.borderRadius, // Rounded edges
   },
 
   workoutPlanFocusContainer: {
@@ -503,7 +590,7 @@ const styles = StyleSheet.create({
     fontSize: SELECTOR_TEXT_SIZE,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.textPrimary,
+    color: theme.colors.textSecondary, // Light gray (#B0B0B0)
     textTransform: 'uppercase',
     textAlign: 'center',
   },
@@ -512,25 +599,48 @@ const styles = StyleSheet.create({
   workoutSessionCard: {
     backgroundColor: theme.colors.backgroundPrimary,
     borderRadius: theme.spacing.s, // Standard card border radius
-    padding: theme.spacing.s, // Standard card internal padding
+    paddingLeft: theme.spacing.s, // Standard card internal padding
+    paddingRight: theme.spacing.s, // Standard card internal padding
+    paddingBottom: theme.spacing.s, // Standard card internal padding
     marginBottom: theme.spacing.s, // Standard card separation
-  },
-
-  workoutSessionCurrentSelector: {
-    height: 50, // Standard selector height for touch targets
-    backgroundColor: theme.colors.pureBlack,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: theme.spacing.s, // Standard selector border radius
-    marginBottom: 1, // Minimal spacing between stacked selectors
   },
 
   workoutSessionCurrentText: {
     fontSize: theme.typography.fontSize.xl, // Large text for primary labels
+    lineHeight: theme.typography.fontSize.xl, // Match font size to eliminate extra line spacing
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.backgroundTertiary, // Subdued label color for hierarchy
+    color: theme.colors.backgroundTertiary, // Same as Current Plan
     textTransform: 'uppercase',
+    textAlign: 'center', // Center the text horizontally
+    includeFontPadding: false, // Remove Android font padding for precise spacing
+    marginTop: 13, // Compensate for 3dp font metrics to achieve visual 16dp
+    marginBottom: 13, // Compensate for 3dp font metrics to achieve visual 16dp
+  },
+
+  workoutSessionDurationSelector: {
+    height: 50, // Standard selector height
+    backgroundColor: theme.colors.pureBlack,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: theme.spacing.s, // Standard selector border radius
+    marginBottom: theme.spacing.s, // 8dp from session type selectors below
+  },
+
+  workoutSessionDurationLabel: {
+    fontSize: theme.typography.fontSize.m, // 16dp text size
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.textPrimary, // White text for "DURATION:"
+    textTransform: 'uppercase',
+  },
+
+  workoutSessionDurationValue: {
+    fontWeight: theme.typography.fontWeight.bold, // Ensure bold text
+    // Color is set dynamically based on selected session
+    // Standard: green (#00FF00)
+    // Express: olive (#77ff00)
+    // Maintenance: yellow (#ffff00)
   },
 
   workoutSessionTypesContainer: {
@@ -557,7 +667,7 @@ const styles = StyleSheet.create({
     fontSize: SELECTOR_TEXT_SIZE,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.textPrimary,
+    color: theme.colors.textSecondary, // Light gray (#B0B0B0)
     textTransform: 'uppercase',
     textAlign: 'center',
   },
@@ -566,24 +676,22 @@ const styles = StyleSheet.create({
   workoutEquipmentCard: {
     backgroundColor: theme.colors.backgroundPrimary,
     borderRadius: theme.spacing.s, // Standard card border radius
-    padding: theme.spacing.s, // Standard card internal padding
-  },
-
-  workoutEquipmentCurrentSelector: {
-    height: 50, // Standard selector height for touch targets
-    backgroundColor: theme.colors.pureBlack,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: theme.spacing.s, // Standard selector border radius
-    marginBottom: 1, // Minimal spacing between stacked selectors
+    paddingLeft: theme.spacing.s, // Standard card internal padding
+    paddingRight: theme.spacing.s, // Standard card internal padding
+    paddingBottom: theme.spacing.s, // Standard card internal padding
   },
 
   workoutEquipmentCurrentText: {
     fontSize: theme.typography.fontSize.xl, // Large text for primary labels
+    lineHeight: theme.typography.fontSize.xl, // Match font size to eliminate extra line spacing
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.backgroundTertiary, // Subdued label color for hierarchy
+    color: theme.colors.backgroundTertiary, // Same as Current Plan
     textTransform: 'uppercase',
+    textAlign: 'center', // Center the text horizontally
+    includeFontPadding: false, // Remove Android font padding for precise spacing
+    marginTop: 13, // Compensate for 3dp font metrics to achieve visual 16dp
+    marginBottom: 13, // Compensate for 3dp font metrics to achieve visual 16dp
   },
 
   workoutEquipmentTypesContainer: {
@@ -614,7 +722,7 @@ const styles = StyleSheet.create({
     fontSize: SELECTOR_TEXT_SIZE,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.textPrimary,
+    color: theme.colors.textSecondary, // Light gray (#B0B0B0)
     textTransform: 'uppercase',
     textAlign: 'center', // Center text within selector
   },

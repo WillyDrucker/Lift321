@@ -2,8 +2,36 @@
   "migIndex": 1,
   "data": [
     {
-      "path": "assets/fonts/BebasNeue-Regular.ttf",
+      "path": "src/assets/fonts/Anton-Regular.ttf",
+      "sha1": "726b5b90799781efcdbea11b90722cea38c9d8c7"
+    },
+    {
+      "path": "src/assets/fonts/BebasNeue-Regular.ttf",
       "sha1": "8b3aaeb978f3cb5f575860774b50c332338563c1"
+    },
+    {
+      "path": "src/assets/fonts/DrukText-Medium-Trial.otf",
+      "sha1": "a916a2680834295f9e982b6455aec2a15dc56086"
+    },
+    {
+      "path": "src/assets/fonts/DrukTextWide-Medium-Trial.otf",
+      "sha1": "a8e33d9ecdd48ef42b7d355ae42fbd1fedcc47cf"
+    },
+    {
+      "path": "src/assets/fonts/Oswald-Regular.ttf",
+      "sha1": "10599ee4b500dead0a5fa3ef70bbbeb568c16c11"
+    },
+    {
+      "path": "src/assets/fonts/SlamDunk.ttf",
+      "sha1": "0c75f447e4025cd71f4fbf0d799d3598df548d88"
+    },
+    {
+      "path": "src/assets/fonts/Zuume-Bold.ttf",
+      "sha1": "2fe7545aed2835bd2a59f5c37d56b75228decd45"
+    },
+    {
+      "path": "src/assets/fonts/Zuume-ExtraBold.ttf",
+      "sha1": "bf5aa142887eebd0e4aca8b5d6de7b7c7b7f7ea9"
     }
   ]
 }

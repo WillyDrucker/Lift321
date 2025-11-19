@@ -153,4 +153,123 @@ const styles = StyleSheet.create({
 
 ---
 
-**Last Updated**: 2025-11-11
+## Custom Font with scaleX Transform Pattern
+
+```typescript
+// Custom font with horizontal scaling (20% wider)
+// CRITICAL: Never use fontWeight with custom fonts - breaks font loading
+
+bodyPartTitle: {
+  fontSize: theme.typography.fontSize.xxxl, // 32dp
+  fontFamily: theme.typography.fontFamily.workoutCard, // Zuume-ExtraBold
+  color: theme.colors.actionSuccess,
+  textTransform: 'uppercase',
+  includeFontPadding: false, // Remove Android padding
+  transform: [{scaleX: 1.2}], // 20% wider (1.2 = 120%)
+  marginLeft: 6, // Compensate for scaleX left shift
+  // NO fontWeight - font file contains weight
+},
+```
+
+**Why this works:**
+- `scaleX: 1.2` scales text horizontally to 120% width
+- Transform scales from center, shifting left edge ~6dp leftward
+- `marginLeft: 6` compensates to maintain original 16dp alignment
+- `includeFontPadding: false` removes Android font metrics padding
+- Omitting `fontWeight` prevents React Native from searching for non-existent bold variant
+
+**Common mistake:** Adding `fontWeight: 'bold'` causes React Native to look for "Zuume-ExtraBold-Bold" font file, which doesn't exist, falling back to system font.
+
+---
+
+## Optical Centering with translateY
+
+```typescript
+// Use translateY for vertical positioning, NOT marginTop
+// marginTop + scaleX causes sub-pixel rendering artifacts
+
+workoutTitleText: {
+  fontSize: theme.typography.fontSize.xxxl, // 32dp
+  fontFamily: theme.typography.fontFamily.workoutCard, // Zuume-ExtraBold
+  color: theme.colors.actionSuccess,
+  textTransform: 'uppercase',
+  includeFontPadding: false,
+  transform: [{scaleX: 1.2}, {translateY: 1}], // Combined transforms
+  marginLeft: 14, // 8dp padding + 6dp scaleX compensation
+},
+```
+
+**Why translateY not marginTop:**
+- Combining `marginTop` with `scaleX` causes sub-pixel rendering issues
+- Individual letters can appear at different heights ("C" and "S" higher than "H", "E", "T")
+- `translateY` in transform array avoids this artifact
+- Both transforms in same array: `[{scaleX: 1.2}, {translateY: 1}]`
+
+---
+
+## Font Metrics Compensation
+
+```typescript
+// Fonts have intrinsic spacing (ascent/descent) that adds ~3dp
+// Compensate by reducing margins to achieve visual target
+
+currentPlanText: {
+  fontSize: theme.typography.fontSize.xl, // 24dp
+  lineHeight: theme.typography.fontSize.xl, // Match to eliminate line spacing
+  fontFamily: theme.typography.fontFamily.primary, // Roboto
+  fontWeight: theme.typography.fontWeight.bold,
+  color: theme.colors.backgroundTertiary,
+  textTransform: 'uppercase',
+  textAlign: 'center',
+  includeFontPadding: false, // Remove Android padding
+  marginTop: 13, // 13dp + 3dp font metrics = 16dp visual
+  marginBottom: 13, // 13dp + 3dp font metrics = 16dp visual
+},
+```
+
+**Pattern:**
+- Roboto font adds ~3dp intrinsic spacing (ascent/descent)
+- Target: 16dp visual spacing
+- Solution: 13dp margin (13 + 3 = 16)
+- Always use: `lineHeight === fontSize` + `includeFontPadding: false`
+
+---
+
+## Dynamic Color-Coded Duration
+
+```typescript
+// Duration selector with session-based colors
+
+<Text style={styles.durationLabel}>
+  DURATION: <Text style={[
+    styles.durationValue,
+    selectedSession === 'standard' && {color: theme.colors.actionSuccess}, // Green
+    selectedSession === 'express' && {color: '#77ff00'}, // Olive
+    selectedSession === 'maintenance' && {color: '#ffff00'}, // Yellow
+  ]}>
+    {selectedSession === 'standard' && '31 MINUTES'}
+    {selectedSession === 'express' && '25 MINUTES'}
+    {selectedSession === 'maintenance' && '19 MINUTES'}
+  </Text>
+</Text>
+
+// Styles
+durationLabel: {
+  fontSize: theme.typography.fontSize.m, // 16dp
+  fontFamily: theme.typography.fontFamily.primary,
+  fontWeight: theme.typography.fontWeight.bold,
+  color: theme.colors.textPrimary, // White
+  textTransform: 'uppercase',
+},
+
+durationValue: {
+  // Color applied dynamically via inline style array
+  fontWeight: theme.typography.fontWeight.bold,
+},
+```
+
+**Pattern:** Inline conditional styles for dynamic values that change based on state.
+
+---
+
+**Last Updated**: 2025-01-19

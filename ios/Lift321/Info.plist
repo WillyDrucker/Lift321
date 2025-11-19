@@ -51,7 +51,14 @@
 	<false/>
 	<key>UIAppFonts</key>
 	<array>
+		<string>DrukText-Medium-Trial.otf</string>
+		<string>DrukTextWide-Medium-Trial.otf</string>
+		<string>Anton-Regular.ttf</string>
 		<string>BebasNeue-Regular.ttf</string>
+		<string>Oswald-Regular.ttf</string>
+		<string>SlamDunk.ttf</string>
+		<string>Zuume-Bold.ttf</string>
+		<string>Zuume-ExtraBold.ttf</string>
 	</array>
 </dict>
 </plist>
