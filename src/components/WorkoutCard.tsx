@@ -193,9 +193,12 @@ const styles = StyleSheet.create({
 
   bodyPartTitle: {
     fontSize: theme.typography.fontSize.xxxl,
+    fontFamily: theme.typography.fontFamily.workoutCard,
     color: theme.colors.actionSuccess,
     textTransform: 'uppercase',
     includeFontPadding: false, // Eliminate Android font padding for precise alignment
+    transform: [{scaleX: 1.2}], // 20% wider for enhanced visual impact
+    marginLeft: 6, // Compensate for scaleX left shift to maintain 16dp alignment
   },
 
   imageArea: {

@@ -16,6 +16,10 @@ export const typography = {
   fontFamily: {
     // Brand font - Bebas Neue for headlines and brand elements
     brand: 'BebasNeue-Regular',
+    // Workout title font - Roboto for WorkoutOverviewScreen title card
+    workoutTitle: 'Roboto',
+    // Workout card font - Zuume ExtraBold for large bold workout headings
+    workoutCard: 'Zuume-ExtraBold',
     // Primary font - Roboto for UI text (Android default)
     primary: 'Roboto',
     // System fallback

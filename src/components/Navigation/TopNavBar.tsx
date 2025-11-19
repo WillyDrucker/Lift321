@@ -102,8 +102,6 @@ const styles = StyleSheet.create({
     right: 0,
     height: theme.layout.topNav.height,
     backgroundColor: theme.colors.pureBlack,
-    borderWidth: theme.layout.border.thin, // Thin border for visual separation
-    borderColor: theme.colors.textPrimary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

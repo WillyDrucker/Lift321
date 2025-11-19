@@ -11,7 +11,14 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		847CF5F523F7444B9E1AFA4B /* BebasNeue-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CB928B11C3FA49EC96B669D6 /* BebasNeue-Regular.ttf */; };
+		E93456AC73D640F68E261EC5 /* DrukText-Medium-Trial.otf in Resources */ = {isa = PBXBuildFile; fileRef = D99CC95D1EA64880A3726B07 /* DrukText-Medium-Trial.otf */; };
+		2F9546F8F35945E488C96BC8 /* DrukTextWide-Medium-Trial.otf in Resources */ = {isa = PBXBuildFile; fileRef = DA119D72E31B41799BA51957 /* DrukTextWide-Medium-Trial.otf */; };
+		3156E66919B44BF0A126E623 /* Anton-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 09F98CCE302F411DAD91BC39 /* Anton-Regular.ttf */; };
+		94192A5D8D8243DBBBE3C686 /* BebasNeue-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C4027012606E408488E08FB0 /* BebasNeue-Regular.ttf */; };
+		D1E4343F3B984EC883B7C689 /* Oswald-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 28E711CA425C4F5F9B9DBDCF /* Oswald-Regular.ttf */; };
+		E31248E75C37403AB6591EAA /* SlamDunk.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B1A9DAA13EDD4D83BB76DB11 /* SlamDunk.ttf */; };
+		1A3D6ACE9F454BB18D7B2392 /* Zuume-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2E5CFA2F04D24935A089DBBF /* Zuume-Bold.ttf */; };
+		7448BA9F36514BB3A7320958 /* Zuume-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ACEA2A91EBCA49D188BA9B0C /* Zuume-ExtraBold.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,7 +32,14 @@
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = Lift321/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Lift321/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		CB928B11C3FA49EC96B669D6 /* BebasNeue-Regular.ttf */ = {isa = PBXFileReference; name = "BebasNeue-Regular.ttf"; path = "../assets/fonts/BebasNeue-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		D99CC95D1EA64880A3726B07 /* DrukText-Medium-Trial.otf */ = {isa = PBXFileReference; name = "DrukText-Medium-Trial.otf"; path = "../src/assets/fonts/DrukText-Medium-Trial.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		DA119D72E31B41799BA51957 /* DrukTextWide-Medium-Trial.otf */ = {isa = PBXFileReference; name = "DrukTextWide-Medium-Trial.otf"; path = "../src/assets/fonts/DrukTextWide-Medium-Trial.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		09F98CCE302F411DAD91BC39 /* Anton-Regular.ttf */ = {isa = PBXFileReference; name = "Anton-Regular.ttf"; path = "../src/assets/fonts/Anton-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		C4027012606E408488E08FB0 /* BebasNeue-Regular.ttf */ = {isa = PBXFileReference; name = "BebasNeue-Regular.ttf"; path = "../src/assets/fonts/BebasNeue-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		28E711CA425C4F5F9B9DBDCF /* Oswald-Regular.ttf */ = {isa = PBXFileReference; name = "Oswald-Regular.ttf"; path = "../src/assets/fonts/Oswald-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		B1A9DAA13EDD4D83BB76DB11 /* SlamDunk.ttf */ = {isa = PBXFileReference; name = "SlamDunk.ttf"; path = "../src/assets/fonts/SlamDunk.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		2E5CFA2F04D24935A089DBBF /* Zuume-Bold.ttf */ = {isa = PBXFileReference; name = "Zuume-Bold.ttf"; path = "../src/assets/fonts/Zuume-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		ACEA2A91EBCA49D188BA9B0C /* Zuume-ExtraBold.ttf */ = {isa = PBXFileReference; name = "Zuume-ExtraBold.ttf"; path = "../src/assets/fonts/Zuume-ExtraBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,7 +117,14 @@
 		1908A3D707394D58B380A3AE /* Resources */ = {
 			isa = "PBXGroup";
 			children = (
-				CB928B11C3FA49EC96B669D6 /* BebasNeue-Regular.ttf */,
+				D99CC95D1EA64880A3726B07 /* DrukText-Medium-Trial.otf */,
+				DA119D72E31B41799BA51957 /* DrukTextWide-Medium-Trial.otf */,
+				09F98CCE302F411DAD91BC39 /* Anton-Regular.ttf */,
+				C4027012606E408488E08FB0 /* BebasNeue-Regular.ttf */,
+				28E711CA425C4F5F9B9DBDCF /* Oswald-Regular.ttf */,
+				B1A9DAA13EDD4D83BB76DB11 /* SlamDunk.ttf */,
+				2E5CFA2F04D24935A089DBBF /* Zuume-Bold.ttf */,
+				ACEA2A91EBCA49D188BA9B0C /* Zuume-ExtraBold.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -171,7 +192,14 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				847CF5F523F7444B9E1AFA4B /* BebasNeue-Regular.ttf in Resources */,
+				E93456AC73D640F68E261EC5 /* DrukText-Medium-Trial.otf in Resources */,
+				2F9546F8F35945E488C96BC8 /* DrukTextWide-Medium-Trial.otf in Resources */,
+				3156E66919B44BF0A126E623 /* Anton-Regular.ttf in Resources */,
+				94192A5D8D8243DBBBE3C686 /* BebasNeue-Regular.ttf in Resources */,
+				D1E4343F3B984EC883B7C689 /* Oswald-Regular.ttf in Resources */,
+				E31248E75C37403AB6591EAA /* SlamDunk.ttf in Resources */,
+				1A3D6ACE9F454BB18D7B2392 /* Zuume-Bold.ttf in Resources */,
+				7448BA9F36514BB3A7320958 /* Zuume-ExtraBold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

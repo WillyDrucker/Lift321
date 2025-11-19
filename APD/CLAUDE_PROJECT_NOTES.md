@@ -16,6 +16,206 @@ This file contains the historical record of version changes for Lift 3-2-1. Deta
 
 ## Version History
 
+### v1.1.4 - Font Management & Title Bar Refinements (2025-01-19)
+**Branch**: Claude-v1.1.4
+
+**Summary**: Reorganized all font assets from root-level `assets/fonts/` to `src/assets/fonts/` for consistency with image and video assets. Applied Zuume-ExtraBold custom font to workout titles with 20% horizontal scaling (scaleX: 1.2) and margin compensation for transform shift. Refined WorkoutOverviewScreen title bar to 66dp height with perfectly balanced 100x50dp "LET'S GO!" button. Added dynamic duration selector displaying color-coded session lengths (green/olive/yellow). Changed all selector text to light gray for improved visual hierarchy. Discovered critical custom font constraint (fontWeight breaks font loading) and rendering pattern (translateY for vertical positioning, not marginTop). Updated all modified files with complete CLAUDE_DEV_STANDARDS compliance.
+
+**What Was Built**:
+- **Font Asset Reorganization**:
+  - Moved all 8 font files from `assets/fonts/` to `src/assets/fonts/`
+  - Updated `react-native.config.js` to point to new location: `assets: ['./src/assets/fonts']`
+  - Re-linked fonts with `npx react-native-asset` to regenerate link manifests
+  - Deleted empty `assets/` folder after migration
+  - All assets now consistently under `src/assets/` structure (fonts, images, videos)
+  - Added proper file header to react-native.config.js with purpose and usage
+
+- **Zuume-ExtraBold Font Integration**:
+  - **HomePage WorkoutCard** (src/components/WorkoutCard.tsx):
+    - Applied Zuume-ExtraBold to body part titles (CHEST, ARMS, SHOULDERS, etc.)
+    - Font: 32dp (`theme.typography.fontSize.xxxl`)
+    - Transform: `scaleX: 1.2` (20% wider for enhanced visual impact)
+    - Margin: `marginLeft: 6` (compensates for scaleX left shift to maintain 16dp alignment)
+    - Property: `includeFontPadding: false` (removes Android font padding)
+    - **Critical**: Removed `fontWeight` property (breaks custom font loading)
+
+  - **WorkoutOverviewScreen Title Bar** (src/features/workout/screens/WorkoutOverviewScreen.tsx):
+    - Applied Zuume-ExtraBold to "CHEST" title text
+    - Font: 32dp (`theme.typography.fontSize.xxxl`)
+    - Transform: `[{scaleX: 1.2}, {translateY: 1}]` (20% wider + 1dp optical centering)
+    - Margin: `marginLeft: 14` (8dp bar padding + 6dp scaleX compensation)
+    - **Critical**: translateY avoids sub-pixel rendering artifacts from marginTop + scaleX combination
+
+- **Title Bar Architecture Refinement**:
+  - **Title Bar Dimensions**:
+    - Height: 48dp → 66dp (accommodates 50dp button with 8dp top/bottom spacing)
+    - Padding: 8dp horizontal (`theme.spacing.s`)
+    - Background: `theme.colors.backgroundPrimary`
+    - Border: 1dp green bottom border (`theme.layout.border.thin`, `theme.colors.actionSuccess`)
+
+  - **"CHEST" Text**:
+    - Position: 16dp from left edge (8dp padding + 14dp margin - 6dp scaleX shift)
+    - Vertical: translateY: 1 for optical centering
+    - Font: Zuume-ExtraBold 32dp with scaleX: 1.2
+
+  - **"LET'S GO!" Button**:
+    - Dimensions: 100dp x 50dp (matches HomePage "BEGIN" button exactly)
+    - Position: 8dp from right/top/bottom edges
+    - Font: Roboto 20dp Bold (theme.typography.fontFamily.primary + fontWeight.bold)
+    - Color: Black text on green background
+    - Multi-layer shadow system (3 layers at -2dp, -4dp, -6dp)
+
+  - **Scroll Content Adjustment**:
+    - paddingTop: Updated from `64 + 48 + 8` to `64 + 66 + 8` (138dp total)
+    - Accommodates new 66dp title bar height
+
+- **Duration Selector Implementation**:
+  - Dynamic 50dp black selector box between "Current Session" text and session type selectors
+  - Displays "DURATION: XX MINUTES" with session-based values and colors
+  - **Session Duration Mapping**:
+    - Standard: "31 MINUTES" in green (#00FF00)
+    - Express: "25 MINUTES" in olive (#77ff00)
+    - Maintenance: "19 MINUTES" in yellow (#ffff00)
+    - (Advanced: "55 MINUTES" prepared for future)
+  - **Styling**:
+    - Text: 16dp (`theme.typography.fontSize.m`)
+    - Label: "DURATION:" in white (`theme.colors.textPrimary`)
+    - Value: Color changes dynamically based on `selectedSession` state
+    - Layout: Centered in 50dp selector box
+  - **Spacing**:
+    - marginBottom: 8dp from "Current Session" text
+    - marginTop: 8dp from session type selectors below
+
+- **Visual Hierarchy Improvements**:
+  - Changed all selector text from white to light gray (#B0B0B0 - `theme.colors.textSecondary`)
+  - Affected selectors:
+    - Plan focus: STRENGTH / BALANCED / GROWTH
+    - Session types: STANDARD / EXPRESS / MAINTENANCE
+    - Equipment types: ALL WEIGHTS / FREE WEIGHTS / MACHINES / BANDS / BODYWEIGHT
+  - Creates visual contrast between:
+    - Interactive selectors (light gray)
+    - Display labels (darker gray #424242)
+    - Dynamic values (colored)
+
+- **Spacing Precision Refinements**:
+  - **Font Metrics Compensation**:
+    - "Current Plan/Session/Equipment" text: marginTop/Bottom changed from 16dp to 13dp
+    - Compensates for ~3dp intrinsic font metrics (ascent/descent)
+    - Achieves visual 16dp spacing (13dp margin + 3dp font metrics)
+    - Pattern: `lineHeight` matching `fontSize` + `includeFontPadding: false` + margin compensation
+
+  - **Progress Bar Spacing**:
+    - Week text ("WEEK 2 OF 15"): Removed marginLeft (card padding provides 8dp from edge)
+    - Progress bar container: Removed marginRight (card padding provides 8dp from edge)
+    - Gap between text and bar: Increased from 8dp to 16dp for better readability
+    - Total layout: 8dp edge | text | 16dp gap | progress bar | 8dp edge
+
+- **CLAUDE_DEV_STANDARDS Compliance**:
+  - **typography.ts**:
+    - Updated workoutCard comment from "Hyphen version" (historical/technical) to "Zuume ExtraBold for large bold workout headings" (forward-looking purpose)
+
+  - **react-native.config.js**:
+    - Added comprehensive file header explaining configuration purpose
+    - Added inline comment describing font assets configuration
+    - Follows triple-equals header format standard
+
+  - **WorkoutOverviewScreen.tsx**:
+    - All comments are forward-looking (describe purpose and design intent)
+    - Clear section organization maintained
+    - No historical change references
+
+**Why This Approach**:
+- **Font Consolidation**: All assets under `src/assets/` creates predictable, consistent structure matching other static resources (images, videos)
+- **20% Width Scaling**: Zuume-ExtraBold is condensed font; scaleX: 1.2 provides better readability and visual presence for workout titles
+- **Margin Compensation**: scaleX transform scales from center, shifting left edge leftward; marginLeft compensates to maintain desired alignment
+- **translateY Over marginTop**: marginTop + scaleX causes sub-pixel rendering artifacts where individual letters appear at different heights; translateY applied within transform array avoids this
+- **66dp Title Bar**: Math: 8dp + 50dp button + 8dp = 66dp perfectly balanced
+- **100dp Button Width**: Matches HomePage "BEGIN" button for visual consistency; "LET'S GO!" text fits comfortably at 20dp
+- **Dynamic Duration Colors**: Color-coding provides immediate visual feedback on session intensity/length deviation
+- **Light Gray Selectors**: Creates visual hierarchy - interactive elements recede, display text and dynamic values stand out
+- **13dp Margin Compensation**: Roboto font has intrinsic ascent/descent spacing (~3dp); reducing margin from 16 to 13 achieves visual 16dp spacing
+
+**Problems Solved**:
+1. **Font Asset Confusion**: Root-level `assets/fonts/` separate from `src/assets/images/` created inconsistent structure. Unified under `src/assets/` provides single source of truth.
+
+2. **Custom Font Not Loading**: Applied `fontWeight: bold` to Zuume-ExtraBold caused React Native to search for "Zuume-ExtraBold-Bold" variant (doesn't exist), falling back to system font. **Solution**: Omit fontWeight entirely for custom fonts - font file contains weight.
+
+3. **Title Bar Height Arbitrary**: Initial 50dp set without calculation. **Solution**: Calculated 66dp = 8 + 50 + 8 for mathematically perfect balance.
+
+4. **Uneven Letter Heights**: Combining `marginTop: 1` with `scaleX: 1.2` caused sub-pixel rendering artifacts where "C" and "S" in "CHEST" appeared higher than "H", "E", "T". **Solution**: Use `translateY: 1` in transform array instead of marginTop.
+
+5. **Button Width Mismatch**: Initial 50dp width looked cramped for "LET'S GO!" text. **Solution**: Changed to 100dp to match HomePage "BEGIN" button dimensions.
+
+6. **Text Spacing 19dp Instead of 16dp**: User measured 57 pixels (19dp at 3x density) but design called for 16dp. Roboto font has ~3dp intrinsic spacing. **Solution**: Reduced marginTop/Bottom from 16 to 13, achieving visual 16dp.
+
+7. **Progress Bar Spacing 48 Pixels**: User measured 48 pixels (16dp) from left edge to week text, but design called for 8dp. **Solution**: Removed marginLeft from week text and marginRight from progress bar - card padding provides 8dp from edges. Increased gap between text and bar to 16dp for readability.
+
+**What Changed**:
+- **New Files**: None (all modifications)
+
+- **Modified Files**:
+  - `src/assets/fonts/` (new directory): Moved all 8 fonts here
+  - `react-native.config.js`: Updated assets path, added file header
+  - `src/theme/typography.ts`: Updated workoutCard comment, verified font family name
+  - `src/components/WorkoutCard.tsx`: Applied Zuume-ExtraBold, scaleX: 1.2, marginLeft: 6, includeFontPadding: false, removed fontWeight
+  - `src/features/workout/screens/WorkoutOverviewScreen.tsx`:
+    - Title bar: Height 66dp, padding 8dp
+    - "CHEST" text: Zuume-ExtraBold 32dp, scaleX: 1.2, translateY: 1, marginLeft: 14
+    - "LET'S GO!" button: 100x50dp, Roboto 20dp Bold
+    - Duration selector: New 50dp box with dynamic color-coded duration
+    - All selector text: Changed to light gray (#B0B0B0)
+    - "Current" labels: Margin compensation 13dp (visual 16dp)
+    - Progress bar: Removed edge margins, increased gap to 16dp
+    - Scroll content: Updated paddingTop for new title bar height
+
+- **Asset Reorganization**:
+  - Deleted: `assets/fonts/` (empty after migration)
+  - Deleted: `assets/` (empty after fonts/ removal)
+  - Updated: `android/link-assets-manifest.json` (new font paths)
+  - Updated: `ios/link-assets-manifest.json` (new font paths)
+
+**User Decisions**:
+- Font assets belong in `src/assets/fonts/` (not root `assets/`)
+- Custom fonts must NOT use `fontWeight` property (breaks font loading)
+- Title bar is 66dp to accommodate 50dp button with 8dp spacing
+- "LET'S GO!" button is 100dp wide (matches "BEGIN" button)
+- Workout title font is Zuume-ExtraBold with scaleX: 1.2 (20% wider)
+- Duration colors: green (standard), olive (express), yellow (maintenance)
+- All selector text is light gray (#B0B0B0) for visual hierarchy
+- Use translateY for vertical positioning (NOT marginTop - causes rendering artifacts)
+- Text spacing uses margin compensation for font metrics (13dp margin = 16dp visual)
+- Progress bar has 16dp gap from week text, 8dp from edges
+
+**Key Learnings**:
+- **Custom Font Loading**: React Native font system interprets fontWeight as request for font variant. Specifying `fontWeight: 'bold'` on "Zuume-ExtraBold" font tries to load "Zuume-ExtraBold-Bold" (doesn't exist) → fallback to system font. **Pattern**: Omit fontWeight entirely for custom fonts.
+
+- **Transform Rendering**: Combining `marginTop` with `scaleX` transform causes sub-pixel rendering artifacts where individual letters render at different vertical positions. **Pattern**: Use `translateY` in transform array instead of marginTop for vertical positioning.
+
+- **Font Intrinsic Metrics**: All fonts have ascent/descent/line-gap metadata that adds visual spacing beyond specified fontSize. Roboto adds ~3dp. **Pattern**: `lineHeight === fontSize` + `includeFontPadding: false` + margin compensation (13dp margin achieves 16dp visual).
+
+- **Asset Organization**: Keeping all static assets (fonts, images, videos) under unified `src/assets/` structure provides:
+  - Consistent import pattern (@/assets/*)
+  - Single location for all static resources
+  - Cleaner project root
+  - Easier mental model
+
+- **Optical Centering**: Mathematical centering doesn't always look centered due to font metrics. 66dp bar with 32dp text = 17dp top/bottom mathematically, but looks high. 1dp translateY adjustment achieves optical balance.
+
+- **Button Sizing Consistency**: Interactive elements should maintain consistent dimensions across screens. "BEGIN" button is 100dp wide → "LET'S GO!" button should match for visual coherence.
+
+- **Visual Hierarchy Through Color**: Light gray selectors (#B0B0B0) recede visually, allowing display labels (#424242) and dynamic colored values (green/olive/yellow) to stand out. Creates clear information hierarchy without additional visual weight.
+
+- **Precision Measurement**: When user reports spacing discrepancy (measured 19dp vs expected 16dp), trust the measurement. Font metrics are real and require compensation. Don't dismiss as measurement error.
+
+**Next Steps**:
+- Exercise list and detail screens
+- Workout session flow with set tracking
+- State persistence for user selections (AsyncStorage)
+- Connect real workout data to selectors
+- Implement actual duration calculations based on set counts
+
+---
+
 ### v1.1.3 - WorkoutOverviewScreen Implementation (2025-01-18)
 **Branch**: Claude-v1.1.3
 

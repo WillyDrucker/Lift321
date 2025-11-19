@@ -28,7 +28,9 @@ export const PlanProgressBar: React.FC<PlanProgressBarProps> = React.memo(
 
     return (
       <View style={styles.container}>
-        <Text style={styles.planName}>{planName}</Text>
+        <Text style={styles.planName}>
+          <Text style={styles.planNameItalic}>LIFT</Text> 3-2-1
+        </Text>
         <View style={styles.progressBarContainer}>
           <View style={styles.progressBarBackground}>
             <View
@@ -70,6 +72,11 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.navActive,
+    textTransform: 'uppercase', // All caps text
+  },
+
+  planNameItalic: {
+    fontStyle: 'italic', // Italic for LIFT only
   },
 
   progressBarContainer: {

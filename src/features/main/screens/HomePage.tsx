@@ -156,6 +156,9 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
+          snapToInterval={256 + 40} // Snap to each workout section (card height + header)
+          decelerationRate="fast"
+          snapToAlignment="start"
         >
           {/* Welcome Box */}
           <WelcomeBox

@@ -19,84 +19,95 @@ This file contains only critical architectural patterns and current session stat
 
 ---
 
-## Current Version: 1.1.3
+## Current Version: 1.1.4
 
-**Branch**: Claude-v1.1.3
-**Status**: WorkoutOverviewScreen Complete
-**Last Updated**: 2025-01-18
+**Branch**: Claude-v1.1.4
+**Status**: Font Management & Title Bar Refinements Complete
+**Last Updated**: 2025-01-19
 
 ---
 
 ## Session State
 
 ### Current Work
-- WorkoutOverviewScreen fully functional with complete selector system
-- Navigation integration with back button in TopNavBar
-- All cards using 8dp standardized spacing
-- Multi-selector equipment toggle logic implemented
-- CLAUDE_DEV_STANDARDS fully applied
-- Ready to merge to main and create v1.1.4
+- Font assets reorganized to src/assets/fonts/ for consistency
+- WorkoutOverviewScreen title bar enhanced with custom fonts and dynamic duration
+- Title bar perfectly balanced at 66dp with 100x50dp "LET'S GO!" button
+- Zuume-ExtraBold font applied to workout titles with 20% width expansion
+- All selector text changed to light gray for visual hierarchy
+- CLAUDE_DEV_STANDARDS fully applied to all modified files
+- Ready to merge to main and create v1.1.5
 
 ### Completed This Session
-**v1.1.3 - WorkoutOverviewScreen Implementation** (2025-01-18):
-1. **WorkoutOverviewScreen Creation**:
-   - Generic screen adapts to all workout types (CHEST, ARMS, etc.)
-   - Four card system: Title, Plan, Session, Equipment
-   - Scrollable area between TopNav and BottomTabBar
-   - All styling tokenized with 8dp standardization
+**v1.1.4 - Font Management & Title Bar Refinements** (2025-01-19):
+1. **Font Asset Reorganization**:
+   - Moved all fonts from `assets/fonts/` to `src/assets/fonts/`
+   - Updated react-native.config.js to point to new location
+   - Re-linked fonts with npx react-native-asset
+   - Deleted old assets/ folder for clean structure
+   - All assets now consistently under src/assets/ (fonts, images, videos)
 
-2. **Selector System Architecture**:
-   - Title Card: 50dp black selector with workout type in green
-   - Plan Card: Current Plan (24dp), Plan Name (italic "LIFT" 3-2-1), Week Progress, Focus selectors (Strength/Balanced/Growth)
-   - Session Card: Current Session (24dp), Type selectors (Standard/Express/Maintenance)
-   - Equipment Card: Current Equipment (24dp), Multi-toggle equipment selectors with "All Weights" logic
+2. **Zuume-ExtraBold Font Integration**:
+   - Applied to HomePage workout card titles (CHEST, ARMS, etc.)
+   - Applied to WorkoutOverviewScreen title bar "CHEST" text
+   - 20% horizontal scaling with scaleX: 1.2 transform
+   - marginLeft compensation (6dp HomePage, 14dp title bar) for transform shift
+   - Critical finding: fontWeight property breaks custom fonts (removed)
 
-3. **TopNavBar Enhancement**:
-   - Added optional back button (16dp from hamburger)
-   - Conditional rendering for screens that need navigation back
-   - 1dp white border added to navigation bar
-   - Back chevron moved from screen content to navigation bar
+3. **Title Bar Architecture Refinement**:
+   - Height: 48dp → 66dp for perfect 8dp spacing around 50dp button
+   - "CHEST" text: 32dp Zuume-ExtraBold with scaleX: 1.2 + translateY: 1
+   - "LET'S GO!" button: 100dp x 50dp (matches HomePage BEGIN button dimensions)
+   - Padding: 8dp horizontal (bar), 16dp text alignment from left
+   - translateY: 1 for optical centering (avoids marginTop sub-pixel artifacts)
 
-4. **Equipment Selection Logic**:
-   - Default: All equipment types highlighted
-   - "All Weights" selects everything
-   - Individual selection: First click deselects "All" and highlights only clicked item
-   - Subsequent clicks: Toggle individual equipment on/off
-   - Auto-highlight "All" when all 4 types manually selected
+4. **Duration Selector Implementation**:
+   - Dynamic 50dp black selector between "Current Session" and session types
+   - Displays "DURATION: XX MINUTES" with color-coded values
+   - Standard: 31 MINUTES (green #00FF00)
+   - Express: 25 MINUTES (olive #77ff00)
+   - Maintenance: 19 MINUTES (yellow #ffff00)
+   - 16dp text size, bold, updates dynamically with session selection
 
-5. **Typography & Sizing**:
-   - Selector text: Consistent 12dp for compact multi-option displays
-   - Primary labels: 24dp (Current Plan, Current Session, Current Equipment)
-   - Titles: 32dp (CHEST, workout type names)
-   - All text bold within cards
-   - Multi-line text support (ALL\nWEIGHTS, FREE\nWEIGHTS)
+5. **Visual Hierarchy Improvements**:
+   - All selector text changed from white to light gray (#B0B0B0)
+   - Applies to: Plan focus, Session types, Equipment types
+   - Creates visual contrast between interactive selectors and display text
 
-6. **CLAUDE_DEV_STANDARDS Compliance**:
-   - Created SELECTOR_TEXT_SIZE constant (no magic numbers)
-   - All borderWidth uses theme.layout.border.thin
-   - Forward-looking comments throughout ("Standard selector height for touch targets" vs "50dp height")
-   - Proper file headers and section organization
-   - Semantic naming (workoutPlanFocusSelector vs selector1)
+6. **Spacing Precision**:
+   - "Current Plan/Session/Equipment" text: 13dp margins (compensates for 3dp font metrics)
+   - Progress bar: 16dp gap from week text, 8dp from card edges
+   - Duration selector: 8dp below "Current Session" text
+   - Session type selectors: 8dp below duration selector
+
+7. **CLAUDE_DEV_STANDARDS Compliance**:
+   - typography.ts: Forward-looking comment (purpose, not technical details)
+   - react-native.config.js: Added proper file header with description
+   - WorkoutOverviewScreen: All comments describe design intent
+   - All three files have clear section headers and documentation
 
 ### Next Session Should
-1. **Workout Data Integration**: Connect real workout data to WorkoutOverviewScreen
-2. **Navigation Flow**: Implement full navigation from HomePage → WorkoutOverview → WorkoutSession
-3. **Exercise Detail Screens**: Build exercise list and tracking screens
-4. **State Persistence**: Save user selections (plan focus, session type, equipment)
+1. **Exercise Screens**: Build exercise list, detail, and tracking screens
+2. **Workout Session Flow**: Implement active workout session with set tracking
+3. **Data Persistence**: Save user selections (plan focus, session type, equipment)
+4. **Real Workout Data**: Connect actual workout data to screens
 
 ### User Decisions Made
-- 8dp spacing standardized throughout (margins, card separation)
-- 1dp spacing for closely-grouped selectors
-- 12dp text for all selectable options (consistency over auto-scaling)
-- "Balanced" selected by default for plan focus
-- "Standard" selected by default for session type
-- All equipment highlighted by default
-- Back button belongs in TopNavBar, not in screen content
-- CLAUDE_DEV_STANDARDS must be applied to all new code
+- Font assets belong in src/assets/fonts/ (not root assets/)
+- Custom fonts (Zuume-ExtraBold) should not use fontWeight property
+- Title bar height is 66dp for 50dp button with 8dp spacing
+- "LET'S GO!" button is 100dp wide (matches BEGIN button)
+- Duration colors: green (standard), olive (express), yellow (maintenance)
+- Selector text is light gray (#B0B0B0) for visual hierarchy
+- translateY transform for vertical positioning (not marginTop)
+- Text spacing uses margin compensation for font metrics (13dp for visual 16dp)
 
 ---
 
 ## Previous Sessions (Recent)
+
+### v1.1.4 - Font Management & Title Bar Refinements (2025-01-19)
+Reorganized font assets to src/assets/fonts/ for consistency with images/videos. Applied Zuume-ExtraBold custom font to workout titles with 20% horizontal scaling (scaleX: 1.2) and margin compensation. Refined title bar to 66dp height with 100x50dp "LET'S GO!" button. Added dynamic duration selector showing color-coded session lengths (green/olive/yellow). Changed all selector text to light gray for visual hierarchy. Applied translateY instead of marginTop to avoid sub-pixel rendering artifacts. Updated all files with CLAUDE_DEV_STANDARDS.
 
 ### v1.1.3 - WorkoutOverviewScreen Implementation (2025-01-18)
 Built complete WorkoutOverviewScreen with 4-card system (Title/Plan/Session/Equipment), implemented multi-selector logic with "All Weights" toggle behavior, added back button to TopNavBar, standardized 8dp spacing throughout, applied 12dp text for selectors, added 1dp white border to navigation, fully tokenized all styling with forward-looking comments. Screen adapts to all workout types with complete configuration options.
@@ -135,7 +146,22 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 
 ## Known Issues
 
-### Navigation & TopNavBar (NEW)
+### Custom Font Integration (NEW)
+- **fontWeight breaks custom fonts**: When specifying `fontWeight` on a custom font like Zuume-ExtraBold, React Native tries to find a bold variant (e.g., "Zuume-ExtraBold-Bold") which doesn't exist, causing fallback to system font
+- **Solution**: Omit fontWeight property entirely for custom fonts. The font file itself contains the weight.
+- **Pattern**: Custom fonts should only specify fontFamily, fontSize, color, transform properties
+
+### Transform Rendering (NEW)
+- **marginTop + scaleX causes sub-pixel artifacts**: Combining marginTop with scaleX transform can cause uneven letter heights due to sub-pixel rendering
+- **Solution**: Use translateY transform instead of marginTop for vertical positioning
+- **Pattern**: `transform: [{scaleX: 1.2}, {translateY: 1}]` instead of `scaleX: 1.2` + `marginTop: 1`
+
+### Font Metrics Spacing (NEW)
+- **Intrinsic font spacing**: Fonts have ascent/descent metrics that add ~3dp of visual spacing
+- **Solution**: Reduce margins by 3dp to achieve desired visual spacing (13dp margin = 16dp visual)
+- **Pattern**: Use lineHeight matching fontSize + includeFontPadding: false + margin compensation
+
+### Navigation & TopNavBar
 - TopNavBar now supports optional back button via onBackPress prop
 - Back button appears 16dp from hamburger menu when provided
 - Pattern: Conditional rendering keeps component flexible for different screen types
@@ -148,6 +174,7 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 ### Android Shadows / Metro Cache / Native Modules
 - Native shadows unreliable → Use multi-layer View pattern
 - New assets/modules → Restart Metro with --reset-cache, rebuild Android
+- Font changes require full app rebuild (native asset linking)
 
 ### Environment Variables
 - ✅ .env file configured with Supabase credentials (SUPABASE_URL, SUPABASE_ANON_KEY)
@@ -158,29 +185,58 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 
 ## Quick Reference: Established Patterns
 
-### WorkoutOverviewScreen Architecture (NEW)
+### Custom Font Usage (NEW)
+| Element | Font | Transform | Margins |
+|---------|------|-----------|---------|
+| **HomePage Workout Title** | Zuume-ExtraBold 32dp | scaleX: 1.2 | marginLeft: 6 (compensate scaleX) |
+| **Title Bar "CHEST"** | Zuume-ExtraBold 32dp | scaleX: 1.2, translateY: 1 | marginLeft: 14 (8+6) |
+| **"LET'S GO!" Button** | Roboto 20dp Bold | none | none |
+
+**Critical**: Never use `fontWeight` with custom fonts. Omit the property entirely.
+
+### Title Bar Architecture (NEW)
+| Component | Dimensions | Spacing |
+|-----------|------------|---------|
+| **Title Bar** | 66dp height | 8dp horizontal padding |
+| **"CHEST" Text** | 32dp font | 16dp from left edge (8+14-6 scaleX) |
+| **"LET'S GO!" Button** | 100dp x 50dp | 8dp from right/top/bottom |
+| **Optical Centering** | translateY: 1 | Positions text down 1dp |
+
+### Duration Selector (NEW)
+| Session Type | Duration | Color |
+|--------------|----------|-------|
+| **Standard** | 31 MINUTES | Green (#00FF00) |
+| **Express** | 25 MINUTES | Olive (#77ff00) |
+| **Maintenance** | 19 MINUTES | Yellow (#ffff00) |
+
+Text: 16dp bold, "DURATION:" white, minutes colored dynamically
+
+### WorkoutOverviewScreen Architecture
 | Component | Purpose | Styling |
 |-----------|---------|---------|
-| **Title Card** | Workout type display | 50dp black selector, 32dp green text |
+| **Title Bar** | Workout type + LET'S GO button | 66dp height, 8dp padding, Zuume-ExtraBold |
 | **Plan Card** | Plan configuration | Current Plan + Name + Week + Focus (3 selectors) |
-| **Session Card** | Session type selection | Current Session + 3 type selectors |
+| **Session Card** | Session type selection | Current Session + Duration + 3 type selectors |
 | **Equipment Card** | Equipment selection | Current Equipment + multi-toggle selectors (2 rows) |
 
-### Selector Patterns (NEW)
-| Selector Type | Height | Text Size | Behavior |
-|---------------|--------|-----------|----------|
-| **Primary Label** | 50dp | 24dp | Display only (Current Plan, Current Session, etc.) |
-| **Interactive Single** | 50dp | 24dp | Single selection (Plan name, Week progress) |
-| **Interactive Multi** | 50dp | 12dp | Multiple options (Strength/Balanced/Growth, Standard/Express/Maintenance) |
-| **Equipment Toggle** | 50dp | 12dp | Multi-select with "All" logic |
+### Selector Patterns
+| Selector Type | Height | Text Size | Color | Behavior |
+|---------------|--------|-----------|-------|----------|
+| **Primary Label** | 50dp | 24dp | #424242 gray | Display only (Current Plan, Current Session, etc.) |
+| **Interactive Single** | 50dp | 24dp | White | Single selection (Plan name, Week progress) |
+| **Interactive Multi** | 50dp | 12dp | #B0B0B0 gray | Multiple options (Strength/Balanced/Growth, Standard/Express/Maintenance) |
+| **Equipment Toggle** | 50dp | 12dp | #B0B0B0 gray | Multi-select with "All" logic |
+| **Duration Display** | 50dp | 16dp | White label, colored value | Dynamic based on session |
 
-### Spacing System (NEW)
+### Spacing System
 | Spacing Type | Value | Usage |
 |--------------|-------|-------|
 | **Card Margins** | 8dp | Between cards, screen edges |
 | **Card Padding** | 8dp | Internal card padding |
 | **Selector Spacing** | 1dp | Between closely-grouped selectors |
 | **Section Spacing** | 8dp | Between major sections |
+| **Text Spacing Compensation** | 13dp margin | Achieves visual 16dp (compensates for 3dp font metrics) |
+| **Progress Bar Gap** | 16dp | Between week text and bar |
 
 ### HomePage Architecture
 | Component | Purpose | Position |
@@ -197,10 +253,10 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 | **BottomTabBar** | Main navigation tabs | Absolute position (existing pattern) |
 
 ### Workout Card System
-| Card Type | Title Format | Examples |
-|-----------|--------------|----------|
-| **Body Part** | Uppercase green 32dp, body part name only | CHEST, ARMS, SHOULDERS, BACK & TRIS, LEGS |
-| **Specialized** | White text, specific names | Custom Workout, Work-As-You-Go, SuperSet Mode, Partner Mode |
+| Card Type | Title Format | Font | Examples |
+|-----------|--------------|------|----------|
+| **Body Part** | Uppercase green 32dp, Zuume-ExtraBold scaleX: 1.2 | Zuume-ExtraBold | CHEST, ARMS, SHOULDERS, BACK & TRIS, LEGS |
+| **Specialized** | White text | Roboto | Custom Workout, Work-As-You-Go, SuperSet Mode, Partner Mode |
 
 ### Card Scrolling Pattern
 - **First/Last Cards**: 330dp width for proper edge spacing
@@ -219,6 +275,7 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 | **Hooks** | Reusable logic (useFormInput, useAnimation, useWeekCalendar, useSwipeGesture) | src/hooks/ |
 | **Theme** | Design tokens (colors, spacing, typography, layout) | src/theme/ |
 | **Constants** | App config (API_TIMEOUT, STORAGE_KEYS, ERROR_MESSAGES) | src/constants/ |
+| **Assets** | Static files (fonts, images, videos) | src/assets/ |
 
 ### Component Library
 | Component | Purpose | Props |
@@ -268,14 +325,14 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 ### Design Token Modules
 | Module | Purpose |
 |--------|---------|
-| `theme.colors` | Semantic colors (primary, primaryMuted, pureBlack, pureWhite, actionSuccess, googleBlue, facebookBlue, shadowBlack) |
+| `theme.colors` | Semantic colors (primary, primaryMuted, pureBlack, pureWhite, actionSuccess, textSecondary, backgroundTertiary, googleBlue, facebookBlue, shadowBlack) |
 | `theme.spacing` | xs/s/m/l/xl/xxl + safeZone/safeZoneHorizontal/textLineGap/buttonSpacing (16dp rhythm) |
-| `theme.typography` | Fonts (brand/primary), sizes (xs/s/m/l/xl/xxl/xxxl/display/mega), weights |
+| `theme.typography` | Fonts (brand/workoutCard/workoutTitle/primary), sizes (xs/s/m/l/xl/xxl/xxxl/display/mega), weights |
 | `theme.textShadows` | default/subtle/strong |
 | `theme.viewShadows` | iOS shadows (small/medium/large) |
 | `theme.elevation` | Android elevation values |
 | `theme.buttons` | Sizing, padding, borderRadius, margins, shadowLayers, opacity |
-| `theme.layout` | header/logo/form/bottom/icon/topNav/bottomNav/recommendedWorkout/welcomeBox/planProgress/weekCalendar/authNavigation/socialLogin/border |
+| `theme.layout` | header/logo/form/bottom/icon/topNav/bottomNav/recommendedWorkout/welcomeBox/planProgress/progressBar/weekCalendar/authNavigation/socialLogin/border/interaction |
 
 ### Architecture Patterns (REQUIRED)
 | Pattern | Rule |
@@ -291,6 +348,9 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 | **Barrel Exports** | Import from @/components, @/hooks, @/utils, @/services, @/navigation |
 | **Flow Layout First** | Prefer natural document flow over absolute positioning when possible |
 | **Constants for Repeated Values** | Create named constants instead of repeating literals |
+| **Custom Fonts** | Omit fontWeight property - font file contains weight |
+| **Vertical Positioning** | Use translateY transform - NOT marginTop (avoids sub-pixel artifacts) |
+| **Font Spacing** | Compensate for font metrics with reduced margins (13dp = visual 16dp) |
 
 ### Component Structure Sections
 ```typescript
@@ -318,23 +378,24 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 ## Environment & Critical Info
 
 ### Configured
-✅ Supabase (.env with credentials) | ✅ react-native-config | ✅ URL polyfill | Metro (8081) | GitHub synced | All deps installed | Android device testing | Gradle 9.2.0 | Fonts (Bebas Neue, Roboto) | **Design tokens complete** | **Component library established** | **Service layer complete** | **Navigation system complete** | **Utils/hooks infrastructure complete** | **Production readiness framework complete** | **Guest login system** | **GitHub issues (18 created)** | **HomePage workout cards & scrolling complete** | **JSON workout data layer** | **WorkoutOverviewScreen complete**
+✅ Supabase (.env with credentials) | ✅ react-native-config | ✅ URL polyfill | Metro (8081) | GitHub synced | All deps installed | Android device testing | Gradle 9.2.0 | **Fonts (Bebas Neue, Zuume-ExtraBold, Roboto in src/assets/fonts/)** | **Design tokens complete** | **Component library established** | **Service layer complete** | **Navigation system complete** | **Utils/hooks infrastructure complete** | **Production readiness framework complete** | **Guest login system** | **GitHub issues (18 created)** | **HomePage workout cards & scrolling complete** | **JSON workout data layer** | **WorkoutOverviewScreen with duration selector complete**
 
 ### Not Yet Set Up
 DB schema/tables | Supabase Auth config | TS types from DB | Actual authentication implementation (authService exists but not integrated) | Exercise detail screens | Workout tracking screens | Data persistence for user selections
 
 ### Critical Paths
 - **Project Root**: C:\Dev\Lift321 (ACTIVE DEV)
+- **Font Assets**: C:\Dev\Lift321\src\assets\fonts/ (Bebas Neue, Zuume-ExtraBold, Roboto, others)
 - **GitHub**: https://github.com/WillyDrucker/Lift321
 - **GitHub Issues**: 8 EPICs + 10 features/tasks tracking future work
 - **Historical Context**: Fresh React Native build informed by previous project learnings (reference code at C:\Dev\Wills321 - untouched)
-- **Branch**: Claude-v1.1.3 (WorkoutOverviewScreen complete, ready to merge)
+- **Branch**: Claude-v1.1.4 (Font management & title bar refinements complete, ready to merge)
 
 ### Next Steps
-1. **Merge v1.1.3 to main**: Complete WorkoutOverviewScreen implementation
-2. **Create v1.1.4**: Start next feature development
-3. **Data Integration**: Connect real workout data to screens
-4. **Build Exercise Screens**: Create exercise list, detail, and tracking screens
+1. **Merge v1.1.4 to main**: Complete font and title bar refinements
+2. **Create v1.1.5**: Start next feature development
+3. **Build Exercise Screens**: Create exercise list, detail, and tracking screens
+4. **Workout Session Flow**: Implement active workout session with set tracking
 5. **State Management**: Implement persistence for user selections
 6. **Leverage Framework**:
    - Import components from @/components
@@ -345,6 +406,6 @@ DB schema/tables | Supabase Auth config | TS types from DB | Actual authenticati
 
 ---
 
-**Version**: 1.1.3
-**Last Updated**: 2025-01-18
-**Status**: WorkoutOverviewScreen Complete - Ready to Merge and Continue
+**Version**: 1.1.4
+**Last Updated**: 2025-01-19
+**Status**: Font Management & Title Bar Refinements Complete - Ready to Merge and Continue
