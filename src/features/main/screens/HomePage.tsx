@@ -8,9 +8,10 @@
 // Used by: Navigation stack (from LoginScreen guest login)
 // ==========================================================================
 
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {
   Animated,
+  Easing,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -62,6 +63,30 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
     onDismiss: () => setWelcomeVisible(false),
   });
 
+  // === EFFECTS ===
+  // Entrance animation for welcome box
+
+  useEffect(() => {
+    // Set initial position off-screen to the right
+    translateX.setValue(300);
+    opacity.setValue(0);
+
+    // Animate whoosh-in from right to left
+    Animated.parallel([
+      Animated.timing(translateX, {
+        toValue: 0,
+        duration: 500,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 400,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []); // Run only once on mount
 
   // === EVENT HANDLERS ===
   // User interaction callbacks
@@ -229,11 +254,11 @@ const styles = StyleSheet.create({
 
   scrollContent: {
     paddingTop: theme.layout.planProgress.topPosition + theme.layout.planProgress.height, // Scrollable content starts below fixed progress bar
-    paddingBottom: theme.layout.bottomNav.height + theme.spacing.l, // Bottom clearance for tab bar plus comfortable spacing
+    paddingBottom: theme.layout.bottomNav.height + theme.spacing.s, // 8dp clearance from bottom tab bar
   },
 
   sectionHeader: {
-    marginTop: 0, // Combined with element above marginBottom for 10dp total spacing
+    marginTop: theme.spacing.s, // 8dp spacing from element above
     marginBottom: theme.spacing.xs,
     marginLeft: theme.layout.recommendedWorkout.leftMargin, // Align with workout cards
   },

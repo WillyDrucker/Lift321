@@ -9,8 +9,11 @@
 // ==========================================================================
 
 import React from 'react';
-import {Animated, StyleSheet, Text, Image, View, ImageSourcePropType} from 'react-native';
+import {Animated, StyleSheet, Text, Image, View, ImageSourcePropType, TouchableOpacity} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {theme} from '@/theme';
+import type {MainStackParamList} from '@/navigation/types';
 
 // === TYPES ===
 
@@ -21,23 +24,28 @@ export type WorkoutType = BodyPart | CustomWorkout;
 export type WorkoutCardProps = {
   workoutType: WorkoutType;
   animatedTop?: Animated.Value;
-  index?: number;
-  totalCards?: number;
+  isFirstCard?: boolean;
+  isLastCard?: boolean;
 };
 
 // === COMPONENT ===
 
 export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(
-  ({workoutType, animatedTop, index = 0, totalCards = 1}) => {
+  ({workoutType, animatedTop, isFirstCard = false, isLastCard = false}) => {
+    // === HOOKS ===
+    // Navigation hook for screen transitions
+
+    const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList>>();
+
+    // === DERIVED STATE ===
     // Determine workout title and image based on workout type
+
     const workoutTitle = getWorkoutTitle(workoutType);
     const workoutImage = getWorkoutImage(workoutType);
     const isBodyPartWorkout = isBodyPart(workoutType);
 
-    // Calculate card width: first and last cards are 330dp, middle cards are 320dp
-    const isFirstCard = index === 0;
-    const isLastCard = index === totalCards - 1;
-    const cardWidth = isFirstCard || isLastCard ? 330 : 320;
+    // Consistent card width for smooth scrolling
+    const cardWidth = 330;
 
     return (
       <Animated.View
@@ -45,6 +53,7 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(
           styles.workoutCard,
           {width: cardWidth},
           animatedTop ? {top: animatedTop} : undefined,
+          isLastCard && {marginRight: 0}, // Remove right margin from last card
         ]}
       >
         {/* Header Area - 64dp */}
@@ -69,6 +78,24 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(
             />
           </View>
         )}
+
+        {/* Begin Button - Bottom right corner with multi-layer shadow */}
+        <View style={styles.beginButtonContainer}>
+          {/* Shadow Layer 3 - Darkest, furthest */}
+          <View style={[styles.beginButtonShadow, styles.shadowLayer3]} />
+          {/* Shadow Layer 2 - Medium darkness */}
+          <View style={[styles.beginButtonShadow, styles.shadowLayer2]} />
+          {/* Shadow Layer 1 - Lightest, closest */}
+          <View style={[styles.beginButtonShadow, styles.shadowLayer1]} />
+          {/* Actual Button */}
+          <TouchableOpacity
+            style={styles.beginButton}
+            onPress={() => navigation.navigate('WorkoutOverview', {workoutType})}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.beginButtonText}>BEGIN</Text>
+          </TouchableOpacity>
+        </View>
       </Animated.View>
     );
   },
@@ -179,5 +206,59 @@ const styles = StyleSheet.create({
   workoutImage: {
     width: '100%',
     height: '100%',
+  },
+
+  beginButtonContainer: {
+    position: 'absolute',
+    bottom: theme.layout.recommendedWorkout.cardSpacing, // 8dp from bottom edge
+    right: theme.layout.recommendedWorkout.cardSpacing, // 8dp from right edge
+    width: 100, // 100dp width
+    height: 32, // 32dp height
+  },
+
+  beginButtonShadow: {
+    position: 'absolute',
+    width: 100,
+    height: 32,
+    backgroundColor: theme.colors.shadowBlack,
+    borderRadius: 8,
+  },
+
+  shadowLayer3: {
+    bottom: -6, // Furthest shadow layer
+    right: 0,
+    opacity: 0.15,
+  },
+
+  shadowLayer2: {
+    bottom: -4, // Middle shadow layer
+    right: 0,
+    opacity: 0.25,
+  },
+
+  shadowLayer1: {
+    bottom: -2, // Closest shadow layer
+    right: 0,
+    opacity: 0.4,
+  },
+
+  beginButton: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 100,
+    height: 32,
+    backgroundColor: theme.colors.actionSuccess, // Green background
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  beginButtonText: {
+    fontSize: theme.typography.fontSize.l, // 20dp
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.pureBlack, // Black text
+    textTransform: 'uppercase',
   },
 });
