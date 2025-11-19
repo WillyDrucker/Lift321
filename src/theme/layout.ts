@@ -109,11 +109,11 @@ export const layout = {
   // === TOP NAVIGATION BAR ===
   // Minimal top navigation for HomePage and main screens
   topNav: {
-    topSpacing: 32, // Distance from screen top
-    height: 32, // Navigation bar height
-    paddingHorizontal: 10, // Left/right padding for icon spacing
-    searchIconSize: 24, // Search icon size
-    menuIconSize: 32, // Hamburger menu icon size
+    topSpacing: 32, // Distance from screen top (stays below status bar)
+    height: 48, // Navigation bar height (expanded for larger icons)
+    paddingHorizontal: 16, // Left/right padding for icon spacing
+    searchIconSize: 32, // Search icon size (increased)
+    menuIconSize: 40, // Hamburger menu icon size (increased)
     borderWidth: 0, // No border
   },
 
@@ -121,14 +121,14 @@ export const layout = {
   // Week view calendar for day selection
   weekCalendar: {
     height: 32, // Calendar bar height
-    topPosition: 64, // Position below top nav (32dp spacing + 32dp nav height)
+    topPosition: 80, // Position below top nav (32dp spacing + 48dp nav height)
   },
 
   // === PLAN PROGRESS BAR ===
   // Progress tracking for active workout plan
   planProgress: {
     height: 24, // Progress bar height
-    topPosition: 96, // Position below calendar bar (64dp + 32dp calendar height)
+    topPosition: 112, // Position below calendar bar (80dp + 32dp calendar height)
   },
 
   // === ANIMATION SETTINGS ===

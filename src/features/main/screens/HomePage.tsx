@@ -19,6 +19,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import {theme} from '@/theme';
 import type {RootStackScreenProps} from '@/navigation/types';
 import {
@@ -119,15 +120,13 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
 
     switch (option) {
       case 'profile':
-        console.log('Navigate to Profile screen');
-        // TODO: Implement profile screen
+        navigation.navigate('ProfileScreen');
         break;
       case 'settings':
         navigation.navigate('SettingsScreen');
         break;
       case 'help':
-        console.log('Navigate to Help screen');
-        // TODO: Implement help screen
+        navigation.navigate('HelpScreen');
         break;
       case 'logout':
         console.log('Logout - clearing auth state');
@@ -186,6 +185,22 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
 
         {/* Fixed Top Navigation (renders above ScrollView) */}
         <View style={styles.topBarsContainer}>
+          {/* Gradient overlay from top to calendar bar */}
+          <LinearGradient
+            colors={[
+              theme.colors.pureBlack,      // #000000
+              '#050505',
+              '#0A0A0A',
+              '#0F0F0F',
+              '#141414',
+              '#191919',
+              theme.colors.backgroundPrimary, // #1E1E1E
+            ]}
+            locations={[0, 0.15, 0.3, 0.45, 0.6, 0.8, 1]}
+            style={styles.topGradient}
+            pointerEvents="none"
+          />
+
           <TopNavBar
             onSearchPress={handleSearchPress}
             onMenuPress={handleMenuPress}
@@ -240,7 +255,16 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 10, // Fixed bars layer above scrollable content
-    backgroundColor: theme.colors.pureBlack, // Opaque background prevents content bleed-through
+    // Background provided by gradient overlay - no solid backgroundColor needed
+  },
+
+  topGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: theme.layout.weekCalendar.topPosition + theme.layout.weekCalendar.height, // Gradient extends through calendar bar (80dp + 32dp = 112dp)
+    zIndex: 0, // Behind navigation elements but above background
   },
 
   divider: {

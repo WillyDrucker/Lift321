@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: theme.layout.topNav.topSpacing,
-    backgroundColor: theme.colors.pureBlack,
+    backgroundColor: 'transparent', // Transparent to allow gradient from HomePage
   },
 
   container: {
@@ -101,9 +101,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: theme.layout.topNav.height,
-    backgroundColor: theme.colors.pureBlack,
-    borderWidth: theme.layout.border.thin, // Thin border for visual separation
-    borderColor: theme.colors.textPrimary,
+    backgroundColor: 'transparent', // Transparent to allow gradient from HomePage
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

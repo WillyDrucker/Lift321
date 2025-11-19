@@ -11,7 +11,9 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {HomePage} from '@/features/main/screens/HomePage';
+import {ProfileScreen} from '@/features/main/screens/ProfileScreen';
 import {SettingsScreen} from '@/features/main/screens/SettingsScreen';
+import {HelpScreen} from '@/features/main/screens/HelpScreen';
 import {WorkoutOverviewScreen} from '@/features/workout/screens/WorkoutOverviewScreen';
 import type {MainStackParamList} from './types';
 import {defaultTransition, quickFadeTransition} from './transitions';
@@ -44,8 +46,18 @@ export const MainNavigator: React.FC<MainNavigatorProps> = () => {
     >
       <Stack.Screen name="HomePage" component={HomePage} />
       <Stack.Screen
+        name="ProfileScreen"
+        component={ProfileScreen}
+        options={quickFadeTransition}
+      />
+      <Stack.Screen
         name="SettingsScreen"
         component={SettingsScreen}
+        options={quickFadeTransition}
+      />
+      <Stack.Screen
+        name="HelpScreen"
+        component={HelpScreen}
         options={quickFadeTransition}
       />
       <Stack.Screen
