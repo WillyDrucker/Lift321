@@ -19,6 +19,7 @@ import {
   StyleSheet,
   Text,
   View,
+  StatusBar,
 } from 'react-native';
 import {theme} from '@/theme';
 
@@ -225,7 +226,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   }
 
   return (
-    <Modal visible={modalVisible} transparent animationType="none" onRequestClose={onClose}>
+    <Modal
+      visible={modalVisible}
+      transparent
+      animationType="none"
+      statusBarTranslucent={true}
+      onRequestClose={onClose}>
       {/* Backdrop - tap to close */}
       <Pressable style={styles.container} onPress={onClose}>
         <Animated.View style={[styles.overlay, {opacity: overlayOpacity}]} />
@@ -315,7 +321,7 @@ const styles = StyleSheet.create({
     left: -100, // Extend 100px to the left to prevent background showing during spring
     top: 0,
     bottom: 0,
-    height: '100%',
+    height: Dimensions.get('window').height, // Use full window height to cover safe areas
     paddingLeft: 100, // Add padding to compensate for negative left position
     backgroundColor: theme.colors.backgroundCard,
     ...theme.viewShadows.large,

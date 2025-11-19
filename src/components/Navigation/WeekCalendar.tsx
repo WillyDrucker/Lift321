@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: theme.layout.weekCalendar.height,
-    backgroundColor: theme.colors.backgroundPrimary,
+    backgroundColor: 'transparent', // Transparent to allow gradient from HomePage
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
