@@ -9,6 +9,7 @@
 // ==========================================================================
 
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
+import type {WorkoutType} from '@/components/WorkoutCard';
 
 // === AUTH STACK PARAM LIST ===
 // Authentication flow screens
@@ -25,6 +26,7 @@ export type AuthStackParamList = {
 export type MainStackParamList = {
   HomePage: undefined;
   SettingsScreen: undefined;
+  WorkoutOverview: {workoutType: WorkoutType};
   WorkoutList: undefined;
   WorkoutSession: {workoutId: string};
   PlanList: undefined;

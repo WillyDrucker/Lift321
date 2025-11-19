@@ -16,6 +16,135 @@ This file contains the historical record of version changes for Lift 3-2-1. Deta
 
 ## Version History
 
+### v1.1.3 - WorkoutOverviewScreen Implementation (2025-01-18)
+**Branch**: Claude-v1.1.3
+
+**Summary**: Built complete WorkoutOverviewScreen with 4-card selector system (Title, Plan, Session, Equipment) adapting to all workout types. Implemented sophisticated multi-selector logic with "All Weights" toggle behavior and intelligent first-click guidance. Enhanced TopNavBar with optional back button integrated into navigation bar. Standardized 8dp spacing throughout all cards with 1dp selector gaps. Applied complete CLAUDE_DEV_STANDARDS compliance including named constants, forward-looking comments, and semantic naming refactor.
+
+**What Was Built**:
+- **WorkoutOverviewScreen** (src/features/workout/screens/WorkoutOverviewScreen.tsx):
+  - Generic screen accepts workoutType param and adapts content
+  - Four-card architecture: Title (workout type), Plan (configuration), Session (type selection), Equipment (multi-toggle)
+  - Full vertical scrolling between TopNav and BottomTabBar
+  - Sidebar integration with hamburger menu
+  - Navigation back button integrated in TopNavBar (not screen content)
+  - All styling tokenized: SELECTOR_TEXT_SIZE constant, theme.layout.border.thin, theme.spacing.s/m
+  - Proper section headers: TYPES, STATE, EVENT HANDLERS, RENDER, STYLES
+
+- **Selector System Architecture**:
+  - **Title Card**: 50dp black selector containing workout type (CHEST, ARMS, etc.) in green 32dp
+  - **Plan Card**:
+    - "CURRENT PLAN" label (24dp, subdued gray)
+    - Plan name selector: "LIFT 3-2-1" with italic "LIFT" (24dp, green border)
+    - Week progress: "WEEK 2 OF 15" with green numbers (24dp)
+    - Focus selectors: Strength/Balanced/Growth (12dp, 1dp gaps, default: Balanced)
+  - **Session Card**:
+    - "CURRENT SESSION" label (24dp, subdued gray)
+    - Type selectors: Standard/Express/Maintenance (12dp, 1dp gaps, default: Standard)
+  - **Equipment Card**:
+    - "CURRENT EQUIPMENT" label (24dp, subdued gray)
+    - Equipment selectors in 2 rows: All Weights/Free Weights/Machines (row 1), Bands/Bodyweight (row 2)
+    - Multi-line text: "ALL\nWEIGHTS", "FREE\nWEIGHTS"
+    - 12dp text sizing for compact display
+
+- **Equipment Selection Logic**:
+  - Default state: All equipment types highlighted (all, free, machines, bands, bodyweight)
+  - "All Weights" behavior: Selects all equipment types when pressed
+  - Individual equipment first press when "All" active: Deselects "All" + all others, highlights only clicked item (guides user on how selectors work)
+  - Individual equipment subsequent presses: Toggle on/off independently
+  - Auto-highlight "All": When all 4 individual types manually selected, "All Weights" automatically highlights
+  - Smart Set-based state management for efficient toggle operations
+
+- **TopNavBar Enhancement** (src/components/Navigation/TopNavBar.tsx):
+  - Added optional `onBackPress?: () => void` prop
+  - Created leftButtonsContainer with hamburger + optional back button
+  - Back button appears 16dp from hamburger when onBackPress provided
+  - Conditional rendering: `{onBackPress && <BackButton />}`
+  - 1dp white border added to navigation bar (theme.layout.border.thin)
+  - Maintains component flexibility for screens with/without back navigation
+
+- **Spacing Standardization**:
+  - **8dp System**: All card margins (external), card padding (internal), card separation
+  - **1dp System**: Selector gaps within same logical group (creates visual cohesion)
+  - scrollContent padding: 8dp left/right, clears TopNav (64dp) + 8dp, clears BottomNav (68dp) + 8dp
+  - No magic numbers: All values use theme tokens or named constants
+
+- **Typography Consistency**:
+  - **32dp**: Workout type titles (CHEST, workoutTitleText)
+  - **24dp**: Primary labels (Current Plan/Session/Equipment), plan name, week progress (theme.typography.fontSize.xl)
+  - **12dp**: All selectable options (SELECTOR_TEXT_SIZE constant for easy updates)
+  - All text bold within cards (theme.typography.fontWeight.bold)
+  - Multi-line support for compact selectors
+
+- **CLAUDE_DEV_STANDARDS Compliance**:
+  - Created SELECTOR_TEXT_SIZE constant (no magic 12)
+  - All borderWidth uses theme.layout.border.thin (no magic 1)
+  - Forward-looking comments: "Standard selector height for touch targets" vs "50dp height"
+  - Semantic naming refactor: workoutPlanFocusSelector (not selector1), workoutSessionTypeSelector (not sessionBox)
+  - Proper file headers with purpose, dependencies, usage
+  - Organized sections: TITLE CARD, PLAN CARD, SESSION CARD, EQUIPMENT CARD
+  - All styling via theme tokens
+
+**Why This Approach**:
+- **Four-Card System**: Logical separation of concerns (title, plan config, session type, equipment) creates clear mental model
+- **8dp Standardization**: Consistent rhythm throughout app, easy to remember, touch-friendly spacing
+- **1dp Selector Gaps**: Creates visual grouping while maintaining clear boundaries
+- **12dp Text for Selectors**: Compact display allows multiple options in 50dp height while remaining readable
+- **Equipment Toggle Logic**: First-press guidance teaches users the multi-select behavior pattern
+- **Set-Based State**: Efficient toggle operations, easy to check membership, clean add/remove
+- **Back in TopNavBar**: Navigation controls belong in navigation chrome, not scattered in screen content
+- **Named Constants**: SELECTOR_TEXT_SIZE enables consistent updates across all selectors
+- **Semantic Naming**: workoutPlanFocusSelector communicates purpose better than selector1
+
+**Problems Solved**:
+1. **Spacing Confusion**: Initial attempts mixed 8dp and 10dp. Standardized to pure 8dp rhythm across entire screen.
+2. **Text Sizing Inconsistency**: Tried auto-scaling text (adjustsFontSizeToFit). Rejected in favor of consistent 12dp for visual uniformity.
+3. **CHEST Text Clipping**: ScrollView paddingTop calculated incorrectly (only topNav.height instead of topSpacing + height). Fixed to 64dp (32+32).
+4. **Double Spacing Issues**: Card paddingTop + text marginBottom created 16dp gaps. Removed one to achieve exact 8dp spacing.
+5. **Back Button Placement**: Initially in Title Card, moved to TopNavBar for proper navigation UX pattern.
+6. **Magic Numbers**: Multiple literal values (1, 12, 50). Created constants and used theme tokens throughout.
+7. **Comment Quality**: Historical comments ("Changed from 10dp to 8dp"). Refactored to purpose-driven ("Standard card border radius").
+
+**What Changed**:
+- **New Files**:
+  - src/features/workout/screens/WorkoutOverviewScreen.tsx (622 lines)
+  - src/features/workout/ (new directory structure)
+
+- **Modified Files**:
+  - src/components/Navigation/TopNavBar.tsx: Added onBackPress prop, leftButtonsContainer, conditional back button, borderWidth token
+  - src/navigation/types.ts: Added WorkoutOverview route with workoutType param
+  - src/features/main/screens/HomePage.tsx: Updated to pass onBackPress to TopNavBar (if used)
+
+**User Decisions**:
+- 8dp spacing standardized (not 10dp, not 16dp)
+- 1dp selector spacing (creates visual grouping)
+- 12dp text for selectors (consistency over auto-scaling)
+- "Balanced" default for plan focus
+- "Standard" default for session type
+- All equipment highlighted by default
+- Back button in TopNavBar (not in screen content)
+- Equipment first-press deselects all and highlights clicked (guidance pattern)
+
+**Key Learnings**:
+- Spacing systems work best with single value (8dp) vs mixing values (8dp, 10dp, 16dp)
+- Consistent text sizing (12dp) more professional than variable auto-scaling
+- Set data structure perfect for multi-select toggle logic
+- Named constants (SELECTOR_TEXT_SIZE) enable easy global updates
+- Forward-looking comments age better than historical/measurement comments
+- Semantic naming (workoutPlanFocusSelector) improves code navigation vs generic (selector1)
+- TopNav should own all navigation chrome (back, hamburger, search)
+- First-press special behavior can guide users on interaction patterns
+- Theme tokens + constants = zero magic numbers
+
+**Next Steps**:
+- Connect real workout data to WorkoutOverviewScreen selectors
+- Implement navigation flow: HomePage → WorkoutOverview → WorkoutSession
+- Build exercise list and detail screens
+- Add state persistence for user selections (AsyncStorage)
+- Continue to next workout flow screens
+
+---
+
 ### v1.1.2 - HomePage Workout Cards & Scrolling (2025-11-16)
 **Branch**: Claude-v1.1.2
 

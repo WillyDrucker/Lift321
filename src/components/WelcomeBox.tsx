@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     marginLeft: theme.layout.welcomeBox.leftMargin,
     marginRight: theme.layout.welcomeBox.rightMargin,
     marginTop: theme.layout.recommendedWorkout.cardSpacing, // Consistent spacing from progress bar
-    marginBottom: theme.layout.recommendedWorkout.cardSpacing, // Consistent spacing before section headers
+    marginBottom: 0, // No bottom margin - section header controls spacing
     backgroundColor: theme.colors.backgroundPrimary,
     borderTopLeftRadius: theme.layout.welcomeBox.borderRadius,
     borderBottomLeftRadius: theme.layout.welcomeBox.borderRadius,
