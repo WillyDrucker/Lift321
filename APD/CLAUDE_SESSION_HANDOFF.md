@@ -19,67 +19,87 @@ This file contains only critical architectural patterns and current session stat
 
 ---
 
-## Current Version: 1.1.2
+## Current Version: 1.1.3
 
-**Branch**: Claude-v1.1.2
-**Status**: HomePage Workout Cards & Scrolling System Complete
-**Last Updated**: 2025-11-16
+**Branch**: Claude-v1.1.3
+**Status**: WorkoutOverviewScreen Complete
+**Last Updated**: 2025-01-18
 
 ---
 
 ## Session State
 
 ### Current Work
-- HomePage fully functional with vertical and horizontal scrolling
-- Custom workout cards system implemented
-- All workout card images integrated
-- CLAUDE_DEV_STANDARDS applied to all new code
-- Ready for next feature development
+- WorkoutOverviewScreen fully functional with complete selector system
+- Navigation integration with back button in TopNavBar
+- All cards using 8dp standardized spacing
+- Multi-selector equipment toggle logic implemented
+- CLAUDE_DEV_STANDARDS fully applied
+- Ready to merge to main and create v1.1.4
 
 ### Completed This Session
-**v1.1.2 - HomePage Workout Cards & Scrolling** (2025-11-16):
-1. **Custom Workout Cards System**:
-   - Created CustomWorkoutCardsScroller component
-   - Implemented 4 specialized workout types: Custom, Work-As-You-Go, SuperSet Mode, Partner Mode
-   - Added all workout images: custom.png, work-as-you-go.png, superset.png, partner-mode.png
-   - Same dimensions and peek behavior as primary workout cards
+**v1.1.3 - WorkoutOverviewScreen Implementation** (2025-01-18):
+1. **WorkoutOverviewScreen Creation**:
+   - Generic screen adapts to all workout types (CHEST, ARMS, etc.)
+   - Four card system: Title, Plan, Session, Equipment
+   - Scrollable area between TopNav and BottomTabBar
+   - All styling tokenized with 8dp standardization
 
-2. **Scrolling Architecture**:
-   - Converted from absolute positioning to flow layout
-   - Implemented vertical ScrollView containing all page content
-   - Fixed z-index layering: ScrollView renders first, fixed bars overlay with z-index
-   - Top bars (TopNav, Calendar, Progress) fixed with opaque background
-   - Bottom tab bar remains fixed
-   - Content scrolls behind fixed bars correctly
+2. **Selector System Architecture**:
+   - Title Card: 50dp black selector with workout type in green
+   - Plan Card: Current Plan (24dp), Plan Name (italic "LIFT" 3-2-1), Week Progress, Focus selectors (Strength/Balanced/Growth)
+   - Session Card: Current Session (24dp), Type selectors (Standard/Express/Maintenance)
+   - Equipment Card: Current Equipment (24dp), Multi-toggle equipment selectors with "All Weights" logic
 
-3. **Visual Enhancements**:
-   - Body part titles: 32dp uppercase green text, vertically centered
-   - Section headers: "Primary Workouts" and "Specialized Workouts" at 16dp
-   - Proper spacing: 10dp between elements using theme tokens
-   - Updated WorkoutCard to support both body part and custom workout types
+3. **TopNavBar Enhancement**:
+   - Added optional back button (16dp from hamburger)
+   - Conditional rendering for screens that need navigation back
+   - 1dp white border added to navigation bar
+   - Back chevron moved from screen content to navigation bar
 
-4. **Code Standards**:
-   - Eliminated all magic numbers - replaced with theme tokens
-   - Updated all comments to be forward-looking (design intent, not history)
-   - Maintained consistent section headers across all files
-   - Full CLAUDE_DEV_STANDARDS compliance
+4. **Equipment Selection Logic**:
+   - Default: All equipment types highlighted
+   - "All Weights" selects everything
+   - Individual selection: First click deselects "All" and highlights only clicked item
+   - Subsequent clicks: Toggle individual equipment on/off
+   - Auto-highlight "All" when all 4 types manually selected
+
+5. **Typography & Sizing**:
+   - Selector text: Consistent 12dp for compact multi-option displays
+   - Primary labels: 24dp (Current Plan, Current Session, Current Equipment)
+   - Titles: 32dp (CHEST, workout type names)
+   - All text bold within cards
+   - Multi-line text support (ALL\nWEIGHTS, FREE\nWEIGHTS)
+
+6. **CLAUDE_DEV_STANDARDS Compliance**:
+   - Created SELECTOR_TEXT_SIZE constant (no magic numbers)
+   - All borderWidth uses theme.layout.border.thin
+   - Forward-looking comments throughout ("Standard selector height for touch targets" vs "50dp height")
+   - Proper file headers and section organization
+   - Semantic naming (workoutPlanFocusSelector vs selector1)
 
 ### Next Session Should
-1. **Continue HomePage Features**: Add workout plan data, exercise details, workout tracking
-2. **Navigation**: Implement navigation from workout cards to workout screens
-3. **Data Layer**: Connect to JSON workout data (already exists in src/data/)
-4. **Testing**: Continue testing scrolling and card interactions on device
+1. **Workout Data Integration**: Connect real workout data to WorkoutOverviewScreen
+2. **Navigation Flow**: Implement full navigation from HomePage → WorkoutOverview → WorkoutSession
+3. **Exercise Detail Screens**: Build exercise list and tracking screens
+4. **State Persistence**: Save user selections (plan focus, session type, equipment)
 
 ### User Decisions Made
-- Custom workout cards renamed to "Specialized Workouts"
-- Body part titles should be uppercase green 32dp text
-- Section headers at 16dp with 10dp spacing
-- Scroll area constrained between plan progress bar and bottom tab bar
-- All cards use flow layout (not absolute positioning)
+- 8dp spacing standardized throughout (margins, card separation)
+- 1dp spacing for closely-grouped selectors
+- 12dp text for all selectable options (consistency over auto-scaling)
+- "Balanced" selected by default for plan focus
+- "Standard" selected by default for session type
+- All equipment highlighted by default
+- Back button belongs in TopNavBar, not in screen content
+- CLAUDE_DEV_STANDARDS must be applied to all new code
 
 ---
 
 ## Previous Sessions (Recent)
+
+### v1.1.3 - WorkoutOverviewScreen Implementation (2025-01-18)
+Built complete WorkoutOverviewScreen with 4-card system (Title/Plan/Session/Equipment), implemented multi-selector logic with "All Weights" toggle behavior, added back button to TopNavBar, standardized 8dp spacing throughout, applied 12dp text for selectors, added 1dp white border to navigation, fully tokenized all styling with forward-looking comments. Screen adapts to all workout types with complete configuration options.
 
 ### v1.1.2 - HomePage Workout Cards & Scrolling (2025-11-16)
 Implemented complete workout cards system with CustomWorkoutCardsScroller (4 specialized modes), converted HomePage to flow layout with vertical scrolling, fixed z-index layering for fixed navigation bars, added all workout images, applied visual styling (32dp uppercase green titles for body parts, 16dp section headers), eliminated all magic numbers with theme tokens, updated all comments to be forward-looking. HomePage now fully scrollable with primary and specialized workout cards.
@@ -115,7 +135,12 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 
 ## Known Issues
 
-### Scrolling & Layout (NEW)
+### Navigation & TopNavBar (NEW)
+- TopNavBar now supports optional back button via onBackPress prop
+- Back button appears 16dp from hamburger menu when provided
+- Pattern: Conditional rendering keeps component flexible for different screen types
+
+### Scrolling & Layout
 - ✅ Fixed: Flow layout approach ensures proper vertical scrolling
 - ✅ Fixed: z-index layering prevents content from rendering above fixed bars
 - Pattern: ScrollView renders first, fixed navigation bars overlay with higher z-index + opaque background
@@ -133,7 +158,31 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 
 ## Quick Reference: Established Patterns
 
-### HomePage Architecture (NEW)
+### WorkoutOverviewScreen Architecture (NEW)
+| Component | Purpose | Styling |
+|-----------|---------|---------|
+| **Title Card** | Workout type display | 50dp black selector, 32dp green text |
+| **Plan Card** | Plan configuration | Current Plan + Name + Week + Focus (3 selectors) |
+| **Session Card** | Session type selection | Current Session + 3 type selectors |
+| **Equipment Card** | Equipment selection | Current Equipment + multi-toggle selectors (2 rows) |
+
+### Selector Patterns (NEW)
+| Selector Type | Height | Text Size | Behavior |
+|---------------|--------|-----------|----------|
+| **Primary Label** | 50dp | 24dp | Display only (Current Plan, Current Session, etc.) |
+| **Interactive Single** | 50dp | 24dp | Single selection (Plan name, Week progress) |
+| **Interactive Multi** | 50dp | 12dp | Multiple options (Strength/Balanced/Growth, Standard/Express/Maintenance) |
+| **Equipment Toggle** | 50dp | 12dp | Multi-select with "All" logic |
+
+### Spacing System (NEW)
+| Spacing Type | Value | Usage |
+|--------------|-------|-------|
+| **Card Margins** | 8dp | Between cards, screen edges |
+| **Card Padding** | 8dp | Internal card padding |
+| **Selector Spacing** | 1dp | Between closely-grouped selectors |
+| **Section Spacing** | 8dp | Between major sections |
+
+### HomePage Architecture
 | Component | Purpose | Position |
 |-----------|---------|----------|
 | **ScrollView** | Main content container | Fills screen, renders first |
@@ -147,13 +196,13 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 | **CustomWorkoutCardsScroller** | Horizontal specialized workout cards | Inside ScrollView |
 | **BottomTabBar** | Main navigation tabs | Absolute position (existing pattern) |
 
-### Workout Card System (NEW)
+### Workout Card System
 | Card Type | Title Format | Examples |
 |-----------|--------------|----------|
 | **Body Part** | Uppercase green 32dp, body part name only | CHEST, ARMS, SHOULDERS, BACK & TRIS, LEGS |
 | **Specialized** | White text, specific names | Custom Workout, Work-As-You-Go, SuperSet Mode, Partner Mode |
 
-### Card Scrolling Pattern (NEW)
+### Card Scrolling Pattern
 - **First/Last Cards**: 330dp width for proper edge spacing
 - **Middle Cards**: 320dp width for consistent 10dp peek
 - **Snap Offsets**: Calculated positions for smooth card-to-card scrolling
@@ -163,6 +212,7 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 | Layer | Pattern | Location |
 |-------|---------|----------|
 | **Components** | Reusable UI (ShadowButton, FormInput, WorkoutCard, etc.) | src/components/ |
+| **Features** | Screen-specific logic (WorkoutOverviewScreen, HomePage) | src/features/ |
 | **Services** | Backend operations (authService, BaseService) | src/services/ |
 | **Navigation** | Type-safe routing (useTypedNavigation, navigationService) | src/navigation/ |
 | **Utils** | Pure functions (dateUtils, validationUtils, formatUtils) | src/utils/ |
@@ -181,6 +231,7 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 | **WorkoutCard** | Workout display card | workoutType, index, totalCards |
 | **WorkoutCardsScroller** | Horizontal body part cards container | - |
 | **CustomWorkoutCardsScroller** | Horizontal specialized cards container | - |
+| **TopNavBar** | Top navigation with optional back button | onSearchPress, onMenuPress, onBackPress? |
 | **WelcomeBox** | Dismissible welcome message | userName, message, visible, translateX, opacity, panHandlers |
 | **LoadingState** | Async loading UI | message?, size?, fullScreen? |
 | **ErrorState** | Error UI with retry | message, onRetry?, fullScreen? |
@@ -191,7 +242,7 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 | Hook/Service | Purpose | Usage |
 |--------------|---------|-------|
 | **useTypedNavigation** | Type-safe navigation | navigation.navigate('HomePage') |
-| **useTypedRoute<T>** | Type-safe route params | const {workoutId} = route.params |
+| **useTypedRoute<T>** | Type-safe route params | const {workoutType} = route.params |
 | **useNavigationActions** | Common shortcuts | goBack(), goToHome(), reset() |
 | **navigationService** | Imperative navigation | navigationService.navigate('HomePage') |
 | **useAuthGuard** | Protect authenticated screens | if (!isAllowed) return null |
@@ -224,7 +275,7 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 | `theme.viewShadows` | iOS shadows (small/medium/large) |
 | `theme.elevation` | Android elevation values |
 | `theme.buttons` | Sizing, padding, borderRadius, margins, shadowLayers, opacity |
-| `theme.layout` | header/logo/form/bottom/icon/topNav/bottomNav/recommendedWorkout/welcomeBox/planProgress/weekCalendar/authNavigation/socialLogin |
+| `theme.layout` | header/logo/form/bottom/icon/topNav/bottomNav/recommendedWorkout/welcomeBox/planProgress/weekCalendar/authNavigation/socialLogin/border |
 
 ### Architecture Patterns (REQUIRED)
 | Pattern | Rule |
@@ -239,6 +290,7 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 | **Component Library** | Use existing components before creating new ones |
 | **Barrel Exports** | Import from @/components, @/hooks, @/utils, @/services, @/navigation |
 | **Flow Layout First** | Prefer natural document flow over absolute positioning when possible |
+| **Constants for Repeated Values** | Create named constants instead of repeating literals |
 
 ### Component Structure Sections
 ```typescript
@@ -266,24 +318,25 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 ## Environment & Critical Info
 
 ### Configured
-✅ Supabase (.env with credentials) | ✅ react-native-config | ✅ URL polyfill | Metro (8081) | GitHub synced | All deps installed | Android device testing | Gradle 9.2.0 | Fonts (Bebas Neue, Roboto) | **Design tokens complete** | **Component library established** | **Service layer complete** | **Navigation system complete** | **Utils/hooks infrastructure complete** | **Production readiness framework complete** | **Guest login system** | **GitHub issues (18 created)** | **HomePage workout cards & scrolling complete** | **JSON workout data layer**
+✅ Supabase (.env with credentials) | ✅ react-native-config | ✅ URL polyfill | Metro (8081) | GitHub synced | All deps installed | Android device testing | Gradle 9.2.0 | Fonts (Bebas Neue, Roboto) | **Design tokens complete** | **Component library established** | **Service layer complete** | **Navigation system complete** | **Utils/hooks infrastructure complete** | **Production readiness framework complete** | **Guest login system** | **GitHub issues (18 created)** | **HomePage workout cards & scrolling complete** | **JSON workout data layer** | **WorkoutOverviewScreen complete**
 
 ### Not Yet Set Up
-DB schema/tables | Supabase Auth config | TS types from DB | Actual authentication implementation (authService exists but not integrated) | Workout card navigation | Exercise detail screens
+DB schema/tables | Supabase Auth config | TS types from DB | Actual authentication implementation (authService exists but not integrated) | Exercise detail screens | Workout tracking screens | Data persistence for user selections
 
 ### Critical Paths
 - **Project Root**: C:\Dev\Lift321 (ACTIVE DEV)
 - **GitHub**: https://github.com/WillyDrucker/Lift321
 - **GitHub Issues**: 8 EPICs + 10 features/tasks tracking future work
 - **Historical Context**: Fresh React Native build informed by previous project learnings (reference code at C:\Dev\Wills321 - untouched)
-- **Branch**: Claude-v1.1.2 (workout cards & scrolling complete)
+- **Branch**: Claude-v1.1.3 (WorkoutOverviewScreen complete, ready to merge)
 
 ### Next Steps
-1. **Workout Card Navigation**: Implement onPress handlers to navigate to workout detail screens
-2. **Connect Data Layer**: Use existing JSON workout data (src/data/exercises.json, src/data/workoutPlans.json)
-3. **Build Workout Screens**: Create workout detail, exercise list, and tracking screens
-4. **Continue Testing**: Verify scrolling performance and interactions on device
-5. **Leverage Framework**:
+1. **Merge v1.1.3 to main**: Complete WorkoutOverviewScreen implementation
+2. **Create v1.1.4**: Start next feature development
+3. **Data Integration**: Connect real workout data to screens
+4. **Build Exercise Screens**: Create exercise list, detail, and tracking screens
+5. **State Management**: Implement persistence for user selections
+6. **Leverage Framework**:
    - Import components from @/components
    - Use navigation hooks from @/navigation
    - Call services from @/services
@@ -292,6 +345,6 @@ DB schema/tables | Supabase Auth config | TS types from DB | Actual authenticati
 
 ---
 
-**Version**: 1.1.2
-**Last Updated**: 2025-11-16
-**Status**: HomePage Workout Cards & Scrolling Complete - Ready for Next Features
+**Version**: 1.1.3
+**Last Updated**: 2025-01-18
+**Status**: WorkoutOverviewScreen Complete - Ready to Merge and Continue

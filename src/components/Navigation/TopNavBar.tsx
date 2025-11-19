@@ -11,37 +11,56 @@
 import React from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
 import {theme} from '@/theme';
-import {SearchIcon, HamburgerIcon} from '@/components/icons';
+import {SearchIcon, HamburgerIcon, LeftChevron} from '@/components/icons';
 
 // === TYPES ===
 
 export type TopNavBarProps = {
   onSearchPress: () => void;
   onMenuPress: () => void;
+  onBackPress?: () => void; // Optional back button
 };
 
 // === COMPONENT ===
 
 export const TopNavBar: React.FC<TopNavBarProps> = React.memo(
-  ({onSearchPress, onMenuPress}) => {
+  ({onSearchPress, onMenuPress, onBackPress}) => {
     return (
       <>
         {/* Status bar background extension */}
         <View style={styles.statusBarBackground} />
 
         <View style={styles.container}>
-          {/* Hamburger Menu - Left aligned */}
-          <Pressable
-            onPress={onMenuPress}
-            style={({pressed}) => [
-              styles.menuButton,
-              pressed && styles.pressed,
-            ]}>
-            <HamburgerIcon
-              size={theme.layout.topNav.menuIconSize}
-              color={theme.colors.textPrimary}
-            />
-          </Pressable>
+          {/* Left side buttons */}
+          <View style={styles.leftButtonsContainer}>
+            {/* Hamburger Menu - Left aligned */}
+            <Pressable
+              onPress={onMenuPress}
+              style={({pressed}) => [
+                styles.menuButton,
+                pressed && styles.pressed,
+              ]}>
+              <HamburgerIcon
+                size={theme.layout.topNav.menuIconSize}
+                color={theme.colors.textPrimary}
+              />
+            </Pressable>
+
+            {/* Back Button - Optional, 16dp from hamburger */}
+            {onBackPress && (
+              <Pressable
+                onPress={onBackPress}
+                style={({pressed}) => [
+                  styles.backButton,
+                  pressed && styles.pressed,
+                ]}>
+                <LeftChevron
+                  size={theme.layout.icon.large}
+                  color={theme.colors.textPrimary}
+                />
+              </Pressable>
+            )}
+          </View>
 
           {/* Search Icon - Right aligned */}
           <Pressable
@@ -73,7 +92,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: theme.layout.topNav.topSpacing,
-    backgroundColor: theme.colors.backgroundPrimary,
+    backgroundColor: theme.colors.pureBlack,
   },
 
   container: {
@@ -82,8 +101,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: theme.layout.topNav.height,
-    backgroundColor: theme.colors.backgroundPrimary,
-    borderWidth: theme.layout.topNav.borderWidth,
+    backgroundColor: theme.colors.pureBlack,
+    borderWidth: theme.layout.border.thin, // Thin border for visual separation
     borderColor: theme.colors.textPrimary,
     flexDirection: 'row',
     alignItems: 'center',
@@ -91,7 +110,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.layout.topNav.paddingHorizontal,
   },
 
+  leftButtonsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.m, // Standard gap between navigation icons
+  },
+
   menuButton: {
+    padding: 0,
+  },
+
+  backButton: {
     padding: 0,
   },
 
