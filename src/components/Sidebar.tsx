@@ -12,6 +12,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {
   Animated,
   Dimensions,
+  Easing,
   Image,
   Modal,
   PanResponder,
@@ -184,20 +185,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
       setModalVisible(true);
       isAnimatingRef.current = true;
 
-      // Animate to open position with spring for smooth feel
+      // Animate to open position with Material Design decelerate curve
       Animated.parallel([
-        Animated.spring(slideAnim, {
+        Animated.timing(slideAnim, {
           toValue: 0,
+          duration: 300,
+          easing: Easing.bezier(0.0, 0.0, 0.2, 1), // Material Design decelerate - smooth entry
           useNativeDriver: true,
-          tension: theme.layout.sidebar.springTension,
-          friction: theme.layout.sidebar.springFriction,
-          velocity: 2,
         }),
-        Animated.spring(overlayOpacity, {
+        Animated.timing(overlayOpacity, {
           toValue: 1,
+          duration: 300,
+          easing: Easing.bezier(0.0, 0.0, 0.2, 1),
           useNativeDriver: true,
-          tension: theme.layout.sidebar.springTension,
-          friction: theme.layout.sidebar.springFriction,
         }),
       ]).start(() => {
         isAnimatingRef.current = false;
@@ -277,7 +277,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {
                 translateX: slideAnim.interpolate({
                   inputRange: [-1, 0],
-                  outputRange: [-sidebarWidth, 0],
+                  outputRange: [-sidebarWidth * 2.5, 0], // Start 150% further left for smooth, dramatic entrance
                 }),
               },
             ],
