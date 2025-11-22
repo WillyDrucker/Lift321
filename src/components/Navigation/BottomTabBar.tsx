@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     right: 0,
     flexDirection: 'row',
     // Height is dynamic - set via inline style based on safe area insets
-    backgroundColor: theme.colors.backgroundPrimary,
+    backgroundColor: theme.colors.pureBlack, // Pure black background (global standard)
     paddingHorizontal: theme.layout.bottomNav.paddingHorizontal,
     justifyContent: 'space-around',
     alignItems: 'flex-start',

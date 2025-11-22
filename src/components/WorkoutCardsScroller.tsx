@@ -71,12 +71,15 @@ export const WorkoutCardsScroller: React.FC<WorkoutCardsScrollerProps> =
           ref={scrollViewRef}
           horizontal
           showsHorizontalScrollIndicator={false}
-          decelerationRate="normal"
+          decelerationRate="fast"
           snapToOffsets={SNAP_OFFSETS}
           snapToAlignment="start"
           disableIntervalMomentum={true}
           contentContainerStyle={styles.scrollContent}
           scrollEventThrottle={16}
+          nestedScrollEnabled={true}
+          directionalLockEnabled={true}
+          pagingEnabled={false}
         >
           {BODY_PARTS.map((bodyPart, index) => (
             <WorkoutCard

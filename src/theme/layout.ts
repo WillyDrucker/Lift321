@@ -110,10 +110,11 @@ export const layout = {
   // Minimal top navigation for HomePage and main screens
   topNav: {
     topSpacing: 32, // Distance from screen top (stays below status bar)
-    height: 48, // Navigation bar height (expanded for larger icons)
+    height: 32, // Navigation bar height (minimalist for maximum scrollable space)
     paddingHorizontal: 16, // Left/right padding for icon spacing
-    searchIconSize: 32, // Search icon size (increased)
-    menuIconSize: 40, // Hamburger menu icon size (increased)
+    searchIconSize: 20, // Search icon size (minimalist)
+    menuIconSize: 28, // Hamburger menu icon size (minimalist)
+    backIconSize: 28, // Back button icon size (minimalist, globally consistent)
     borderWidth: 0, // No border
   },
 
@@ -121,14 +122,14 @@ export const layout = {
   // Week view calendar for day selection
   weekCalendar: {
     height: 32, // Calendar bar height
-    topPosition: 80, // Position below top nav (32dp spacing + 48dp nav height)
+    topPosition: 64, // Position below top nav (32dp spacing + 32dp nav height)
   },
 
   // === PLAN PROGRESS BAR ===
   // Progress tracking for active workout plan
   planProgress: {
     height: 24, // Progress bar height
-    topPosition: 112, // Position below calendar bar (80dp + 32dp calendar height)
+    topPosition: 96, // Position below calendar bar (64dp + 32dp calendar height)
   },
 
   // === ANIMATION SETTINGS ===
@@ -167,7 +168,7 @@ export const layout = {
     leftMargin: 8, // Left margin from screen edge (first card)
     rightMargin: 0, // Right margin from screen edge (last card's marginRight provides 8dp spacing)
     peekAmount: 8, // Amount of next/prev card visible (partial card visibility pattern)
-    height: 256, // Fixed card height
+    height: 240, // Fixed card height (reduced from 256dp)
     borderRadius: 8, // Corner radius
     paddingLeft: 16, // Left inner padding
     paddingTop: 16, // Top inner padding

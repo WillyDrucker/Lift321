@@ -9,6 +9,8 @@
 
 import React, {useState} from 'react';
 import {
+  ActivityIndicator,
+  Alert,
   Keyboard,
   Pressable,
   SafeAreaView,
@@ -17,10 +19,13 @@ import {
   Text,
   TouchableWithoutFeedback,
   View,
+  DeviceEventEmitter,
 } from 'react-native';
 import {theme} from '@/theme';
 import type {RootStackScreenProps} from '@/navigation/types';
 import {LeftChevron, FormInput, PasswordInput, SocialButton} from '@/components';
+import {authService} from '@/services/authService';
+import {AUTH_CHANGE_EVENT} from '@/services';
 
 // === TYPES ===
 
@@ -32,10 +37,11 @@ export const LoginFormScreen: React.FC<LoginFormScreenProps> = ({
   navigation,
 }) => {
   // === STATE ===
-  // Form input values
+  // Form input values and loading state
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   // === EVENT HANDLERS ===
   // Handle user interactions and form submissions
@@ -54,9 +60,28 @@ export const LoginFormScreen: React.FC<LoginFormScreenProps> = ({
     // TODO: Navigate to forgot password screen
   };
 
-  const handleContinue = () => {
-    console.log('Continue pressed', {email, password});
-    // TODO: Implement login logic
+  const handleContinue = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please enter both email and password');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const result = await authService.signIn({email, password});
+
+      if (result.status === 'success') {
+        // Emit auth change event to trigger App.tsx to switch to MainNavigator
+        DeviceEventEmitter.emit(AUTH_CHANGE_EVENT);
+      } else {
+        // Show error message
+        Alert.alert('Login Failed', result.error.message);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -82,7 +107,7 @@ export const LoginFormScreen: React.FC<LoginFormScreenProps> = ({
         {/* Header with Back and Support - 32dp from top */}
         <View style={styles.header}>
           <Pressable onPress={handleBack} style={styles.backButton}>
-            <LeftChevron size={32} color={theme.colors.textPrimary} />
+            <LeftChevron size={theme.layout.topNav.backIconSize} color={theme.colors.textPrimary} />
           </Pressable>
           <Pressable onPress={handleSupport}>
             <Text style={styles.supportText}>Support</Text>
@@ -120,10 +145,16 @@ export const LoginFormScreen: React.FC<LoginFormScreenProps> = ({
             style={({pressed}) => [
               styles.continueButton,
               pressed && styles.buttonPressed,
+              isLoading && styles.buttonDisabled,
             ]}
             onPress={handleContinue}
+            disabled={isLoading}
           >
-            <Text style={styles.continueButtonText}>CONTINUE</Text>
+            {isLoading ? (
+              <ActivityIndicator color={theme.colors.textOnAction} />
+            ) : (
+              <Text style={styles.continueButtonText}>CONTINUE</Text>
+            )}
           </Pressable>
 
           {/* Divider with OR */}
@@ -157,6 +188,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 16, // Shift form group down to perfectly center (measured 122dp top, 154dp bottom)
   },
 
   // === HEADER STYLES ===
@@ -193,10 +225,13 @@ const styles = StyleSheet.create({
 
   forgotPassword: {
     fontSize: theme.typography.fontSize.m,
+    lineHeight: theme.typography.fontSize.m + 4, // Add space for descenders
     fontFamily: theme.typography.fontFamily.primary,
     color: theme.colors.borderMuted,
     textAlign: 'center',
-    marginBottom: theme.spacing.m,
+    includeFontPadding: false, // Remove Android font padding
+    marginTop: 9, // 16dp target (9 + 5 from PasswordInput + ~2 intrinsic = 16)
+    marginBottom: 12, // Adjusted for lineHeight change
     marginHorizontal: theme.spacing.inputMarginSmall,
   },
 
@@ -208,7 +243,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.layout.form.inputBorderRadius,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: theme.spacing.xl,
+    marginBottom: 11, // 16dp target to OR divider (measuring 21dp, reducing by 5)
     marginHorizontal: theme.layout.form.buttonHorizontalMargin,
     ...theme.viewShadows.medium,
     elevation: theme.elevation.medium,
@@ -225,12 +260,16 @@ const styles = StyleSheet.create({
     opacity: theme.buttons.opacity.pressed,
   },
 
+  buttonDisabled: {
+    opacity: 0.5,
+  },
+
   // === DIVIDER STYLES ===
 
   dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: theme.spacing.xl,
+    marginBottom: 12, // 16dp target to Google button (measuring 17dp, reducing by 1)
     marginHorizontal: theme.layout.form.buttonHorizontalMargin,
   },
 

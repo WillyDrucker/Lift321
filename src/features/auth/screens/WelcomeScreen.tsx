@@ -1,10 +1,10 @@
 // ==========================================================================
 // WELCOME SCREEN
 //
-// First screen after account creation. Introduces the onboarding questionnaire.
+// Welcome screen before account creation. Introduces the onboarding questionnaire.
 //
 // Dependencies: theme tokens, React Navigation
-// Used by: Navigation stack (from SignUpStep2Screen)
+// Used by: Navigation stack (after branding screens, before CreateAccountScreen)
 // ==========================================================================
 
 import React from 'react';
@@ -15,10 +15,12 @@ import {
   Text,
   View,
   Dimensions,
+  DeviceEventEmitter,
 } from 'react-native';
 import {theme} from '@/theme';
 import type {RootStackScreenProps} from '@/navigation/types';
 import {LeftChevron, ActionButton} from '@/components';
+import {AUTH_CHANGE_EVENT} from '@/services';
 
 const {height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -37,8 +39,9 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
   };
 
   const handleLetsGo = () => {
-    console.log("Let's Go pressed - Welcome");
-    // TODO: Navigate to questionnaire
+    // User is logged in after account creation
+    // Emit auth change event to trigger App.tsx to switch to MainNavigator
+    DeviceEventEmitter.emit(AUTH_CHANGE_EVENT);
   };
 
   // === RENDER ===
@@ -65,7 +68,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
         {/* Back Button - 64dp from bottom */}
         <View style={styles.header}>
           <Pressable onPress={handleBack} style={styles.backButton}>
-            <LeftChevron size={32} color={theme.colors.textPrimary} />
+            <LeftChevron size={theme.layout.topNav.backIconSize} color={theme.colors.textPrimary} />
           </Pressable>
         </View>
 
