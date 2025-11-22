@@ -16,6 +16,213 @@ This file contains the historical record of version changes for Lift 3-2-1. Deta
 
 ## Version History
 
+### v1.1.5 - Data-Driven Exercise System & Dynamic Duration (2025-01-22)
+**Branch**: Claude-v1.1.5
+
+**Summary**: Created complete data-driven exercise system with duration calculator utility implementing rest/workout/warmup formula, exercise service for session type filtering (Lift 3-2-1 logic), and full WorkoutOverviewScreen refactor eliminating 180+ lines of hardcoded JSX. Duration formula (totalSets × 6) - 2 produces accurate estimates: 34 minutes (Standard 6 sets), 28 minutes (Express 5 sets), 22 minutes (Maintenance 4 sets). Exercise service implements session logic: Standard (3+2+1 sets), Express (3+2), Maintenance (2+2). Added session color tokens to theme (sessionStandard/Express/Maintenance). Dynamic vertical line height adapts to exercise count. Applied CLAUDE_DEV_STANDARDS to all files with proper section headers and forward-looking comments.
+
+**What Was Built**:
+- **Duration Calculator Utility** (src/utils/durationCalculator.ts):
+  - **Formula**: `(totalSets × 5) + totalSets + 3 - 5 = (totalSets × 6) - 2`
+  - **Components**:
+    - Rest time: totalSets × 5 minutes (5 min rest per set at 10 reps)
+    - Workout time: totalSets × 1 minute (1 min per exercise set)
+    - Warmup time: 3 minutes (fixed warmup period)
+    - Final rest removal: -5 minutes (no rest after completing final set)
+  - **Results**:
+    - Standard (6 sets): (6×5) + 6 + 3 - 5 = 34 minutes
+    - Express (5 sets): (5×5) + 5 + 3 - 5 = 28 minutes
+    - Maintenance (4 sets): (4×5) + 4 + 3 - 5 = 22 minutes
+  - **Exports**:
+    - `calculateWorkoutDuration(params)`: Full calculation with breakdown
+    - `getWorkoutDuration(totalSets)`: Simple helper returning just minutes
+  - **Types**: DurationParams, DurationResult with breakdown details
+  - **File Header**: Complete documentation with purpose, formula breakdown, examples
+
+- **Exercise Service** (src/services/exerciseService.ts):
+  - **Core Functionality**:
+    - Loads exercises from src/data/exercises.json
+    - Filters by body part (Chest, Back, Legs, Arms, Shoulders)
+    - Filters by session type (Standard/Express/Maintenance)
+    - Returns processed exercises with adjusted set counts
+  - **Session Type Logic**:
+    - Standard: Include Major1 (3 sets) + Minor1 (2 sets) + Tertiary (1 set) = 6 total
+    - Express: Include Major1 (3 sets) + Minor1 (2 sets), exclude Tertiary = 5 total
+    - Maintenance: Limit Major1 to 2 sets, Minor1 to 2 sets, exclude Tertiary = 4 total
+  - **Key Functions**:
+    - `getExercisesForWorkout(bodyPart, sessionType)`: Main data loading function
+    - `getAllBodyParts()`: Get unique list of body parts
+    - `getExerciseSetCount(bodyPart, sessionType)`: Quick set count without full data
+  - **Helper Functions**:
+    - `filterByBodyPart()`: Extract exercises for specific body part
+    - `groupByMuscleGroup()`: Organize exercises by Major1/Minor1/Tertiary
+    - `selectExerciseFromGroup()`: Pick one exercise from each group
+    - `processExercise()`: Apply session type limits to exercise sets
+  - **Types**:
+    - `SessionType`: 'Standard' | 'Express' | 'Maintenance'
+    - `ProcessedExercise`: Exercise + adjustedSets + originalSets
+    - `ExerciseServiceResult`: exercises, totalSets, sessionType, bodyPart, breakdown
+  - **Future Expansion**: Equipment filtering prepared but not implemented (selects first exercise from each group currently)
+
+- **WorkoutOverviewScreen Refactoring**:
+  - **Hardcoded Removal** (src/features/workout/screens/WorkoutOverviewScreen.tsx):
+    - Eliminated 180+ lines of hardcoded exercise JSX
+    - Removed all inline exercise definitions (3 sets bench, 2 sets incline, 1 set flyes)
+    - Replaced with dynamic data loading from exerciseService
+  - **Dynamic Features**:
+    - **Duration Calculation**: Updates automatically when session type changes
+    - **Exercise Rendering**: renderExercises() helper builds tree from loaded data
+    - **Set Rendering**: renderExerciseSets() creates all sets for each exercise
+    - **Vertical Line Height**: Dynamically calculated based on exercise count
+    - **Session Type Conversion**: Converts lowercase UI state to PascalCase SessionType
+  - **New Imports**:
+    - `getExercisesForWorkout, SessionType` from @/services/exerciseService
+    - `getWorkoutDuration` from @/utils/durationCalculator
+    - `useMemo` from React for computed values
+  - **Computed Values**:
+    - `sessionType`: PascalCase conversion of selectedSession
+    - `workoutData`: Loaded exercises filtered by body part and session type
+    - `workoutDuration`: Calculated duration based on total sets
+    - `verticalLineHeight`: Dynamic height based on exercise count with offsets
+  - **Helper Functions**:
+    - `getExerciseImage(exerciseName)`: Maps exercise names to image assets
+    - `renderExerciseSets(exerciseName, totalSets, currentReps)`: Renders all sets for one exercise
+    - `renderExercises()`: Renders all exercise groups with spacers
+  - **Constants** (for vertical line calculation):
+    - START_OFFSET: 25dp (connects with title connector)
+    - SET_HEIGHT: 50dp (height of each exercise row)
+    - SET_MARGIN: 5dp (margin between sets)
+    - GROUP_SPACER: 32dp (spacer between exercise groups)
+
+- **Theme Token Enhancement** (src/theme/colors.ts):
+  - **New Session Color Tokens**:
+    - `sessionStandard: '#00FF00'` - Pure green for standard workouts
+    - `sessionExpress: '#77FF00'` - Olive green for express workouts
+    - `sessionMaintenance: '#FFFF00'` - Yellow for maintenance workouts
+  - **Usage**: Replaced all hardcoded #77ff00 and #ffff00 hex values throughout WorkoutOverviewScreen
+  - **Pattern**: Semantic color naming for session types (not literal color names)
+  - **Documentation**: Added "SESSION TYPE COLORS" section with purpose/usage comments
+
+- **CLAUDE_DEV_STANDARDS Compliance**:
+  - **Section Headers**: Changed === format to ============ throughout WorkoutOverviewScreen
+  - **Comments**: All forward-looking (design intent, not historical changes)
+  - **Magic Numbers**: Eliminated with named constants (START_OFFSET, SET_HEIGHT, etc.)
+  - **File Headers**: All new files have proper headers with purpose and dependencies
+  - **Forward-Looking**: Replaced "Testing with very large padding" → "Extra bottom padding ensures content clears navigation"
+
+**Why This Approach**:
+- **Service Layer Pattern**: Never query JSON directly from components - always via service layer for testability and reusability
+- **Duration Formula Accuracy**: Accounts for all workout components (rest, exercise, warmup) and removes unnecessary final rest period
+- **Session Type Math**: Lift 3-2-1 naming directly maps to Standard session (3 Major, 2 Minor, 1 Tertiary)
+- **Dynamic Rendering**: Single renderExercises() function handles all session types without conditional JSX
+- **Vertical Line Calculation**: Formula-based approach adapts automatically to any exercise count
+- **Theme Token Centralization**: All session colors in theme.colors enables consistent usage across app
+- **Computed Values**: useMemo prevents unnecessary recalculation on re-renders
+- **Type Safety**: SessionType ensures only valid values ('Standard'/'Express'/'Maintenance')
+
+**Problems Solved**:
+1. **Hardcoded Exercise Data**: Screen had 180+ lines of hardcoded JSX defining exercises. **Solution**: Exercise service loads from exercises.json with type-safe filtering.
+
+2. **Manual Duration Calculation**: Duration was hardcoded (31/25/19 minutes) without formula. **Solution**: Duration calculator implements precise formula based on total sets, updating automatically.
+
+3. **Session Type Duplication**: Exercise lists duplicated across session types with manual adjustments. **Solution**: Single data source with session type filtering in service layer.
+
+4. **Fixed Vertical Line**: Tree line height hardcoded for 6-set Standard workout. **Solution**: Dynamic calculation based on actual exercise count and spacing constants.
+
+5. **Hardcoded Session Colors**: Inline #77ff00 and #ffff00 hex values throughout. **Solution**: Theme tokens sessionExpress and sessionMaintenance for semantic usage.
+
+6. **No Equipment Filtering**: Service needed equipment selection logic. **Solution**: Prepared equipment filtering structure (TODO: implement in selectExerciseFromGroup).
+
+7. **Hardcoded Rep Counts**: All sets showing 10 reps regardless of week/plan. **Solution**: Prepared for plans.json integration (TODO: load rep counts based on week).
+
+**What Changed**:
+- **New Files**:
+  - `src/utils/durationCalculator.ts`: Duration calculation utility with formula
+  - `src/services/exerciseService.ts`: Exercise data loading and filtering service
+
+- **Modified Files**:
+  - `src/features/workout/screens/WorkoutOverviewScreen.tsx`:
+    - Added imports: exerciseService, durationCalculator, useMemo
+    - Added computed values: sessionType, workoutData, workoutDuration, verticalLineHeight
+    - Added helper functions: getExerciseImage, renderExerciseSets, renderExercises
+    - Removed 180+ lines of hardcoded exercise JSX
+    - Updated duration display to use dynamic workoutDuration
+    - Made vertical line height dynamic via inline style
+    - Updated all hardcoded colors to theme tokens
+    - Applied CLAUDE_DEV_STANDARDS section headers
+  - `src/theme/colors.ts`:
+    - Added SESSION TYPE COLORS section
+    - Added sessionStandard/Express/Maintenance tokens
+    - Added documentation for each color
+
+**User Decisions**:
+- Duration formula uses (totalSets × 6) - 2 pattern for simplicity
+- Rest time is 5 minutes per set (based on 10-rep sets)
+- Workout time is 1 minute per set
+- Warmup time is fixed 3 minutes
+- Final rest period removed from total (workout ends after last set completes)
+- Session types follow Lift 3-2-1 pattern: 3-2-1 (Standard), 3-2 (Express), 2-2 (Maintenance)
+- Exercise service selects first exercise from each muscle group (equipment filtering deferred)
+- Rep counts currently 10 for all sets (plans.json integration deferred)
+- Vertical line height calculated with formula (START_OFFSET + exercise heights - adjustments)
+- All session-specific colors belong in theme.colors as semantic tokens
+- Image mapping limited to chest exercises (bench-press, incline-bench-press, chest-flyes)
+
+**Key Learnings**:
+- **Service Layer Benefits**: Separating data loading from UI components enables:
+  - Unit testing of data logic
+  - Reusable filtering across multiple screens
+  - Centralized data access patterns
+  - Easier future equipment/rep count integration
+
+- **Dynamic Calculation Patterns**: Computed values with useMemo provide:
+  - Automatic updates when dependencies change
+  - Performance optimization (no unnecessary recalculations)
+  - Clear data flow (state → computed → render)
+  - Type safety throughout chain
+
+- **Formula-Based Layout**: Calculating vertical line height with constants enables:
+  - Automatic adaptation to exercise count changes
+  - Easy adjustment via constant updates
+  - Self-documenting layout math
+  - Elimination of magic numbers
+
+- **Theme Token Migration**: Moving inline colors to theme.colors provides:
+  - Single source of truth for colors
+  - Semantic naming (sessionStandard vs #00FF00)
+  - Easy theme changes
+  - Consistent color usage across app
+
+- **Hardcoded Data Elimination**: Removing 180+ lines of JSX proves:
+  - Data belongs in JSON, not component code
+  - Dynamic rendering is more maintainable
+  - Service layer is worth initial setup cost
+  - Type safety catches data structure changes early
+
+- **Duration Formula Design**: Breaking formula into components makes it:
+  - Easy to understand (rest + workout + warmup - final rest)
+  - Easy to test individual components
+  - Easy to adjust parameters (change rest time per set)
+  - Self-documenting with clear variable names
+
+- **Session Type Architecture**: Lift 3-2-1 naming directly maps to data structure:
+  - 3 = Major1 sets in Standard
+  - 2 = Minor1 sets in Standard
+  - 1 = Tertiary sets in Standard
+  - Express/Maintenance modify this pattern logically
+  - Name reinforces workout structure understanding
+
+**Next Steps**:
+- Implement equipment filtering in exerciseService.selectExerciseFromGroup()
+- Integrate rep count progression from plans.json based on current week
+- Expand image mapping to cover all exercises (not just chest)
+- Add session persistence (AsyncStorage) for user selections
+- Build workout session tracking with real-time duration logging
+- Create exercise detail screens
+- Implement actual workout session flow with set completion tracking
+
+---
+
 ### v1.1.4 - Font Management & Title Bar Refinements (2025-01-19)
 **Branch**: Claude-v1.1.4
 

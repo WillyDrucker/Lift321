@@ -21,6 +21,14 @@ export const colors = {
   // Muted Green (#00BF00 - 75% brightness) - Softer brand accent
   // Use for: Secondary brand text, softer green accents, reduced emphasis highlights
 
+  opposite: '#FF00FF',
+  // Magenta (#FF00FF) - Complementary color to pure green
+  // Use for: Accent elements, complementary design elements, color wheel opposite
+
+  veryDarkGray: '#101010',
+  // Very Dark Gray (#101010) - Easy-to-remember neutral dark tone
+  // Use for: Backup navigation bar color, alternative dark surfaces
+
   secondary: '#2A2A2A',
   // Medium Charcoal (#2A2A2A) - Secondary brand color
   // Use for: Secondary buttons, inactive states, alternative surfaces
@@ -65,6 +73,21 @@ export const colors = {
   textYellowMaintenance: '#FFFF00',
   // Yellow (#FFFF00) - Maintenance mode indicator
   // Use for: Maintenance mode text, guest user indicators, temporary features
+
+  // === SESSION TYPE COLORS ===
+  // Visual differentiation for workout session types
+
+  sessionStandard: '#00FF00',
+  // Pure Green (#00FF00) - Standard session indicator
+  // Use for: Standard session text, full workout indicators
+
+  sessionExpress: '#77FF00',
+  // Olive Green (#77FF00) - Express session indicator
+  // Use for: Express session text, quick workout indicators
+
+  sessionMaintenance: '#FFFF00',
+  // Yellow (#FFFF00) - Maintenance session indicator
+  // Use for: Maintenance session text, minimal workout indicators
 
   // === ACTION COLORS ===
   // Semantic naming: describes purpose, not literal color

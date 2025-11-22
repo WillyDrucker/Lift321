@@ -8,7 +8,7 @@
 // Used by: Navigation stack (from WorkoutCard BEGIN button)
 // ==========================================================================
 
-import React, {useState} from 'react';
+import React, {useState, useMemo} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -17,25 +17,35 @@ import {
   Text,
   View,
   TouchableOpacity,
+  Image,
 } from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {theme} from '@/theme';
 import type {RootStackScreenProps} from '@/navigation/types';
 import {TopNavBar, BottomTabBar, Sidebar, type TabItem} from '@/components';
+import {getExercisesForWorkout, type SessionType} from '@/services/exerciseService';
+import {getWorkoutDuration} from '@/utils/durationCalculator';
 
-// === TYPES ===
+// ============================================================================
+// TYPES
+// ============================================================================
 
 type WorkoutOverviewProps = RootStackScreenProps<'WorkoutOverview'>;
 
-// === COMPONENT ===
+// ============================================================================
+// COMPONENT
+// ============================================================================
 
 export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
   route,
   navigation,
 }) => {
-  // === STATE ===
-  // Component state management
+  // ==========================================================================
+  // STATE
+  // ==========================================================================
 
   const {workoutType} = route.params;
+  const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<TabItem>('home');
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
   const [selectedPlanFocus, setSelectedPlanFocus] = useState<'strength' | 'balanced' | 'growth'>('balanced');
@@ -44,8 +54,179 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
   );
   const [selectedSession, setSelectedSession] = useState<'standard' | 'express' | 'maintenance'>('standard');
 
-  // === EVENT HANDLERS ===
-  // User interaction callbacks
+  // ==========================================================================
+  // COMPUTED VALUES
+  // ==========================================================================
+
+  // Convert lowercase session to PascalCase SessionType
+  const sessionType: SessionType = useMemo(() => {
+    return selectedSession.charAt(0).toUpperCase() + selectedSession.slice(1) as SessionType;
+  }, [selectedSession]);
+
+  // Load exercises for current workout and session type
+  const workoutData = useMemo(() => {
+    return getExercisesForWorkout(workoutType, sessionType);
+  }, [workoutType, sessionType]);
+
+  // Calculate workout duration dynamically
+  const workoutDuration = useMemo(() => {
+    return getWorkoutDuration(workoutData.totalSets);
+  }, [workoutData.totalSets]);
+
+  // Calculate dynamic vertical line height for exercise tree
+  const verticalLineHeight = useMemo(() => {
+    const START_OFFSET = 25; // Offset to connect with title connector
+    const SET_HEIGHT = 50; // Height of each exercise row
+    const SET_MARGIN = 5; // Margin between sets
+    const GROUP_SPACER = 32; // Spacer between exercise groups
+
+    let totalHeight = START_OFFSET;
+    let exerciseCount = 0;
+
+    workoutData.exercises.forEach((exercise, index) => {
+      if (exercise.adjustedSets === 0) return;
+
+      // Add spacer before this group (except first group)
+      if (exerciseCount > 0) {
+        totalHeight += GROUP_SPACER;
+      }
+
+      // Add height for all sets in this exercise
+      totalHeight += exercise.adjustedSets * (SET_HEIGHT + SET_MARGIN);
+
+      exerciseCount++;
+    });
+
+    // Subtract margin from last set and add half set height to end at center
+    totalHeight -= SET_MARGIN;
+    totalHeight -= (SET_HEIGHT / 2);
+    totalHeight += (SET_MARGIN / 2);
+
+    return totalHeight;
+  }, [workoutData.exercises]);
+
+  // Calculate dynamic bottom padding to match BottomTabBar height
+  const dynamicBottomTabHeight = insets.bottom > theme.layout.bottomNav.gestureNavThreshold
+    ? theme.layout.bottomNav.height + theme.layout.bottomNav.buttonNavExtraHeight
+    : theme.layout.bottomNav.height;
+
+  // Total bottom padding accounts for tab bar height, safe area insets, and extra margin
+  const totalBottomPadding = dynamicBottomTabHeight + Math.max(insets.bottom, 50);
+
+  // ==========================================================================
+  // HELPER FUNCTIONS
+  // ==========================================================================
+
+  /**
+   * Get exercise image source based on exercise name
+   * TODO: Make this dynamic based on exercise data
+   */
+  const getExerciseImage = (exerciseName: string) => {
+    // Convert to kebab-case for file naming
+    const imageName = exerciseName.toLowerCase().replace(/\s+/g, '-');
+
+    // Map known exercises to their images
+    const imageMap: Record<string, any> = {
+      'bench-press': require('@/assets/images/exercises/bench-press.png'),
+      'incline-bench-press': require('@/assets/images/exercises/incline-bench-press.png'),
+      'chest-flyes': require('@/assets/images/exercises/chest-flyes.png'),
+      'chest-press': require('@/assets/images/exercises/bench-press.png'), // Use bench press as fallback
+    };
+
+    return imageMap[imageName] || imageMap['bench-press']; // Fallback to bench press
+  };
+
+  /**
+   * Render all sets for an exercise
+   */
+  const renderExerciseSets = (
+    exerciseName: string,
+    totalSets: number,
+    currentReps: number,
+  ) => {
+    const sets: JSX.Element[] = [];
+
+    for (let setNumber = 1; setNumber <= totalSets; setNumber++) {
+      sets.push(
+        <View key={`${exerciseName}-set-${setNumber}`} style={styles.exerciseSetRow}>
+          <View style={styles.horizontalConnector} />
+          <TouchableOpacity
+            style={styles.exerciseRow}
+            onPress={() => console.log(`${exerciseName} Set ${setNumber} selected`)}
+            activeOpacity={1}>
+            <Image
+              source={getExerciseImage(exerciseName)}
+              style={styles.exerciseImage}
+              resizeMode="cover"
+            />
+            <View style={styles.exerciseInfo}>
+              <Text style={styles.exerciseName}>{exerciseName.toUpperCase()}</Text>
+              <Text style={styles.exerciseSetCount}>
+                <Text style={styles.exerciseSetLabel}>SET: </Text>
+                <Text style={[
+                  styles.exerciseSetNumber,
+                  selectedSession === 'standard' && {color: theme.colors.sessionStandard},
+                  selectedSession === 'express' && {color: theme.colors.sessionExpress},
+                  selectedSession === 'maintenance' && {color: theme.colors.sessionMaintenance},
+                ]}>
+                  {setNumber}{' '}
+                </Text>
+                <Text style={styles.exerciseSetLabel}>OF </Text>
+                <Text style={[
+                  styles.exerciseSetNumber,
+                  selectedSession === 'standard' && {color: theme.colors.sessionStandard},
+                  selectedSession === 'express' && {color: theme.colors.sessionExpress},
+                  selectedSession === 'maintenance' && {color: theme.colors.sessionMaintenance},
+                ]}>
+                  {totalSets}
+                </Text>
+              </Text>
+            </View>
+            <Text style={styles.exerciseReps}>
+              <Text style={styles.exerciseRepsLabel}>REPS: </Text>
+              <Text style={styles.exerciseRepsNumber}>{currentReps}</Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
+    return sets;
+  };
+
+  /**
+   * Render all exercise groups with tree structure
+   */
+  const renderExercises = () => {
+    const exerciseGroups: JSX.Element[] = [];
+
+    workoutData.exercises.forEach((exercise, index) => {
+      // Skip exercises with 0 adjusted sets
+      if (exercise.adjustedSets === 0) {
+        return;
+      }
+
+      // Add spacer between exercise groups (not before first group)
+      if (index > 0) {
+        exerciseGroups.push(
+          <View key={`spacer-${index}`} style={styles.exerciseGroupSpacer} />
+        );
+      }
+
+      // Render exercise group
+      exerciseGroups.push(
+        <View key={`group-${exercise.exercise_name}`} style={styles.exerciseGroup}>
+          {renderExerciseSets(exercise.exercise_name, exercise.adjustedSets, 10)}
+        </View>
+      );
+    });
+
+    return exerciseGroups;
+  };
+
+  // ==========================================================================
+  // EVENT HANDLERS
+  // ==========================================================================
 
   const handleBackPress = () => {
     navigation.goBack();
@@ -119,8 +300,9 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
     });
   };
 
-  // === RENDER ===
-  // Main component JSX structure
+  // ==========================================================================
+  // RENDER
+  // ==========================================================================
 
   return (
     <>
@@ -130,17 +312,16 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
         translucent={false}
       />
       <SafeAreaView style={styles.container}>
-        {/* Fixed Top Navigation */}
-        <View style={styles.topNavContainer}>
+        {/* Fixed Navigation Area */}
+        <View style={styles.navigationArea}>
           <TopNavBar
             onSearchPress={handleSearchPress}
             onMenuPress={handleMenuPress}
             onBackPress={handleBackPress}
           />
-        </View>
 
-        {/* Fixed Workout Title Bar */}
-        <View style={styles.workoutTitleBar}>
+          {/* Workout Title Bar */}
+          <View style={styles.workoutTitleBar}>
           {/* Workout Title */}
           <Text style={styles.workoutTitleText}>{workoutType}</Text>
 
@@ -160,12 +341,16 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
               <Text style={styles.letsGoButtonText}>LET'S GO!</Text>
             </TouchableOpacity>
           </View>
+          </View>
         </View>
 
         {/* Scrollable Content Area */}
         <ScrollView
           style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[
+            styles.scrollContent,
+            {paddingBottom: 250} // Extra bottom padding ensures content clears navigation on all devices
+          ]}
           showsVerticalScrollIndicator={false}>
           {/* Workout Overview Plan Card */}
           <View style={styles.workoutPlanCard}>
@@ -238,13 +423,11 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
               <Text style={styles.workoutSessionDurationLabel}>
                 DURATION: <Text style={[
                   styles.workoutSessionDurationValue,
-                  selectedSession === 'standard' && {color: theme.colors.actionSuccess},
-                  selectedSession === 'express' && {color: '#77ff00'},
-                  selectedSession === 'maintenance' && {color: '#ffff00'},
+                  selectedSession === 'standard' && {color: theme.colors.sessionStandard},
+                  selectedSession === 'express' && {color: theme.colors.sessionExpress},
+                  selectedSession === 'maintenance' && {color: theme.colors.sessionMaintenance},
                 ]}>
-                  {selectedSession === 'standard' && '31 MINUTES'}
-                  {selectedSession === 'express' && '25 MINUTES'}
-                  {selectedSession === 'maintenance' && '19 MINUTES'}
+                  {workoutDuration} MINUTES
                 </Text>
               </Text>
             </View>
@@ -351,6 +534,25 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
               </View>
             </View>
           </View>
+
+          {/* Today's Workout Card */}
+          <View style={styles.todaysWorkoutCard}>
+            {/* Today's Workout Text with Connector */}
+            <View style={styles.todaysWorkoutHeader}>
+              <Text style={styles.todaysWorkoutText}>TODAY'S WORKOUT</Text>
+              {/* Horizontal connector from "T" to tree line */}
+              <View style={styles.titleConnector} />
+            </View>
+
+            {/* Exercise Tree Structure */}
+            <View style={styles.exerciseTreeContainer}>
+              {/* Vertical line running down from title connector (dynamic height) */}
+              <View style={[styles.verticalLine, {height: verticalLineHeight}]} />
+
+              {/* Dynamic Exercise Groups */}
+              {renderExercises()}
+            </View>
+          </View>
         </ScrollView>
 
         {/* Bottom Navigation */}
@@ -367,8 +569,9 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
   );
 };
 
-// === STYLES ===
-// StyleSheet definitions using global theme tokens
+// ============================================================================
+// STYLES
+// ============================================================================
 
 // Selector text sizing for compact multi-option displays
 const SELECTOR_TEXT_SIZE = 12;
@@ -379,13 +582,14 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.pureBlack,
   },
 
-  topNavContainer: {
+  navigationArea: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     zIndex: 10,
-    backgroundColor: theme.colors.pureBlack,
+    backgroundColor: theme.colors.pureBlack, // Pure black background (global standard)
+    // Contains both top nav and workout title bar as one fixed unit
   },
 
   scrollView: {
@@ -394,20 +598,17 @@ const styles = StyleSheet.create({
 
   scrollContent: {
     flexGrow: 1,
-    paddingTop: theme.layout.topNav.topSpacing + theme.layout.topNav.height + 66 + theme.spacing.s, // Start from bottom of title bar (64dp nav + 66dp bar + 8dp)
-    paddingBottom: theme.layout.bottomNav.height + theme.spacing.s, // Clear bottom navigation with standard margin
+    paddingTop: theme.layout.topNav.topSpacing + theme.layout.topNav.height + 66 + theme.spacing.s, // Start from bottom of title bar (32 + 32 + 66 + 8 = 138dp)
+    // paddingBottom is set dynamically via inline style to match BottomTabBar height (accounts for safe area insets)
     paddingLeft: theme.spacing.s, // Standard screen edge margin
     paddingRight: theme.spacing.s, // Standard screen edge margin
   },
 
   // === WORKOUT TITLE BAR ===
   workoutTitleBar: {
-    position: 'absolute', // Fixed position below top nav
-    top: theme.layout.topNav.topSpacing + theme.layout.topNav.height, // 64dp (32 status + 32 nav)
-    left: 0,
-    right: 0,
+    marginTop: theme.layout.topNav.topSpacing + theme.layout.topNav.height, // Position below top nav (32 + 32 = 64dp)
     height: 66, // 8dp top + 50dp button + 8dp bottom = perfectly balanced
-    backgroundColor: theme.colors.backgroundPrimary,
+    backgroundColor: theme.colors.pureBlack, // Pure black background (global standard)
     borderBottomWidth: theme.layout.border.thin, // Green border on bottom
     borderBottomColor: theme.colors.actionSuccess, // Green border
     flexDirection: 'row', // Horizontal layout for title and button
@@ -415,17 +616,20 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between', // Space between title and button
     paddingLeft: theme.spacing.s, // 8dp from left edge
     paddingRight: theme.spacing.s, // 8dp from right edge
-    zIndex: 5, // Below top nav (10) but above content
+    zIndex: 1, // Above navigation area background
   },
 
   workoutTitleText: {
-    fontSize: theme.typography.fontSize.xxxl, // 32dp
+    fontSize: 36, // 36dp to match HomePage workout cards
     fontFamily: theme.typography.fontFamily.workoutCard, // Zuume-ExtraBold
     color: theme.colors.actionSuccess,
     textTransform: 'uppercase',
     includeFontPadding: false, // Eliminate Android font padding for precise alignment
-    transform: [{scaleX: 1.2}, {translateY: 1}], // 20% wider + 1dp down for optical centering
-    marginLeft: 14, // 8dp bar padding + 6dp scaleX compensation + 8dp spacing = 16dp visual alignment
+    transform: [{scaleX: 1.2}, {translateY: 2}], // 20% wider + 2dp down for balanced vertical centering (matches HomePage)
+    marginLeft: 11, // 11dp left margin to match HomePage balanced spacing
+    textShadowColor: theme.colors.shadowBlack, // Black shadow (matches HomePage)
+    textShadowOffset: {width: 0, height: 2}, // Drop shadow 2dp down (matches HomePage)
+    textShadowRadius: 4, // Shadow blur radius (matches HomePage)
   },
 
   // === LET'S GO BUTTON ===
@@ -636,11 +840,8 @@ const styles = StyleSheet.create({
   },
 
   workoutSessionDurationValue: {
-    fontWeight: theme.typography.fontWeight.bold, // Ensure bold text
-    // Color is set dynamically based on selected session
-    // Standard: green (#00FF00)
-    // Express: olive (#77ff00)
-    // Maintenance: yellow (#ffff00)
+    fontWeight: theme.typography.fontWeight.bold,
+    // Color set dynamically based on session type via theme.colors.session{Standard|Express|Maintenance}
   },
 
   workoutSessionTypesContainer: {
@@ -725,5 +926,166 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary, // Light gray (#B0B0B0)
     textTransform: 'uppercase',
     textAlign: 'center', // Center text within selector
+  },
+
+  // === TODAY'S WORKOUT CARD ===
+  todaysWorkoutCard: {
+    backgroundColor: theme.colors.backgroundPrimary,
+    borderRadius: theme.spacing.s, // Standard card border radius
+    paddingLeft: theme.spacing.s, // Standard card internal padding
+    paddingRight: theme.spacing.s, // Standard card internal padding
+    paddingBottom: theme.spacing.s, // Standard card internal padding
+    marginTop: theme.spacing.s, // Standard card separation
+  },
+
+  todaysWorkoutHeader: {
+    position: 'relative', // For absolute positioning of titleConnector
+    marginTop: 13, // Compensate for 3dp font metrics to achieve visual 16dp
+    marginBottom: 13, // Compensate for 3dp font metrics to achieve visual 16dp
+  },
+
+  todaysWorkoutText: {
+    fontSize: theme.typography.fontSize.xl, // Large text for primary labels
+    lineHeight: theme.typography.fontSize.xl, // Match font size to eliminate extra line spacing
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.backgroundTertiary, // Same as other card headers
+    textTransform: 'uppercase',
+    textAlign: 'center', // Center the text horizontally
+    includeFontPadding: false, // Remove Android font padding for precise spacing
+  },
+
+  titleConnector: {
+    position: 'absolute',
+    left: 0, // Start at left edge of card content (card has 8dp padding, so this is 8dp from card edge)
+    top: 12, // Center vertically with text (24dp font / 2 = 12dp)
+    width: 50, // 50dp horizontal line to "T" in "TODAY'S WORKOUT"
+    height: 1,
+    backgroundColor: theme.colors.pureWhite, // White line
+  },
+
+  // === EXERCISE TREE STRUCTURE ===
+  exerciseTreeContainer: {
+    position: 'relative',
+  },
+
+  verticalLine: {
+    position: 'absolute',
+    left: 0, // At left edge of card content (8dp from card edge due to card padding) - connects to titleConnector
+    top: -13 - 12, // Extend up to connect with titleConnector (-13 for marginBottom, -12 to center with text) = -25dp
+    // Height is set dynamically based on exercise count and session type
+    width: 1,
+    backgroundColor: theme.colors.pureWhite, // White line
+  },
+
+  exerciseGroup: {
+    marginBottom: 0, // No margin - exerciseGroupSpacer controls spacing between groups
+  },
+
+  exerciseSetRow: {
+    position: 'relative',
+    marginBottom: 5, // 5dp spacing between individual sets
+    marginLeft: 16, // Make room for horizontal connector (0 + 16 = 16dp)
+  },
+
+  horizontalConnector: {
+    position: 'absolute',
+    left: -16, // Position connector to connect from vertical line (16 - 16 = 0 where vertical line is)
+    top: 25, // Center vertically with exercise row (50dp height / 2 = 25dp)
+    width: 16, // 16dp line from vertical to exercise card
+    height: 1,
+    backgroundColor: theme.colors.pureWhite, // White line
+  },
+
+  exerciseGroupSpacer: {
+    height: 32, // 32dp separation between different exercise groups (3 sets, 2 sets, 1 set)
+  },
+
+  exerciseList: {
+    gap: theme.spacing.s, // 8dp spacing between exercises
+  },
+
+  exerciseRow: {
+    height: 50, // 50dp total height
+    backgroundColor: theme.colors.pureBlack,
+    borderRadius: theme.spacing.s,
+    flexDirection: 'row', // Horizontal layout for image and text
+    position: 'relative', // For absolute positioning of children
+  },
+
+  exerciseImage: {
+    width: 46, // 46dp square image (50dp - 4dp for 2dp margins on all sides)
+    height: 46,
+    borderRadius: 6, // Adjusted rounding to match new image size
+    position: 'absolute',
+    top: 2, // 2dp from top
+    left: 2, // 2dp from left
+  },
+
+  exerciseInfo: {
+    position: 'absolute',
+    left: 56, // 2dp + 46dp image + 8dp spacing = 56dp from left
+    top: 0,
+    bottom: 0,
+    flexDirection: 'column', // Stack name and set count vertically
+    justifyContent: 'space-between', // Space between name (top) and set count (bottom)
+  },
+
+  exerciseName: {
+    fontSize: theme.typography.fontSize.m, // 16dp
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.actionSuccess, // Green text
+    textTransform: 'uppercase',
+    includeFontPadding: false, // Remove Android extra padding
+    lineHeight: 16, // Match font size for precise control
+    marginTop: 6, // 6dp to achieve visual 8dp (compensates for 2dp inherent spacing)
+  },
+
+  exerciseSetCount: {
+    fontSize: theme.typography.fontSize.m, // 16dp - same size as exercise name
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: theme.typography.fontWeight.bold,
+    textTransform: 'uppercase',
+    includeFontPadding: false, // Remove Android extra padding
+    lineHeight: 16, // Match font size for precise control
+    marginBottom: 6, // 6dp to achieve visual 8dp (compensates for 2dp inherent spacing)
+  },
+
+  exerciseSetLabel: {
+    color: theme.colors.textSecondary, // Gray text for "SET:", "OF"
+  },
+
+  exerciseSetNumber: {
+    // Color set dynamically based on session type via theme.colors.session{Standard|Express|Maintenance}
+  },
+
+  exerciseReps: {
+    fontSize: theme.typography.fontSize.m, // 16dp - same size as exercise name
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: theme.typography.fontWeight.bold,
+    textTransform: 'uppercase',
+    position: 'absolute',
+    right: 8, // 8dp from right edge
+    bottom: 6, // 6dp to achieve visual 8dp (compensates for 2dp inherent spacing)
+    textAlign: 'right', // Right aligned
+    includeFontPadding: false, // Remove Android extra padding
+    lineHeight: 16, // Match font size for precise control
+  },
+
+  exerciseRepsLabel: {
+    color: theme.colors.textSecondary, // Gray text for "REPS:"
+  },
+
+  exerciseRepsNumber: {
+    color: theme.colors.actionSuccess, // Green text for rep count
+  },
+
+  exerciseDetails: {
+    fontSize: theme.typography.fontSize.s, // 14dp
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: theme.typography.fontWeight.medium,
+    color: theme.colors.textSecondary, // Light gray
+    textTransform: 'uppercase',
   },
 });

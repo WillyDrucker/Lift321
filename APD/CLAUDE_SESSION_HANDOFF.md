@@ -19,92 +19,83 @@ This file contains only critical architectural patterns and current session stat
 
 ---
 
-## Current Version: 1.1.4
+## Current Version: 1.1.5
 
-**Branch**: Claude-v1.1.4
-**Status**: Font Management & Title Bar Refinements Complete
-**Last Updated**: 2025-01-19
+**Branch**: Claude-v1.1.5
+**Status**: Data-Driven Exercise System Complete
+**Last Updated**: 2025-01-22
 
 ---
 
 ## Session State
 
 ### Current Work
-- Font assets reorganized to src/assets/fonts/ for consistency
-- WorkoutOverviewScreen title bar enhanced with custom fonts and dynamic duration
-- Title bar perfectly balanced at 66dp with 100x50dp "LET'S GO!" button
-- Zuume-ExtraBold font applied to workout titles with 20% width expansion
-- All selector text changed to light gray for visual hierarchy
-- CLAUDE_DEV_STANDARDS fully applied to all modified files
-- Ready to merge to main and create v1.1.5
+- Data-driven exercise system implemented with dynamic filtering
+- Duration calculator created for workout session estimates
+- Exercise service built for session type logic (Standard/Express/Maintenance)
+- WorkoutOverviewScreen fully refactored to use dynamic data
+- Dynamic vertical line height calculation for exercise tree
+- All hardcoded colors moved to theme tokens (sessionStandard/Express/Maintenance)
+- CLAUDE_DEV_STANDARDS fully applied to all files
+- Ready to merge to main and create v1.1.6
 
 ### Completed This Session
-**v1.1.4 - Font Management & Title Bar Refinements** (2025-01-19):
-1. **Font Asset Reorganization**:
-   - Moved all fonts from `assets/fonts/` to `src/assets/fonts/`
-   - Updated react-native.config.js to point to new location
-   - Re-linked fonts with npx react-native-asset
-   - Deleted old assets/ folder for clean structure
-   - All assets now consistently under src/assets/ (fonts, images, videos)
+**v1.1.5 - Data-Driven Exercise System & Dynamic Duration** (2025-01-22):
+1. **Duration Calculator Utility** (src/utils/durationCalculator.ts):
+   - Formula: (totalSets × 5) + totalSets + 3 - 5 = (totalSets × 6) - 2
+   - Accounts for rest time (5 min/set), workout time (1 min/set), warmup (3 min), final rest removal (-5 min)
+   - Examples: Standard 6 sets = 34 min, Express 5 sets = 28 min, Maintenance 4 sets = 22 min
+   - Exported: calculateWorkoutDuration() and getWorkoutDuration() helpers
 
-2. **Zuume-ExtraBold Font Integration**:
-   - Applied to HomePage workout card titles (CHEST, ARMS, etc.)
-   - Applied to WorkoutOverviewScreen title bar "CHEST" text
-   - 20% horizontal scaling with scaleX: 1.2 transform
-   - marginLeft compensation (6dp HomePage, 14dp title bar) for transform shift
-   - Critical finding: fontWeight property breaks custom fonts (removed)
+2. **Exercise Service** (src/services/exerciseService.ts):
+   - Loads exercises from exercises.json with type-safe filtering
+   - Session type logic: Standard (3+2+1), Express (3+2), Maintenance (2+2)
+   - ProcessedExercise type tracks adjusted vs original sets
+   - getExercisesForWorkout() returns exercises, totalSets, breakdown
+   - Foundation for equipment filtering (TODO: implement)
 
-3. **Title Bar Architecture Refinement**:
-   - Height: 48dp → 66dp for perfect 8dp spacing around 50dp button
-   - "CHEST" text: 32dp Zuume-ExtraBold with scaleX: 1.2 + translateY: 1
-   - "LET'S GO!" button: 100dp x 50dp (matches HomePage BEGIN button dimensions)
-   - Padding: 8dp horizontal (bar), 16dp text alignment from left
-   - translateY: 1 for optical centering (avoids marginTop sub-pixel artifacts)
+3. **WorkoutOverviewScreen Refactoring**:
+   - Removed all hardcoded exercise JSX (180+ lines eliminated)
+   - Dynamic exercise rendering with renderExercises() helper
+   - Dynamic duration calculation updates with session selection
+   - Dynamic vertical line height adapts to exercise count
+   - Session type conversion (lowercase → PascalCase)
+   - Exercise image mapping helper (getExerciseImage)
 
-4. **Duration Selector Implementation**:
-   - Dynamic 50dp black selector between "Current Session" and session types
-   - Displays "DURATION: XX MINUTES" with color-coded values
-   - Standard: 31 MINUTES (green #00FF00)
-   - Express: 25 MINUTES (olive #77ff00)
-   - Maintenance: 19 MINUTES (yellow #ffff00)
-   - 16dp text size, bold, updates dynamically with session selection
+4. **Theme Token Enhancement**:
+   - Added session color tokens to colors.ts:
+     - sessionStandard: #00FF00 (green)
+     - sessionExpress: #77FF00 (olive)
+     - sessionMaintenance: #FFFF00 (yellow)
+   - Eliminated all hardcoded #77ff00 and #ffff00 references
 
-5. **Visual Hierarchy Improvements**:
-   - All selector text changed from white to light gray (#B0B0B0)
-   - Applies to: Plan focus, Session types, Equipment types
-   - Creates visual contrast between interactive selectors and display text
-
-6. **Spacing Precision**:
-   - "Current Plan/Session/Equipment" text: 13dp margins (compensates for 3dp font metrics)
-   - Progress bar: 16dp gap from week text, 8dp from card edges
-   - Duration selector: 8dp below "Current Session" text
-   - Session type selectors: 8dp below duration selector
-
-7. **CLAUDE_DEV_STANDARDS Compliance**:
-   - typography.ts: Forward-looking comment (purpose, not technical details)
-   - react-native.config.js: Added proper file header with description
-   - WorkoutOverviewScreen: All comments describe design intent
-   - All three files have clear section headers and documentation
+5. **CLAUDE_DEV_STANDARDS Compliance**:
+   - Updated all section headers to ============ format
+   - All comments forward-looking (design intent, not history)
+   - All magic numbers eliminated (START_OFFSET, SET_HEIGHT, etc.)
+   - Complete file headers with purpose and dependencies
 
 ### Next Session Should
-1. **Exercise Screens**: Build exercise list, detail, and tracking screens
-2. **Workout Session Flow**: Implement active workout session with set tracking
-3. **Data Persistence**: Save user selections (plan focus, session type, equipment)
-4. **Real Workout Data**: Connect actual workout data to screens
+1. **Equipment Filtering**: Implement equipment selection logic in exercise service
+2. **Rep Count Integration**: Load rep counts from plans.json based on week
+3. **Exercise Images**: Expand image mapping to cover all exercises
+4. **Session Persistence**: Save user selections (session type, equipment, plan focus)
+5. **Real-Time Logging**: Build workout session tracking with actual duration tracking
 
 ### User Decisions Made
-- Font assets belong in src/assets/fonts/ (not root assets/)
-- Custom fonts (Zuume-ExtraBold) should not use fontWeight property
-- Title bar height is 66dp for 50dp button with 8dp spacing
-- "LET'S GO!" button is 100dp wide (matches BEGIN button)
-- Duration colors: green (standard), olive (express), yellow (maintenance)
-- Selector text is light gray (#B0B0B0) for visual hierarchy
-- translateY transform for vertical positioning (not marginTop)
-- Text spacing uses margin compensation for font metrics (13dp for visual 16dp)
+- Duration formula accounts for rest, workout time, warmup, and removes final rest period
+- Session types follow Lift 3-2-1 pattern: 3-2-1 (Standard), 3-2 (Express), 2-2 (Maintenance)
+- Exercise service should select first exercise from each group (equipment filtering later)
+- Vertical line height calculated dynamically based on exercise count
+- Session colors: green (standard), olive (express), yellow (maintenance)
+- All session-specific colors belong in theme.colors as semantic tokens
 
 ---
 
 ## Previous Sessions (Recent)
+
+### v1.1.5 - Data-Driven Exercise System & Dynamic Duration (2025-01-22)
+Created complete data-driven exercise system with duration calculator utility, exercise service for session type filtering, and full WorkoutOverviewScreen refactor. Duration formula: (totalSets × 6) - 2 produces accurate estimates (34/28/22 minutes for Standard/Express/Maintenance). Exercise service implements Lift 3-2-1 logic (3+2+1, 3+2, 2+2 sets). Eliminated 180+ lines of hardcoded exercise JSX with dynamic rendering. Added session color tokens to theme. Applied CLAUDE_DEV_STANDARDS to all files.
 
 ### v1.1.4 - Font Management & Title Bar Refinements (2025-01-19)
 Reorganized font assets to src/assets/fonts/ for consistency with images/videos. Applied Zuume-ExtraBold custom font to workout titles with 20% horizontal scaling (scaleX: 1.2) and margin compensation. Refined title bar to 66dp height with 100x50dp "LET'S GO!" button. Added dynamic duration selector showing color-coded session lengths (green/olive/yellow). Changed all selector text to light gray for visual hierarchy. Applied translateY instead of marginTop to avoid sub-pixel rendering artifacts. Updated all files with CLAUDE_DEV_STANDARDS.
@@ -146,17 +137,23 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 
 ## Known Issues
 
-### Custom Font Integration (NEW)
+### Data-Driven Exercise System (NEW)
+- **Equipment filtering not implemented**: Exercise service selects first exercise from each muscle group - equipment preferences ignored
+- **Rep counts hardcoded**: Currently using 10 reps for all sets - needs integration with plans.json week progression
+- **Image mapping limited**: Only bench-press, incline-bench-press, chest-flyes mapped - needs expansion for all exercises
+- **Solution**: Implement equipment filtering in selectExerciseFromGroup(), integrate rep counts from plans.json, expand image mapping
+
+### Custom Font Integration
 - **fontWeight breaks custom fonts**: When specifying `fontWeight` on a custom font like Zuume-ExtraBold, React Native tries to find a bold variant (e.g., "Zuume-ExtraBold-Bold") which doesn't exist, causing fallback to system font
 - **Solution**: Omit fontWeight property entirely for custom fonts. The font file itself contains the weight.
 - **Pattern**: Custom fonts should only specify fontFamily, fontSize, color, transform properties
 
-### Transform Rendering (NEW)
+### Transform Rendering
 - **marginTop + scaleX causes sub-pixel artifacts**: Combining marginTop with scaleX transform can cause uneven letter heights due to sub-pixel rendering
 - **Solution**: Use translateY transform instead of marginTop for vertical positioning
 - **Pattern**: `transform: [{scaleX: 1.2}, {translateY: 1}]` instead of `scaleX: 1.2` + `marginTop: 1`
 
-### Font Metrics Spacing (NEW)
+### Font Metrics Spacing
 - **Intrinsic font spacing**: Fonts have ascent/descent metrics that add ~3dp of visual spacing
 - **Solution**: Reduce margins by 3dp to achieve desired visual spacing (13dp margin = 16dp visual)
 - **Pattern**: Use lineHeight matching fontSize + includeFontPadding: false + margin compensation
@@ -185,31 +182,49 @@ Complete first-pass tokenization: eliminated 51 magic numbers across 5 auth scre
 
 ## Quick Reference: Established Patterns
 
-### Custom Font Usage (NEW)
+### Duration Calculation (NEW)
+| Session Type | Total Sets | Calculation | Duration |
+|--------------|------------|-------------|----------|
+| **Standard** | 6 sets | (6×5) + 6 + 3 - 5 | 34 minutes |
+| **Express** | 5 sets | (5×5) + 5 + 3 - 5 | 28 minutes |
+| **Maintenance** | 4 sets | (4×5) + 4 + 3 - 5 | 22 minutes |
+
+Formula breakdown: (totalSets × 5 rest) + (totalSets × 1 workout) + 3 warmup - 5 final rest
+
+### Session Type Logic (NEW)
+| Session | Major1 | Minor1 | Tertiary | Total Sets | Example (Chest) |
+|---------|--------|--------|----------|------------|-----------------|
+| **Standard** | 3 sets | 2 sets | 1 set | 6 sets | Bench (3) + Incline (2) + Flyes (1) |
+| **Express** | 3 sets | 2 sets | 0 sets | 5 sets | Bench (3) + Incline (2) |
+| **Maintenance** | 2 sets | 2 sets | 0 sets | 4 sets | Bench (2) + Incline (2) |
+
+Pattern: Lift 3-2-1 naming comes from Standard session (3 Major, 2 Minor, 1 Tertiary)
+
+### Custom Font Usage
 | Element | Font | Transform | Margins |
 |---------|------|-----------|---------|
-| **HomePage Workout Title** | Zuume-ExtraBold 32dp | scaleX: 1.2 | marginLeft: 6 (compensate scaleX) |
-| **Title Bar "CHEST"** | Zuume-ExtraBold 32dp | scaleX: 1.2, translateY: 1 | marginLeft: 14 (8+6) |
+| **HomePage Workout Title** | Zuume-ExtraBold 36dp | scaleX: 1.2, translateY: 2 | marginLeft: 11 (compensate scaleX) |
+| **Title Bar "CHEST"** | Zuume-ExtraBold 36dp | scaleX: 1.2, translateY: 2 | marginLeft: 11 |
 | **"LET'S GO!" Button** | Roboto 20dp Bold | none | none |
 
 **Critical**: Never use `fontWeight` with custom fonts. Omit the property entirely.
 
-### Title Bar Architecture (NEW)
+### Title Bar Architecture
 | Component | Dimensions | Spacing |
 |-----------|------------|---------|
 | **Title Bar** | 66dp height | 8dp horizontal padding |
-| **"CHEST" Text** | 32dp font | 16dp from left edge (8+14-6 scaleX) |
+| **"CHEST" Text** | 36dp font | 11dp from left edge |
 | **"LET'S GO!" Button** | 100dp x 50dp | 8dp from right/top/bottom |
-| **Optical Centering** | translateY: 1 | Positions text down 1dp |
+| **Optical Centering** | translateY: 2 | Positions text down 2dp |
 
-### Duration Selector (NEW)
-| Session Type | Duration | Color |
-|--------------|----------|-------|
-| **Standard** | 31 MINUTES | Green (#00FF00) |
-| **Express** | 25 MINUTES | Olive (#77ff00) |
-| **Maintenance** | 19 MINUTES | Yellow (#ffff00) |
+### Session Colors (NEW)
+| Session Type | Duration Display | Set Numbers | Theme Token |
+|--------------|------------------|-------------|-------------|
+| **Standard** | Green (#00FF00) | Green | theme.colors.sessionStandard |
+| **Express** | Olive (#77FF00) | Olive | theme.colors.sessionExpress |
+| **Maintenance** | Yellow (#FFFF00) | Yellow | theme.colors.sessionMaintenance |
 
-Text: 16dp bold, "DURATION:" white, minutes colored dynamically
+**Pattern**: All session-specific colors use semantic theme tokens, never hardcoded hex values
 
 ### WorkoutOverviewScreen Architecture
 | Component | Purpose | Styling |
@@ -218,6 +233,7 @@ Text: 16dp bold, "DURATION:" white, minutes colored dynamically
 | **Plan Card** | Plan configuration | Current Plan + Name + Week + Focus (3 selectors) |
 | **Session Card** | Session type selection | Current Session + Duration + 3 type selectors |
 | **Equipment Card** | Equipment selection | Current Equipment + multi-toggle selectors (2 rows) |
+| **Today's Workout Card** | Dynamic exercise tree | Data-driven rendering from exercise service |
 
 ### Selector Patterns
 | Selector Type | Height | Text Size | Color | Behavior |
@@ -255,7 +271,7 @@ Text: 16dp bold, "DURATION:" white, minutes colored dynamically
 ### Workout Card System
 | Card Type | Title Format | Font | Examples |
 |-----------|--------------|------|----------|
-| **Body Part** | Uppercase green 32dp, Zuume-ExtraBold scaleX: 1.2 | Zuume-ExtraBold | CHEST, ARMS, SHOULDERS, BACK & TRIS, LEGS |
+| **Body Part** | Uppercase green 36dp, Zuume-ExtraBold scaleX: 1.2 | Zuume-ExtraBold | CHEST, ARMS, SHOULDERS, BACK & TRIS, LEGS |
 | **Specialized** | White text | Roboto | Custom Workout, Work-As-You-Go, SuperSet Mode, Partner Mode |
 
 ### Card Scrolling Pattern
@@ -269,13 +285,14 @@ Text: 16dp bold, "DURATION:" white, minutes colored dynamically
 |-------|---------|----------|
 | **Components** | Reusable UI (ShadowButton, FormInput, WorkoutCard, etc.) | src/components/ |
 | **Features** | Screen-specific logic (WorkoutOverviewScreen, HomePage) | src/features/ |
-| **Services** | Backend operations (authService, BaseService) | src/services/ |
+| **Services** | Backend operations (authService, exerciseService, BaseService) | src/services/ |
 | **Navigation** | Type-safe routing (useTypedNavigation, navigationService) | src/navigation/ |
-| **Utils** | Pure functions (dateUtils, validationUtils, formatUtils) | src/utils/ |
+| **Utils** | Pure functions (dateUtils, validationUtils, formatUtils, durationCalculator) | src/utils/ |
 | **Hooks** | Reusable logic (useFormInput, useAnimation, useWeekCalendar, useSwipeGesture) | src/hooks/ |
 | **Theme** | Design tokens (colors, spacing, typography, layout) | src/theme/ |
 | **Constants** | App config (API_TIMEOUT, STORAGE_KEYS, ERROR_MESSAGES) | src/constants/ |
 | **Assets** | Static files (fonts, images, videos) | src/assets/ |
+| **Data** | JSON data files (exercises.json, plans.json) | src/data/ |
 
 ### Component Library
 | Component | Purpose | Props |
@@ -295,37 +312,29 @@ Text: 16dp bold, "DURATION:" white, minutes colored dynamically
 | **EmptyState** | No data UI | title?, message, actionText?, onAction?, fullScreen? |
 | **ErrorBoundary** | Crash protection | children, fallback? |
 
-### Navigation System
-| Hook/Service | Purpose | Usage |
-|--------------|---------|-------|
-| **useTypedNavigation** | Type-safe navigation | navigation.navigate('HomePage') |
-| **useTypedRoute<T>** | Type-safe route params | const {workoutType} = route.params |
-| **useNavigationActions** | Common shortcuts | goBack(), goToHome(), reset() |
-| **navigationService** | Imperative navigation | navigationService.navigate('HomePage') |
-| **useAuthGuard** | Protect authenticated screens | if (!isAllowed) return null |
-| **useGuestGuard** | Redirect if authenticated | Used in LoginScreen |
-
-### Service Layer
+### Service Layer (NEW)
 | Service/Utility | Purpose | Usage |
 |-----------------|---------|-------|
 | **authService** | Authentication operations | authService.signIn(credentials) |
+| **exerciseService** | Exercise data loading/filtering | getExercisesForWorkout(bodyPart, sessionType) |
 | **BaseService** | Generic CRUD operations | Extend for any table |
 | **apiUtils** | Response/error handling | handleSupabaseQuery(queryFn) |
 | **Type Guards** | Response checking | if (isApiSuccess(result)) {...} |
 | **ApiResult<T>** | Unified response format | {data, error, status} |
 
-### Utilities
+### Utilities (NEW)
 | Utility | Functions | Examples |
 |---------|-----------|----------|
 | **dateUtils** | 20+ date functions | formatDateShort, getWeekDates, isToday |
 | **validationUtils** | 15+ validators | validateEmail, validatePasswordStrength |
 | **formatUtils** | 25+ formatters | formatCurrency, formatPhoneNumber, pluralize |
 | **envUtils** | Environment helpers | requireEnv(), getEnv(), isDevelopment() |
+| **durationCalculator** | Workout duration estimates | calculateWorkoutDuration({totalSets}), getWorkoutDuration(totalSets) |
 
 ### Design Token Modules
 | Module | Purpose |
 |--------|---------|
-| `theme.colors` | Semantic colors (primary, primaryMuted, pureBlack, pureWhite, actionSuccess, textSecondary, backgroundTertiary, googleBlue, facebookBlue, shadowBlack) |
+| `theme.colors` | Semantic colors (primary, sessionStandard/Express/Maintenance, actionSuccess, textSecondary, backgroundTertiary, googleBlue, facebookBlue, shadowBlack) |
 | `theme.spacing` | xs/s/m/l/xl/xxl + safeZone/safeZoneHorizontal/textLineGap/buttonSpacing (16dp rhythm) |
 | `theme.typography` | Fonts (brand/workoutCard/workoutTitle/primary), sizes (xs/s/m/l/xl/xxl/xxxl/display/mega), weights |
 | `theme.textShadows` | default/subtle/strong |
@@ -341,7 +350,7 @@ Text: 16dp bold, "DURATION:" white, minutes colored dynamically
 | **Absolute Imports** | Use `@/` aliases - NO relative imports |
 | **TypeScript Strict** | Explicit types - NO `any` (unless absolutely necessary) |
 | **Context Pattern** | Never expose Context directly - Always via custom hook with memoization |
-| **Service Layer** | Never query Supabase from components - Always via service layer |
+| **Service Layer** | Never query backend/JSON from components - Always via service layer |
 | **Navigation** | Use typed hooks (useTypedNavigation) - NOT React Navigation hooks directly |
 | **Forward-Looking Comments** | Comments explain design intent, not historical changes or fixes |
 | **Component Library** | Use existing components before creating new ones |
@@ -354,13 +363,30 @@ Text: 16dp bold, "DURATION:" white, minutes colored dynamically
 
 ### Component Structure Sections
 ```typescript
-// === TYPES ===
-// === COMPONENT ===
-// === STATE ===
-// === HOOKS ===
-// === EVENT HANDLERS ===
-// === RENDER ===
-// === STYLES === (use theme.* tokens exclusively)
+// ============================================================================
+// TYPES
+// ============================================================================
+// ============================================================================
+// COMPONENT
+// ============================================================================
+// ==========================================================================
+// STATE
+// ==========================================================================
+// ==========================================================================
+// COMPUTED VALUES
+// ==========================================================================
+// ==========================================================================
+// HELPER FUNCTIONS
+// ==========================================================================
+// ==========================================================================
+// EVENT HANDLERS
+// ==========================================================================
+// ==========================================================================
+// RENDER
+// ==========================================================================
+// ============================================================================
+// STYLES
+// ============================================================================
 ```
 
 ### File Header Format
@@ -378,34 +404,38 @@ Text: 16dp bold, "DURATION:" white, minutes colored dynamically
 ## Environment & Critical Info
 
 ### Configured
-✅ Supabase (.env with credentials) | ✅ react-native-config | ✅ URL polyfill | Metro (8081) | GitHub synced | All deps installed | Android device testing | Gradle 9.2.0 | **Fonts (Bebas Neue, Zuume-ExtraBold, Roboto in src/assets/fonts/)** | **Design tokens complete** | **Component library established** | **Service layer complete** | **Navigation system complete** | **Utils/hooks infrastructure complete** | **Production readiness framework complete** | **Guest login system** | **GitHub issues (18 created)** | **HomePage workout cards & scrolling complete** | **JSON workout data layer** | **WorkoutOverviewScreen with duration selector complete**
+✅ Supabase (.env with credentials) | ✅ react-native-config | ✅ URL polyfill | Metro (8081) | GitHub synced | All deps installed | Android device testing | Gradle 9.2.0 | **Fonts (Bebas Neue, Zuume-ExtraBold, Roboto in src/assets/fonts/)** | **Design tokens complete** | **Component library established** | **Service layer complete** | **Navigation system complete** | **Utils/hooks infrastructure complete** | **Production readiness framework complete** | **Guest login system** | **GitHub issues (18 created)** | **HomePage workout cards & scrolling complete** | **JSON workout data layer** | **WorkoutOverviewScreen with dynamic exercises complete** | **Duration calculator** | **Exercise service with session logic**
 
 ### Not Yet Set Up
-DB schema/tables | Supabase Auth config | TS types from DB | Actual authentication implementation (authService exists but not integrated) | Exercise detail screens | Workout tracking screens | Data persistence for user selections
+DB schema/tables | Supabase Auth config | TS types from DB | Actual authentication implementation (authService exists but not integrated) | Equipment filtering | Rep count progression | Exercise detail screens | Workout tracking screens | Data persistence for user selections
 
 ### Critical Paths
 - **Project Root**: C:\Dev\Lift321 (ACTIVE DEV)
 - **Font Assets**: C:\Dev\Lift321\src\assets\fonts/ (Bebas Neue, Zuume-ExtraBold, Roboto, others)
+- **Exercise Data**: C:\Dev\Lift321\src\data/exercises.json (all exercise definitions)
+- **Plan Data**: C:\Dev\Lift321\src\data/plans.json (rep progression, plan details)
 - **GitHub**: https://github.com/WillyDrucker/Lift321
 - **GitHub Issues**: 8 EPICs + 10 features/tasks tracking future work
 - **Historical Context**: Fresh React Native build informed by previous project learnings (reference code at C:\Dev\Wills321 - untouched)
-- **Branch**: Claude-v1.1.4 (Font management & title bar refinements complete, ready to merge)
+- **Branch**: Claude-v1.1.5 (Data-driven exercise system complete, ready to merge)
 
 ### Next Steps
-1. **Merge v1.1.4 to main**: Complete font and title bar refinements
-2. **Create v1.1.5**: Start next feature development
-3. **Build Exercise Screens**: Create exercise list, detail, and tracking screens
-4. **Workout Session Flow**: Implement active workout session with set tracking
-5. **State Management**: Implement persistence for user selections
-6. **Leverage Framework**:
+1. **Merge v1.1.5 to main**: Complete data-driven exercise system
+2. **Create v1.1.6**: Start next feature development
+3. **Equipment Filtering**: Implement equipment selection logic in exercise service
+4. **Rep Count Integration**: Load rep counts from plans.json based on week
+5. **Exercise Images**: Expand image mapping for all exercises
+6. **Workout Session Flow**: Implement active workout session with set tracking
+7. **State Management**: Implement persistence for user selections
+8. **Leverage Framework**:
    - Import components from @/components
    - Use navigation hooks from @/navigation
-   - Call services from @/services
-   - Use utilities from @/utils
+   - Call services from @/services (exerciseService, authService)
+   - Use utilities from @/utils (durationCalculator, dateUtils, etc.)
    - Follow established patterns
 
 ---
 
-**Version**: 1.1.4
-**Last Updated**: 2025-01-19
-**Status**: Font Management & Title Bar Refinements Complete - Ready to Merge and Continue
+**Version**: 1.1.5
+**Last Updated**: 2025-01-22
+**Status**: Data-Driven Exercise System Complete - Ready to Merge and Continue
