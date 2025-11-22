@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: theme.layout.planProgress.height,
-    backgroundColor: theme.colors.backgroundPrimary,
+    backgroundColor: theme.colors.pureBlack, // Pure black background (global standard)
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: theme.spacing.m,

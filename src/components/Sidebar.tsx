@@ -22,6 +22,7 @@ import {
   StatusBar,
 } from 'react-native';
 import {theme} from '@/theme';
+import {authService, isGuestMode} from '@/services';
 
 // === TYPES ===
 
@@ -50,6 +51,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const slideAnim = externalSlideAnim || internalSlideAnim;
   const overlayOpacity = externalOverlayOpacity || internalOverlayOpacity;
   const [modalVisible, setModalVisible] = useState(false);
+  const [userEmail, setUserEmail] = useState<string>('');
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isAnimatingRef = useRef(false);
   const screenWidth = Dimensions.get('window').width;
@@ -139,6 +141,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ).current;
 
   // === HOOKS ===
+
+  // Fetch user email on mount
+  useEffect(() => {
+    const fetchUserEmail = async () => {
+      try {
+        // Check if guest mode
+        const isGuest = await isGuestMode();
+        if (isGuest) {
+          setUserEmail('Guest');
+          return;
+        }
+
+        // Get authenticated user
+        const result = await authService.getCurrentUser();
+        if (result.status === 'success' && result.data.email) {
+          setUserEmail(result.data.email);
+        } else {
+          setUserEmail('User');
+        }
+      } catch (error) {
+        console.error('Failed to fetch user email:', error);
+        setUserEmail('User');
+      }
+    };
+
+    fetchUserEmail();
+  }, []);
+
   useEffect(() => {
     if (visible) {
       // Clear any pending close timeout
@@ -264,8 +294,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               resizeMode="contain"
             />
 
-            {/* Username */}
-            <Text style={styles.username}>Username</Text>
+            {/* User Email */}
+            <Text style={styles.username}>{userEmail}</Text>
           </View>
 
           {/* Menu Items */}

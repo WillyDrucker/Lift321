@@ -19,7 +19,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {theme} from '@/theme';
 import type {RootStackScreenProps} from '@/navigation/types';
 import {
@@ -45,6 +45,7 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
   // === STATE ===
   // Component state management
 
+  const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<TabItem>('home');
   const [selectedDay, setSelectedDay] = useState<string>('');
   const [welcomeVisible, setWelcomeVisible] = useState<boolean>(true);
@@ -56,6 +57,12 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
   const planName = 'Lift 3-2-1';
   const totalWorkouts = 36; // 12 weeks × 3 days/week
   const completedWorkouts = 3; // Week 1 complete (3 days)
+
+  // Calculate dynamic bottom padding to match BottomTabBar height
+  // The dynamicHeight already accounts for safe area - no need to add insets again
+  const dynamicBottomTabHeight = insets.bottom > theme.layout.bottomNav.gestureNavThreshold
+    ? theme.layout.bottomNav.height + theme.layout.bottomNav.buttonNavExtraHeight
+    : theme.layout.bottomNav.height;
 
   // === HOOKS ===
   // Swipe gesture for welcome box dismissal
@@ -153,11 +160,15 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
         {/* Scrollable Content Area */}
         <ScrollView
           style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[
+            styles.scrollContent,
+            {paddingBottom: dynamicBottomTabHeight + theme.spacing.s}
+          ]}
           showsVerticalScrollIndicator={false}
           snapToInterval={256 + 40} // Snap to each workout section (card height + header)
           decelerationRate="fast"
           snapToAlignment="start"
+          directionalLockEnabled={true}
         >
           {/* Welcome Box */}
           <WelcomeBox
@@ -188,22 +199,6 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
 
         {/* Fixed Top Navigation (renders above ScrollView) */}
         <View style={styles.topBarsContainer}>
-          {/* Gradient overlay from top to calendar bar */}
-          <LinearGradient
-            colors={[
-              theme.colors.pureBlack,      // #000000
-              '#050505',
-              '#0A0A0A',
-              '#0F0F0F',
-              '#141414',
-              '#191919',
-              theme.colors.backgroundPrimary, // #1E1E1E
-            ]}
-            locations={[0, 0.15, 0.3, 0.45, 0.6, 0.8, 1]}
-            style={styles.topGradient}
-            pointerEvents="none"
-          />
-
           <TopNavBar
             onSearchPress={handleSearchPress}
             onMenuPress={handleMenuPress}
@@ -258,16 +253,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 10, // Fixed bars layer above scrollable content
-    // Background provided by gradient overlay - no solid backgroundColor needed
-  },
-
-  topGradient: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: theme.layout.weekCalendar.topPosition + theme.layout.weekCalendar.height, // Gradient extends through calendar bar (80dp + 32dp = 112dp)
-    zIndex: 0, // Behind navigation elements but above background
+    backgroundColor: theme.colors.pureBlack, // Pure black background (global standard)
   },
 
   divider: {
@@ -281,7 +267,7 @@ const styles = StyleSheet.create({
 
   scrollContent: {
     paddingTop: theme.layout.planProgress.topPosition + theme.layout.planProgress.height, // Scrollable content starts below fixed progress bar
-    paddingBottom: theme.layout.bottomNav.height + theme.spacing.s, // 8dp clearance from bottom tab bar
+    // paddingBottom is set dynamically via inline style to match BottomTabBar height (accounts for safe area insets)
   },
 
   sectionHeader: {
@@ -293,6 +279,7 @@ const styles = StyleSheet.create({
   sectionHeaderText: {
     fontSize: theme.typography.fontSize.m,
     fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.pureWhite,
   },
 });

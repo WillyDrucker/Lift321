@@ -41,7 +41,8 @@ export const SignUpStep2Screen: React.FC<SignUpStep2ScreenProps> = ({
   };
 
   const handleNext = () => {
-    navigation.navigate('WelcomeScreen');
+    // Navigate to account creation
+    navigation.navigate('CreateAccountScreen');
   };
 
   // === RENDER ===
@@ -75,7 +76,7 @@ export const SignUpStep2Screen: React.FC<SignUpStep2ScreenProps> = ({
           <View style={styles.header}>
             <Pressable onPress={handleBack} style={styles.backButton}>
               <LeftChevron
-                size={theme.layout.icon.large}
+                size={theme.layout.topNav.backIconSize}
                 color={theme.colors.textPrimary}
               />
             </Pressable>

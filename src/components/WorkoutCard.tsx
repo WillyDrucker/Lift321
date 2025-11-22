@@ -44,6 +44,9 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(
     const workoutImage = getWorkoutImage(workoutType);
     const isBodyPartWorkout = isBodyPart(workoutType);
 
+    // Get color for custom workout types
+    const customWorkoutColor = getCustomWorkoutColor(workoutType);
+
     // Consistent card width for smooth scrolling
     const cardWidth = 330;
 
@@ -62,6 +65,8 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(
             style={[
               styles.workoutTitle,
               isBodyPartWorkout && styles.bodyPartTitle,
+              !isBodyPartWorkout && styles.customWorkoutTitle,
+              !isBodyPartWorkout && customWorkoutColor && {color: customWorkoutColor},
             ]}
           >
             {workoutTitle}
@@ -89,7 +94,10 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(
           <View style={[styles.beginButtonShadow, styles.shadowLayer1]} />
           {/* Actual Button */}
           <TouchableOpacity
-            style={styles.beginButton}
+            style={[
+              styles.beginButton,
+              !isBodyPartWorkout && customWorkoutColor && {backgroundColor: customWorkoutColor},
+            ]}
             onPress={() => navigation.navigate('WorkoutOverview', {workoutType})}
             activeOpacity={0.8}
           >
@@ -132,6 +140,28 @@ const getWorkoutTitle = (workoutType: WorkoutType): string => {
  */
 const isBodyPart = (workoutType: WorkoutType): workoutType is BodyPart => {
   return ['Chest', 'Arms', 'Shoulders', 'Back & Tris', 'Legs'].includes(workoutType);
+};
+
+/**
+ * Gets custom workout color based on workout type
+ */
+const getCustomWorkoutColor = (workoutType: WorkoutType): string | null => {
+  if (isBodyPart(workoutType)) {
+    return null;
+  }
+
+  switch (workoutType) {
+    case 'Custom':
+      return '#0099FF'; // Blue
+    case 'Work-As-You-Go':
+      return '#0099FF'; // Blue
+    case 'SuperSet':
+      return '#FFFF00'; // Yellow
+    case 'Partner Mode':
+      return '#00ffee'; // Cyan
+    default:
+      return null;
+  }
 };
 
 /**
@@ -178,7 +208,7 @@ const styles = StyleSheet.create({
   },
 
   headerArea: {
-    height: 64, // Fixed header area for card title
+    height: 48, // Fixed header area for card title (reduced from 64dp)
     paddingLeft: theme.layout.recommendedWorkout.paddingLeft,
     paddingTop: 0, // Vertical centering handled by justifyContent
     justifyContent: 'center', // Center title vertically in header
@@ -192,13 +222,28 @@ const styles = StyleSheet.create({
   },
 
   bodyPartTitle: {
-    fontSize: theme.typography.fontSize.xxxl,
+    fontSize: 36, // 36dp for primary workouts
     fontFamily: theme.typography.fontFamily.workoutCard,
     color: theme.colors.actionSuccess,
     textTransform: 'uppercase',
     includeFontPadding: false, // Eliminate Android font padding for precise alignment
-    transform: [{scaleX: 1.2}], // 20% wider for enhanced visual impact
-    marginLeft: 6, // Compensate for scaleX left shift to maintain 16dp alignment
+    transform: [{scaleX: 1.2}, {translateY: 2}], // 20% wider + 2dp down for balanced vertical centering (32px = ~11dp)
+    marginLeft: 11, // 11dp left margin to match balanced vertical spacing
+    textShadowColor: theme.colors.shadowBlack, // Black shadow
+    textShadowOffset: {width: 0, height: 2}, // Drop shadow 2dp down
+    textShadowRadius: 4, // Shadow blur radius
+  },
+
+  customWorkoutTitle: {
+    fontSize: 36, // 36dp to match primary workouts
+    fontFamily: theme.typography.fontFamily.workoutCard, // Same font as primary workouts (Zuume-ExtraBold)
+    textTransform: 'uppercase', // All caps
+    includeFontPadding: false, // Eliminate Android font padding for precise alignment
+    transform: [{scaleX: 1.2}, {translateY: 2}], // 20% wider + 2dp down for balanced vertical centering
+    marginLeft: 22, // Adjusted to maintain 16dp visual alignment from card edge
+    textShadowColor: theme.colors.shadowBlack, // Black shadow
+    textShadowOffset: {width: 0, height: 2}, // Drop shadow 2dp down
+    textShadowRadius: 4, // Shadow blur radius
   },
 
   imageArea: {

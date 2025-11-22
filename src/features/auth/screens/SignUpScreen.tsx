@@ -62,7 +62,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({navigation}) => {
           {/* Back Button - 64dp from bottom */}
           <View style={styles.header}>
             <Pressable onPress={handleBack} style={styles.backButton}>
-              <LeftChevron size={32} color={theme.colors.textPrimary} />
+              <LeftChevron size={theme.layout.topNav.backIconSize} color={theme.colors.textPrimary} />
             </Pressable>
           </View>
 

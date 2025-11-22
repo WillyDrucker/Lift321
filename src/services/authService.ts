@@ -82,11 +82,20 @@ class AuthService {
         return handleSupabaseError(error);
       }
 
-      if (!data.user || !data.session) {
+      if (!data.user) {
         return createErrorResponse(
-          'Sign up succeeded but user or session is missing',
+          'Sign up failed - no user data returned',
           'UNKNOWN_ERROR',
         );
+      }
+
+      // If session is null, email confirmation is required
+      // This is normal behavior when Supabase email confirmation is enabled
+      if (!data.session) {
+        return createSuccessResponse({
+          user: data.user,
+          session: null as any, // Session will be created after email confirmation
+        });
       }
 
       return createSuccessResponse({

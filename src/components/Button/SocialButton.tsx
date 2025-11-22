@@ -20,6 +20,7 @@ export type SocialButtonProps = {
   provider: SocialProvider;
   onPress: () => void;
   style?: ViewStyle;
+  actionText?: 'CONTINUE' | 'SIGN UP'; // Defaults to 'CONTINUE'
 };
 
 // === CONFIGURATION ===
@@ -27,7 +28,7 @@ export type SocialButtonProps = {
 const PROVIDER_CONFIG = {
   google: {
     logo: 'G',
-    text: 'CONTINUE WITH GOOGLE',
+    name: 'GOOGLE',
     backgroundColor: theme.colors.pureWhite,
     textColor: theme.colors.pureBlack,
     logoColor: theme.colors.googleBlue,
@@ -35,7 +36,7 @@ const PROVIDER_CONFIG = {
   },
   facebook: {
     logo: 'f',
-    text: 'CONTINUE WITH FACEBOOK',
+    name: 'FACEBOOK',
     backgroundColor: theme.colors.facebookBlue,
     textColor: theme.colors.pureWhite,
     logoColor: theme.colors.pureWhite,
@@ -49,8 +50,10 @@ export const SocialButton: React.FC<SocialButtonProps> = ({
   provider,
   onPress,
   style,
+  actionText = 'CONTINUE',
 }) => {
   const config = PROVIDER_CONFIG[provider];
+  const buttonText = `${actionText} WITH ${config.name}`;
 
   return (
     <Pressable
@@ -65,7 +68,7 @@ export const SocialButton: React.FC<SocialButtonProps> = ({
         {config.logo}
       </Text>
       <Text style={[styles.text, {color: config.textColor}]}>
-        {config.text}
+        {buttonText}
       </Text>
     </Pressable>
   );

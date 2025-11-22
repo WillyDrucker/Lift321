@@ -14,9 +14,10 @@ import {LoginScreen} from '@/features/auth/screens/LoginScreen';
 import {LoginFormScreen} from '@/features/auth/screens/LoginFormScreen';
 import {SignUpScreen} from '@/features/auth/screens/SignUpScreen';
 import {SignUpStep2Screen} from '@/features/auth/screens/SignUpStep2Screen';
+import {CreateAccountScreen} from '@/features/auth/screens/CreateAccountScreen';
 import {WelcomeScreen} from '@/features/auth/screens/WelcomeScreen';
 import type {AuthStackParamList} from './types';
-import {defaultTransition, modalTransition, noGestureOptions} from './transitions';
+import {defaultTransition, noGestureOptions} from './transitions';
 
 // === TYPES ===
 
@@ -47,12 +48,9 @@ export const AuthNavigator: React.FC<AuthNavigatorProps> = () => {
         options={noGestureOptions}
       />
       <Stack.Screen name="LoginFormScreen" component={LoginFormScreen} />
-      <Stack.Screen
-        name="SignUpScreen"
-        component={SignUpScreen}
-        options={modalTransition}
-      />
+      <Stack.Screen name="SignUpScreen" component={SignUpScreen} />
       <Stack.Screen name="SignUpStep2Screen" component={SignUpStep2Screen} />
+      <Stack.Screen name="CreateAccountScreen" component={CreateAccountScreen} />
       <Stack.Screen
         name="WelcomeScreen"
         component={WelcomeScreen}

@@ -55,7 +55,7 @@ export const DefaultScreenLayout: React.FC<DefaultScreenLayoutProps> = ({
             <Pressable
               onPress={onBack}
               style={({pressed}) => [styles.backButton, pressed && styles.backButtonPressed]}>
-              <LeftChevron size={theme.layout.icon.large} color={theme.colors.textPrimary} />
+              <LeftChevron size={theme.layout.topNav.backIconSize} color={theme.colors.textPrimary} />
             </Pressable>
           )}
 

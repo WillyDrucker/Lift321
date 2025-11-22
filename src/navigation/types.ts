@@ -18,6 +18,7 @@ export type AuthStackParamList = {
   LoginFormScreen: undefined;
   SignUpScreen: undefined;
   SignUpStep2Screen: undefined;
+  CreateAccountScreen: undefined;
   WelcomeScreen: undefined;
 };
 

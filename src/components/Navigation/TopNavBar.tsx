@@ -55,7 +55,7 @@ export const TopNavBar: React.FC<TopNavBarProps> = React.memo(
                   pressed && styles.pressed,
                 ]}>
                 <LeftChevron
-                  size={theme.layout.icon.large}
+                  size={theme.layout.topNav.backIconSize}
                   color={theme.colors.textPrimary}
                 />
               </Pressable>
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: theme.layout.topNav.topSpacing,
-    backgroundColor: 'transparent', // Transparent to allow gradient from HomePage
+    backgroundColor: theme.colors.pureBlack, // Pure black background (global standard)
   },
 
   container: {
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: theme.layout.topNav.height,
-    backgroundColor: 'transparent', // Transparent to allow gradient from HomePage
+    backgroundColor: theme.colors.pureBlack, // Pure black background (global standard)
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
