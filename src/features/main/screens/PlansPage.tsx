@@ -178,7 +178,7 @@ export const PlansPage: React.FC<PlansPageProps> = ({navigation}) => {
       <Sidebar
         visible={sidebarVisible}
         onClose={() => setSidebarVisible(false)}
-        onOptionSelect={handleSidebarSelect}
+        onSelect={handleSidebarSelect}
       />
     </SafeAreaView>
   );
