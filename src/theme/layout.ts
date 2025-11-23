@@ -97,6 +97,20 @@ export const layout = {
     marginBottom: 16, // Space below card
     borderRadius: 12, // Corner radius for card
     exerciseSpacing: 12, // Space between exercise items
+    animation: {
+      entranceDuration: 500, // Card entrance animation duration (ms)
+      entranceStaggerDelay: 100, // Delay between each card animation (ms)
+      entranceDistance: 30, // Slide-up distance for entrance (px)
+      pressScaleMin: 0.98, // Scale when card is pressed
+      buttonPressScaleMin: 0.95, // Scale when BEGIN button is pressed
+      pressSpringFriction: 3, // Spring friction for press animations (lower = more bounce)
+      // Scroll-based animations
+      scrollScaleMin: 0.90, // Minimum scale when card is at edges during scroll (10% reduction for clear visibility)
+      scrollScaleMax: 1.02, // Maximum scale when card is centered during scroll (slight emphasis on center)
+      scrollOpacityMin: 0.75, // Minimum opacity when card is at edges during scroll (softer fade, more premium)
+      scrollOpacityMax: 1.0, // Maximum opacity when card is centered during scroll
+      parallaxDistance: 40, // Horizontal parallax translation distance for images (12% of card width for depth)
+    },
   },
 
   // === TOP BAR ===
@@ -210,22 +224,16 @@ export const layout = {
 
   // === SIDEBAR DRAWER ===
   sidebar: {
-    widthPercentage: 80, // Sidebar width as percentage of screen (increased to prevent background showing)
-    animationDuration: 150, // Slide animation duration in ms (reduced for snappier feel)
+    widthPercentage: 80, // Sidebar width as percentage of screen
     itemPaddingVertical: 16, // Vertical padding for menu items
     itemPaddingHorizontal: 24, // Horizontal padding for menu items
     headerPaddingTop: 48, // Top padding for header section
     headerPaddingBottom: 24, // Bottom padding for header section
     logoMarginBottom: 12, // Space between logo and username
     usernameMarginBottom: 24, // Space between username and first menu item
-    // Gesture thresholds
-    gestureActivationThreshold: 5, // Minimum movement (px) to activate swipe gesture
-    gestureDirectionThreshold: 10, // Minimum movement (px) to determine swipe direction
-    swipeDismissThresholdPercentage: 0.3, // Percentage of width required to trigger dismiss
-    swipeVelocityThreshold: 0.5, // Minimum velocity to trigger quick dismiss
-    // Spring animation physics (less bouncy)
-    springTension: 80, // Spring animation tension (lower = less bouncy)
-    springFriction: 12, // Spring animation friction (higher = more damping, less bounce)
+    // Gesture thresholds (for react-native-gesture-handler)
+    swipeDismissThresholdPercentage: 0.3, // Percentage of width required to trigger dismiss (30%)
+    swipeVelocityThreshold: 0.5, // Minimum velocity to trigger quick dismiss (px/ms)
   },
 
   // === INTERACTION FEEDBACK ===

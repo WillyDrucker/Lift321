@@ -11,6 +11,7 @@
 import React, {useEffect, useState, useCallback} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {
   ActivityIndicator,
   View,
@@ -98,17 +99,23 @@ const App: React.FC<AppProps> = () => {
 
   // Main app with auth-based navigator switching
   return (
-    <SafeAreaProvider>
-      <NavigationContainer ref={navigationRef}>
-        {isAuth ? <MainNavigator /> : <AuthNavigator />}
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={styles.flex}>
+      <SafeAreaProvider>
+        <NavigationContainer ref={navigationRef}>
+          {isAuth ? <MainNavigator /> : <AuthNavigator />}
+        </NavigationContainer>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 };
 
 // === STYLES ===
 
 const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
+
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
