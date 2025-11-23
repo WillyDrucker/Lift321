@@ -59,9 +59,40 @@ export const supabase = hasValidCredentials()
   : // Mock client for development without Supabase credentials
     ({
       auth: {
+        signUp: async () => ({
+          data: {user: null, session: null},
+          error: {
+            message: 'Supabase credentials not configured - signUp is disabled',
+            status: 500,
+          },
+        }),
+        signInWithPassword: async () => ({
+          data: {user: null, session: null},
+          error: {
+            message: 'Supabase credentials not configured - sign in is disabled',
+            status: 500,
+          },
+        }),
+        signOut: async () => ({error: null}),
         getUser: async () => ({data: {user: null}, error: null}),
         getSession: async () => ({data: {session: null}, error: null}),
-        signOut: async () => ({error: null}),
+        resetPasswordForEmail: async () => ({
+          data: null,
+          error: {
+            message: 'Supabase credentials not configured - password reset is disabled',
+            status: 500,
+          },
+        }),
+        updateUser: async () => ({
+          data: {user: null},
+          error: {
+            message: 'Supabase credentials not configured - update user is disabled',
+            status: 500,
+          },
+        }),
+        onAuthStateChange: () => ({
+          data: {subscription: {unsubscribe: () => {}}},
+        }),
       },
     } as any);
 

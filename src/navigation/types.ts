@@ -26,6 +26,7 @@ export type AuthStackParamList = {
 // Main application screens (authenticated users only)
 export type MainStackParamList = {
   HomePage: undefined;
+  PlansPage: undefined;
   ProfileScreen: undefined;
   SettingsScreen: undefined;
   HelpScreen: undefined;
