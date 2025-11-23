@@ -99,7 +99,7 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(
               !isBodyPartWorkout && customWorkoutColor && {backgroundColor: customWorkoutColor},
             ]}
             onPress={() => navigation.navigate('WorkoutOverview', {workoutType})}
-            activeOpacity={0.8}
+            activeOpacity={theme.layout.interaction.cardActiveOpacity}
           >
             <Text style={styles.beginButtonText}>BEGIN</Text>
           </TouchableOpacity>

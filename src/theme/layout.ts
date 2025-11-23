@@ -183,6 +183,13 @@ export const layout = {
     topPositionWithoutWelcome: 396, // Position when welcome dismissed (130dp + 256dp + 10dp spacing)
   },
 
+  // === PLAN CARDS ===
+  // Training plan selection cards on PlansPage (smaller than workout cards)
+  planCard: {
+    height: 128, // Compact card height (smaller than workout cards for denser plan browsing)
+    width: 330, // Same width as workout cards for consistent horizontal scrolling
+  },
+
   // === DAY CALENDAR ADJUSTMENTS ===
   // Fine-tuning for day calendar text positioning
   dayCalendar: {
@@ -231,7 +238,8 @@ export const layout = {
   // === INTERACTION FEEDBACK ===
   // Standard values for touch interaction visual feedback
   interaction: {
-    pressedOpacity: 0.6, // Opacity reduction for pressed state
+    pressedOpacity: 0.6, // Opacity reduction for pressed state (darker press feedback)
+    cardActiveOpacity: 0.8, // Lighter press feedback for card components (subtle touch response)
     pressedScale: 0.9, // Scale reduction for pressed state
     tripleTapCount: 3, // Number of taps required for triple-tap gesture
   },

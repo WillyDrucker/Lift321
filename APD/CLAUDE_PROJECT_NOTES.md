@@ -16,6 +16,253 @@ This file contains the historical record of version changes for Lift 3-2-1. Deta
 
 ## Version History
 
+### v1.1.7 - PlansPage Implementation (2025-11-22)
+**Branch**: Claude-v1.1.7
+
+**Summary**: Created complete PlansPage with 11 plan cards across 2 scrollable sections ("Lift 321 Plans" with 8 plans + "Popular Plans" with 3 plans). Built PlanCard component (330×128dp simple cards with plan names) and PlanCardsScroller component (horizontal scrolling with 8dp peeks and snap-to-card). Full HomePage-mirrored layout with fixed top bars, bottom tabs, and scrollable content. Bidirectional bottom tab navigation between HomePage ↔ PlansPage. Fixed critical Supabase mock client bug preventing CreateAccountScreen signUp. Added theme tokens for plan cards and card interaction feedback. Applied CLAUDE_DEV_STANDARDS to all v1.1.7 files. Created GitHub issue #20 for future Coach/Training Plan integration feature.
+
+**What Was Built**:
+- **Supabase Mock Client Fix** (src/services/supabaseClient.ts):
+  - **Problem**: User's son got "supabase.auth.signUp is not a function" error when trying to create account
+  - **Root Cause**: Mock client (used when credentials not configured) only had 3 auth methods: getUser, getSession, signOut
+  - **Solution**: Added all missing auth methods to mock client:
+    - `signUp()`: Returns error message "Supabase credentials not configured - signUp is disabled"
+    - `signInWithPassword()`: Returns error message for sign in disabled
+    - `resetPasswordForEmail()`: Returns error message for password reset disabled
+    - `updateUser()`: Returns error message for update user disabled
+    - `onAuthStateChange()`: Returns mock subscription with unsubscribe function
+  - **Impact**: CreateAccountScreen now shows proper error UI instead of crashing
+  - **Note**: Real Supabase client (with valid credentials) already had all methods - only mock needed fixing
+
+- **PlanCard Component** (src/components/PlanCard.tsx):
+  - **Design**: Simple 330dp × 128dp card with plan name in upper left corner
+  - **Styling**:
+    - Roboto Bold font (theme.typography.fontFamily.primary)
+    - 20dp font size (theme.typography.fontSize.l)
+    - Pure white text (theme.colors.pureWhite)
+    - UPPERCASE transform via textTransform style
+    - 16dp padding (theme.spacing.cardPadding)
+    - Solid background (theme.colors.backgroundCard)
+    - Subtle 1dp border (theme.layout.border.thin)
+    - 8dp border radius (theme.layout.recommendedWorkout.borderRadius)
+  - **Interaction**:
+    - TouchableOpacity with 0.8 activeOpacity (theme.layout.interaction.cardActiveOpacity)
+    - Currently non-functional (disabled={!onPress}) - prepared for future interactivity
+    - onPress prop optional for future plan selection logic
+  - **Theme Token Usage**: Uses planCard.width, planCard.height, spacing.cardPadding, interaction.cardActiveOpacity
+  - **File Size**: 74 lines (compact, focused component)
+
+- **PlanCardsScroller Component** (src/components/PlanCardsScroller.tsx):
+  - **Purpose**: Horizontal scrolling container for plan cards with partial card visibility (peeks)
+  - **Props**:
+    - `plans: string[]` - Array of plan names to display
+    - `cardHeight?: number` - Optional card height (defaults to 128dp via theme.layout.planCard.height)
+  - **Scroll Behavior**:
+    - Horizontal scrolling with smooth snap-to-card offsets
+    - 8dp left margin (theme.layout.recommendedWorkout.leftMargin)
+    - 8dp spacing between cards (theme.layout.recommendedWorkout.cardSpacing)
+    - 8dp peek on right (shows edge of next card)
+    - decelerationRate: "fast" for snappy scrolling
+    - directionalLockEnabled: true for horizontal-only scroll
+  - **Snap Offset Calculation**:
+    - Card 1: offset 0 (starts at 8dp from left)
+    - Cards 2+: offset ensures previous card shows 8dp peek on left
+    - Last card: offset ensures 8dp margin on right
+    - Same pattern as WorkoutCardsScroller for consistency
+  - **Dynamic Height**: Container height set via prop (default 128dp) for flexibility
+  - **Memoization**: React.memo() wrapper for performance optimization
+  - **File Size**: 113 lines (similar to WorkoutCardsScroller)
+
+- **PlansPage Screen** (src/features/main/screens/PlansPage.tsx):
+  - **Layout Structure** (mirrors HomePage exactly):
+    - SafeAreaView container with flex: 1
+    - StatusBar (light-content, pure black background)
+    - Fixed top bars (absolute positioned, zIndex: 10):
+      - TopNavBar (menu + search icons)
+      - 1dp green divider (theme.colors.navActive)
+      - WeekCalendar (7-day selector)
+      - PlanProgressBar (plan name + progress)
+    - Scrollable content area (paddingTop: 120dp to clear top bars)
+    - Fixed BottomTabBar (absolute positioned, bottom: 0)
+    - Sidebar overlay (hamburger menu)
+  - **Plan Sections**:
+    - Section 1: "Lift 321 Plans" header + PlanCardsScroller with 8 plans:
+      1. Lift 3-2-1 (main leftmost card)
+      2. Lift 3-2-GLP-1
+      3. Beginner 3-2-1
+      4. Advanced 3-2-1
+      5. Expert 3-2-1
+      6. Strength 3-2-1
+      7. Growth 3-2-1
+      8. Zero-to-SuperHero (rightmost card)
+    - Section 2: "Popular Plans" header (16dp below first scroller) + PlanCardsScroller with 3 plans:
+      1. Athlete
+      2. Weight Loss
+      3. Lean
+  - **Section Header Styling** (matches HomePage "Primary Workouts" / "Specialized Workouts"):
+    - 16dp Roboto Bold (theme.typography.fontSize.m, fontWeight.bold)
+    - Pure white (theme.colors.pureWhite)
+    - 8dp top margin (theme.spacing.s)
+    - 4dp bottom margin (theme.spacing.xs)
+    - 8dp left margin (theme.layout.recommendedWorkout.leftMargin) - aligns with cards
+  - **Navigation Integration**:
+    - Full tab navigation via bottom tab bar (home/plans/performance/profile)
+    - Sidebar menu integration (profile/settings/help/logout)
+    - handleTabPress navigates between HomePage ↔ PlansPage
+    - activeTab state syncs with current screen ('plans')
+  - **Dynamic Bottom Padding**:
+    - Calculates bottom tab height based on safe area insets
+    - Gesture nav (small inset): 68dp
+    - Button nav (large inset): 68dp + 32dp = 100dp
+    - Adds 8dp spacing (theme.spacing.s) below bottom tab
+  - **Event Handlers**:
+    - `handleMenuPress()`: Opens sidebar
+    - `handleSearchPress()`: TODO - search functionality
+    - `handleTabPress(tab)`: Navigates to different screens
+    - `handleSidebarSelect(option)`: Handles profile/settings/help/logout
+  - **File Size**: 235 lines (similar to HomePage at 273 lines)
+
+- **Theme Token Enhancements** (src/theme/layout.ts):
+  - **New planCard Section**:
+    - `height: 128` - Compact card height (smaller than workout cards for denser browsing)
+    - `width: 330` - Same width as workout cards for consistent horizontal scrolling
+    - Comment: "Training plan selection cards on PlansPage (smaller than workout cards)"
+  - **New interaction.cardActiveOpacity Token**:
+    - `cardActiveOpacity: 0.8` - Lighter press feedback for card components (subtle touch response)
+    - Comment: "Lighter press feedback for card components (subtle touch response)"
+    - Contrast with `pressedOpacity: 0.6` (darker feedback for buttons)
+    - Applied to both PlanCard and WorkoutCard for consistency
+  - **Design Rationale**:
+    - Plan cards are 128dp (vs 240dp workout cards) to fit more content on screen
+    - 330dp width maintains visual rhythm with workout cards
+    - 0.8 opacity is subtler than 0.6 - cards feel responsive but not heavy
+
+- **Navigation Integration**:
+  - **MainNavigator.tsx** (src/navigation/MainNavigator.tsx):
+    - Added PlansPage import from @/features/main/screens/PlansPage
+    - Added Stack.Screen for PlansPage with quickFadeTransition
+    - PlansPage appears after HomePage in navigation stack
+    - quickFadeTransition provides smooth 150ms fade animation
+  - **Navigation Types** (src/navigation/types.ts):
+    - Added `PlansPage: undefined` to MainStackParamList
+    - Type-safe navigation: navigation.navigate('PlansPage') has autocomplete
+    - No route params needed (plans are static display for now)
+  - **HomePage Integration** (src/features/main/screens/HomePage.tsx):
+    - Updated `handleTabPress()` to navigate to PlansPage when Plans tab pressed
+    - Switch statement: 'plans' → navigation.navigate('PlansPage')
+    - 'home' case: Already on home page (no action)
+    - 'performance' case: TODO - not yet implemented
+    - 'profile' case: Navigates to ProfileScreen
+  - **Bidirectional Navigation**:
+    - HomePage → PlansPage: Tap Plans tab in bottom bar
+    - PlansPage → HomePage: Tap Home tab in bottom bar
+    - Both screens maintain active tab state and highlight correctly
+
+- **CLAUDE_DEV_STANDARDS Compliance**:
+  - **File Headers**: All new files have complete headers with:
+    - Component name and description
+    - Design specifications (dimensions, styling)
+    - Dependencies (what they import/use)
+    - Used by (what components consume them)
+  - **Section Headers**: All files use === format:
+    - === TYPES === for type definitions
+    - === CONSTANTS === for static values
+    - === COMPONENT === for main component
+    - === STATE === for useState/useEffect
+    - === EVENT HANDLERS === for callbacks
+    - === RENDER === for JSX return
+    - === STYLES === for StyleSheet.create
+  - **No Magic Numbers**: All values use theme tokens:
+    - Dimensions: theme.layout.planCard.height/width
+    - Spacing: theme.spacing.s/xs/m/cardPadding
+    - Colors: theme.colors.pureWhite/backgroundCard/navActive
+    - Borders: theme.layout.border.thin
+    - Interaction: theme.layout.interaction.cardActiveOpacity
+  - **Absolute Imports**: All imports use @/ aliases:
+    - @/theme for theme tokens
+    - @/navigation/types for navigation types
+    - @/components for shared components
+    - @/features for feature screens
+    - @/services for services
+  - **TypeScript Strict**:
+    - All component props have explicit type definitions
+    - No any types (except legacy supabaseClient mock - acceptable for development mock)
+    - type used over interface (React Native convention)
+    - Proper generic types (React.FC<Props>, React.memo<Props>)
+  - **Forward-Looking Comments**:
+    - Comments explain design intent and purpose
+    - Example: "Compact card height (smaller than workout cards for denser browsing)"
+    - Example: "Lighter press feedback for card components (subtle touch response)"
+    - NO historical comments like "Changed from X to Y" or "Fixed bug where..."
+  - **Consistency Upgrade**: Applied cardActiveOpacity to existing WorkoutCard.tsx (line 102) for consistency with PlanCard
+
+- **Documentation & Planning**:
+  - **User Prompt Documentation** (APD/USERPROMPT/USERPROMPT_Claude-v1.1.7.md):
+    - Complete capture of user's request for PlansPage
+    - Includes clarification Q&A results:
+      - Card structure: Simpler design (just plan name)
+      - Font style: Roboto (not Zuume-ExtraBold)
+      - Card colors: All same style
+      - Card interaction: Not functional yet
+    - Implementation summary with file list
+  - **GitHub Issue #20**: "Coach/Training Plan and Workout Card Integration"
+    - Feature request for plan selection logic
+    - User flow: Select plan → Activate → Update workouts → Track progress
+    - Components affected: PlansPage, PlanCard, WorkoutCard, PlanProgressBar, HomePage
+    - Implementation notes: Plan selection, state management, workout sync
+    - Label: enhancement
+
+**Files Created** (5 new files):
+1. src/components/PlanCard.tsx (74 lines)
+2. src/components/PlanCardsScroller.tsx (113 lines)
+3. src/features/main/screens/PlansPage.tsx (235 lines)
+4. APD/USERPROMPT/USERPROMPT_Claude-v1.1.7.md (documentation)
+5. GitHub issue #20 (feature request)
+
+**Files Modified** (5 files):
+1. src/theme/layout.ts - Added planCard section, interaction.cardActiveOpacity
+2. src/navigation/MainNavigator.tsx - Added PlansPage screen
+3. src/navigation/types.ts - Added PlansPage to MainStackParamList
+4. src/features/main/screens/HomePage.tsx - Added PlansPage navigation in handleTabPress
+5. src/components/WorkoutCard.tsx - Applied cardActiveOpacity theme token for consistency
+6. src/services/supabaseClient.ts - Fixed mock client with all auth methods
+
+**Total Changes**: 10 files (5 new, 5 modified), ~500 lines of code
+
+**User Decisions**:
+- Plan cards should be 128dp high (compact) vs 240dp workout cards (standard)
+- Plan cards use simpler design than workout cards (name only, no images/BEGIN buttons)
+- PlansPage layout mirrors HomePage exactly (top bars, bottom tabs, scroll behavior)
+- Bottom tab navigation is fully bidirectional (HomePage ↔ PlansPage)
+- Plans are visual-only for now - interactivity deferred to future version
+- Card active opacity should be lighter (0.8) for subtle feedback vs heavier (0.6) for buttons
+- All plan-specific dimensions belong in theme.layout.planCard section
+- Use Roboto font (not Zuume-ExtraBold) for plan card text
+- All plan cards use same background color (no unique colors per plan)
+
+**Problems Solved**:
+1. **Supabase SignUp Error**: Fixed "signUp is not a function" crash by adding all auth methods to mock client
+2. **Magic Numbers in Cards**: Created planCard theme tokens to eliminate hardcoded 330/128 values
+3. **Inconsistent Press Feedback**: Created cardActiveOpacity token (0.8) for consistent card interaction
+4. **Layout Duplication**: Reused HomePage layout patterns (top bars, bottom tabs) via shared components
+5. **Navigation Complexity**: Leveraged existing bottom tab bar for simple bidirectional navigation
+
+**Key Learnings**:
+1. **Mock Objects Need Complete Interfaces**: Even development-only mocks should mirror full production interfaces to prevent runtime errors
+2. **Component Reusability Pays Off**: HomePage components (TopNavBar, BottomTabBar, Sidebar) made PlansPage trivial to build
+3. **Theme Token Discipline**: Adding planCard tokens during implementation (not retrofitting) keeps code clean from day one
+4. **Plan vs Implement**: User clarification before coding (card structure, fonts, colors) saved refactoring cycles
+5. **Standards as Refactoring Tool**: Applying CLAUDE_DEV_STANDARDS revealed WorkoutCard inconsistency (hardcoded 0.8 opacity) - fixed proactively
+
+**Next Steps** (Future Versions):
+1. Make plan cards functional (tap to select/activate)
+2. Store active plan in Context or AsyncStorage
+3. Create PlanDetailsScreen showing plan overview
+4. Define plan data structure (workouts/week, duration, exercises)
+5. Integrate Coach/AI recommendations (GitHub issue #20)
+
+---
+
 ### v1.1.5 - Data-Driven Exercise System & Dynamic Duration (2025-01-22)
 **Branch**: Claude-v1.1.5
 
