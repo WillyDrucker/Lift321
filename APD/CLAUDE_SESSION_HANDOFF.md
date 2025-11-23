@@ -19,80 +19,105 @@ This file contains only critical architectural patterns and current session stat
 
 ---
 
-## Current Version: 1.1.5
+## Current Version: 1.1.7
 
-**Branch**: Claude-v1.1.5
-**Status**: Data-Driven Exercise System Complete
-**Last Updated**: 2025-01-22
+**Branch**: Claude-v1.1.7
+**Status**: PlansPage Implementation Complete
+**Last Updated**: 2025-11-22
 
 ---
 
 ## Session State
 
 ### Current Work
-- Data-driven exercise system implemented with dynamic filtering
-- Duration calculator created for workout session estimates
-- Exercise service built for session type logic (Standard/Express/Maintenance)
-- WorkoutOverviewScreen fully refactored to use dynamic data
-- Dynamic vertical line height calculation for exercise tree
-- All hardcoded colors moved to theme tokens (sessionStandard/Express/Maintenance)
-- CLAUDE_DEV_STANDARDS fully applied to all files
-- Ready to merge to main and create v1.1.6
+- PlansPage created with 11 plan cards across 2 sections ("Lift 321 Plans" + "Popular Plans")
+- PlanCard and PlanCardsScroller components built for horizontal scrolling
+- Full HomePage-mirrored layout (top bars, bottom tabs, scrollable content)
+- Navigation between HomePage and PlansPage functional via bottom tab bar
+- Supabase mock client fixed with all auth methods (signUp, signInWithPassword, etc.)
+- Theme tokens added: planCard.height/width, interaction.cardActiveOpacity
+- CLAUDE_DEV_STANDARDS applied to all v1.1.7 files
+- GitHub issue #20 created for Coach/Training Plan integration
+- Ready to merge to main and create v1.1.8
 
 ### Completed This Session
-**v1.1.5 - Data-Driven Exercise System & Dynamic Duration** (2025-01-22):
-1. **Duration Calculator Utility** (src/utils/durationCalculator.ts):
-   - Formula: (totalSets × 5) + totalSets + 3 - 5 = (totalSets × 6) - 2
-   - Accounts for rest time (5 min/set), workout time (1 min/set), warmup (3 min), final rest removal (-5 min)
-   - Examples: Standard 6 sets = 34 min, Express 5 sets = 28 min, Maintenance 4 sets = 22 min
-   - Exported: calculateWorkoutDuration() and getWorkoutDuration() helpers
+**v1.1.7 - PlansPage Implementation** (2025-11-22):
+1. **Supabase Mock Client Fix** (src/services/supabaseClient.ts):
+   - Fixed "signUp is not a function" error when Supabase credentials not configured
+   - Added missing auth methods to mock client: signUp, signInWithPassword, resetPasswordForEmail, updateUser, onAuthStateChange
+   - All mock methods return appropriate error messages indicating credentials not configured
+   - Enables CreateAccountScreen to function without crashing (shows proper error UI)
 
-2. **Exercise Service** (src/services/exerciseService.ts):
-   - Loads exercises from exercises.json with type-safe filtering
-   - Session type logic: Standard (3+2+1), Express (3+2), Maintenance (2+2)
-   - ProcessedExercise type tracks adjusted vs original sets
-   - getExercisesForWorkout() returns exercises, totalSets, breakdown
-   - Foundation for equipment filtering (TODO: implement)
+2. **PlansPage Screen** (src/features/main/screens/PlansPage.tsx):
+   - Full-featured plans selection screen mirroring HomePage layout
+   - Two plan sections: "Lift 321 Plans" (8 cards) + "Popular Plans" (3 cards)
+   - Fixed top bars: TopNavBar, WeekCalendar, PlanProgressBar with 1dp green border
+   - Fixed BottomTabBar with full tab navigation
+   - Sidebar integration with menu, settings, profile, logout
+   - Scrollable content with dynamic bottom padding for safe area insets
+   - Plans: Lift 3-2-1, Lift 3-2-GLP-1, Beginner/Advanced/Expert/Strength/Growth 3-2-1, Zero-to-SuperHero, Athlete, Weight Loss, Lean
 
-3. **WorkoutOverviewScreen Refactoring**:
-   - Removed all hardcoded exercise JSX (180+ lines eliminated)
-   - Dynamic exercise rendering with renderExercises() helper
-   - Dynamic duration calculation updates with session selection
-   - Dynamic vertical line height adapts to exercise count
-   - Session type conversion (lowercase → PascalCase)
-   - Exercise image mapping helper (getExerciseImage)
+3. **PlanCard Component** (src/components/PlanCard.tsx):
+   - Simple 330×128dp card with plan name in upper left corner
+   - Roboto Bold font, white text, UPPERCASE transform
+   - Solid background (backgroundCard) with subtle border
+   - Non-functional (visual only) for now - prepared for future interactivity
+   - Uses theme tokens: planCard.width/height, spacing.cardPadding, interaction.cardActiveOpacity
 
-4. **Theme Token Enhancement**:
-   - Added session color tokens to colors.ts:
-     - sessionStandard: #00FF00 (green)
-     - sessionExpress: #77FF00 (olive)
-     - sessionMaintenance: #FFFF00 (yellow)
-   - Eliminated all hardcoded #77ff00 and #ffff00 references
+4. **PlanCardsScroller Component** (src/components/PlanCardsScroller.tsx):
+   - Horizontal scrolling container with snap-to-card behavior
+   - 8dp left margin, 8dp spacing between cards, 8dp peek on right
+   - Dynamic snap offsets for smooth scrolling
+   - Configurable card height (defaults to 128dp)
+   - Same scroll pattern as WorkoutCardsScroller
 
-5. **CLAUDE_DEV_STANDARDS Compliance**:
-   - Updated all section headers to ============ format
-   - All comments forward-looking (design intent, not history)
-   - All magic numbers eliminated (START_OFFSET, SET_HEIGHT, etc.)
+5. **Theme Token Enhancements** (src/theme/layout.ts):
+   - Added planCard section: height (128), width (330)
+   - Added interaction.cardActiveOpacity (0.8) for consistent card press feedback
+   - Applied cardActiveOpacity to both PlanCard and WorkoutCard for consistency
+   - Comments explain design intent (compact cards, lighter press feedback)
+
+6. **Navigation Integration**:
+   - Updated MainNavigator.tsx: Added PlansPage screen with quickFadeTransition
+   - Updated types.ts: Added PlansPage to MainStackParamList
+   - Updated HomePage.tsx: handleTabPress navigates to PlansPage when Plans tab pressed
+   - Full bidirectional navigation: HomePage ↔ PlansPage via bottom tab bar
+
+7. **CLAUDE_DEV_STANDARDS Compliance**:
+   - All files follow section header format (=== TYPES ===, === COMPONENT ===, === STYLES ===)
+   - No magic numbers - all values use theme tokens
+   - Absolute imports (@/) throughout
+   - TypeScript strict (explicit types, no any except legacy mock client)
+   - Forward-looking comments (design intent, not history)
    - Complete file headers with purpose and dependencies
 
+8. **Documentation & Planning**:
+   - Created USERPROMPT_Claude-v1.1.7.md with full user request
+   - Created GitHub issue #20 for Coach/Training Plan integration feature
+
 ### Next Session Should
-1. **Equipment Filtering**: Implement equipment selection logic in exercise service
-2. **Rep Count Integration**: Load rep counts from plans.json based on week
-3. **Exercise Images**: Expand image mapping to cover all exercises
-4. **Session Persistence**: Save user selections (session type, equipment, plan focus)
-5. **Real-Time Logging**: Build workout session tracking with actual duration tracking
+1. **Plan Selection Logic**: Make plan cards functional - tap to select/activate a plan
+2. **Active Plan State Management**: Store selected plan in Context or AsyncStorage
+3. **Plan Details Screen**: Show plan overview, workout schedule, difficulty, duration
+4. **Plan Data Structure**: Define plan structure (workouts/week, total weeks, exercises)
+5. **Coach/AI Integration**: Plan recommendations based on user goals (see GitHub issue #20)
+6. **Equipment Filtering**: Implement equipment selection logic in exercise service (carry-over from v1.1.5)
 
 ### User Decisions Made
-- Duration formula accounts for rest, workout time, warmup, and removes final rest period
-- Session types follow Lift 3-2-1 pattern: 3-2-1 (Standard), 3-2 (Express), 2-2 (Maintenance)
-- Exercise service should select first exercise from each group (equipment filtering later)
-- Vertical line height calculated dynamically based on exercise count
-- Session colors: green (standard), olive (express), yellow (maintenance)
-- All session-specific colors belong in theme.colors as semantic tokens
+- Plan cards are 128dp high (compact for browsing), same 330dp width as workout cards
+- Plan cards use simpler design than workout cards (name only, no images/buttons)
+- PlansPage layout mirrors HomePage exactly (top bars, bottom tabs, scroll behavior)
+- Bottom tab bar navigation is fully bidirectional (HomePage ↔ PlansPage)
+- Plans are visual-only for now - interactivity deferred to future version
+- Card active opacity should be lighter (0.8) for subtle press feedback vs heavier (0.6) for buttons
+- All plan-specific dimensions belong in theme.layout.planCard section
 
 ---
 
 ## Previous Sessions (Recent)
+
+### v1.1.7 - PlansPage Implementation (2025-11-22)
+Created complete PlansPage with 11 plan cards across 2 sections ("Lift 321 Plans" + "Popular Plans"). Built PlanCard (330×128dp simple cards) and PlanCardsScroller (horizontal scroll with peeks) components. Full HomePage-mirrored layout with fixed top/bottom bars and scrollable content. Bidirectional navigation via bottom tab bar. Fixed Supabase mock client with all auth methods. Added theme tokens: planCard section, interaction.cardActiveOpacity. Applied CLAUDE_DEV_STANDARDS to all v1.1.7 files. Created GitHub issue #20 for Coach/Training Plan integration.
 
 ### v1.1.5 - Data-Driven Exercise System & Dynamic Duration (2025-01-22)
 Created complete data-driven exercise system with duration calculator utility, exercise service for session type filtering, and full WorkoutOverviewScreen refactor. Duration formula: (totalSets × 6) - 2 produces accurate estimates (34/28/22 minutes for Standard/Express/Maintenance). Exercise service implements Lift 3-2-1 logic (3+2+1, 3+2, 2+2 sets). Eliminated 180+ lines of hardcoded exercise JSX with dynamic rendering. Added session color tokens to theme. Applied CLAUDE_DEV_STANDARDS to all files.

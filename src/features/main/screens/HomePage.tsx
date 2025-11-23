@@ -117,7 +117,23 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
   const handleTabPress = (tab: TabItem) => {
     setActiveTab(tab);
     console.log('Tab pressed:', tab);
-    // TODO: Implement navigation to different sections
+
+    // Navigate to different screens based on tab
+    switch (tab) {
+      case 'plans':
+        navigation.navigate('PlansPage');
+        break;
+      case 'home':
+        // Already on home page
+        break;
+      case 'performance':
+        // TODO: Navigate to performance screen
+        console.log('Performance screen not yet implemented');
+        break;
+      case 'profile':
+        navigation.navigate('ProfileScreen');
+        break;
+    }
   };
 
   const handleSidebarSelect = async (
