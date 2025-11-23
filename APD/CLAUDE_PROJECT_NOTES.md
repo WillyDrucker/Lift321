@@ -16,6 +16,139 @@ This file contains the historical record of version changes for Lift 3-2-1. Deta
 
 ## Version History
 
+### v1.1.8 - Plan Card Background Images (2025-11-23)
+**Branch**: Claude-v1.1.8
+
+**Summary**: Implemented background image support for plan cards with full 128dp height display. Created dedicated image directory at src/assets/images/plans/ with established naming convention {plan-name}-plan.png. Updated PlanCard component to support optional background images with text overlay and shadow for readability. Created getPlanImage() helper function in PlanCardsScroller to map all 11 plans to their respective image assets. Fixed critical logout bug on PlansPage (Sidebar prop mismatch). Removed gray border from plan cards per user feedback. Restarted Metro bundler with cache reset for new image assets. All files verified CLAUDE_DEV_STANDARDS compliant.
+
+**What Was Built**:
+- **Plan Images Directory** (src/assets/images/plans/):
+  - **Purpose**: Dedicated directory for plan card background images
+  - **Location**: Follows existing pattern (src/assets/images/exercises/, src/assets/images/videos/)
+  - **Naming Convention**: {plan-name}-plan.png with kebab-case and -plan suffix
+    - User decision: Keep -plan suffix (user's preference: "lift-3-2-1-plan.png")
+    - Alternative considered: Without -plan suffix ("lift-3-2-1.png") - rejected
+  - **All 11 Plan Image Filenames Documented**:
+    1. lift-3-2-1-plan.png (user added this image - first one implemented)
+    2. lift-3-2-glp-1-plan.png (not yet added)
+    3. beginner-3-2-1-plan.png (not yet added)
+    4. advanced-3-2-1-plan.png (not yet added)
+    5. expert-3-2-1-plan.png (not yet added)
+    6. strength-3-2-1-plan.png (not yet added)
+    7. growth-3-2-1-plan.png (not yet added)
+    8. zero-to-superhero-plan.png (not yet added)
+    9. athlete-plan.png (not yet added)
+    10. weight-loss-plan.png (not yet added)
+    11. lean-plan.png (not yet added)
+  - **Git Tracking**: No .gitkeep needed - actual image file added immediately
+  - **Future Work**: User will add remaining 10 images following established naming pattern
+
+- **PlanCard Background Images** (src/components/PlanCard.tsx):
+  - **New Prop**: `imageSource?: ImageSourcePropType` - Optional background image for plan card
+  - **Image Rendering**:
+    - Conditional render: `{imageSource && <Image source={imageSource} ... />}`
+    - Absolute positioning: position: 'absolute', top: 0, bottom: 0, left: 0, right: 0
+    - Fills full 128dp height via top/bottom: 0 (no explicit height needed)
+    - Width: 100% with resizeMode="cover" for centered crop
+    - Renders behind text overlay (appears first in JSX, lower z-index)
+  - **Text Overlay Positioning**:
+    - Absolute positioned View containing plan name text
+    - Full card coverage: top: 0, bottom: 0, left: 0, right: 0
+    - Padding: theme.spacing.cardPadding (16dp)
+    - Alignment: justifyContent: 'flex-start', alignItems: 'flex-start' (upper left corner)
+  - **Text Shadow for Readability**:
+    - textShadowColor: theme.colors.shadowBlack (pure black for contrast)
+    - textShadowOffset: {width: 0, height: 2} (2dp drop shadow straight down)
+    - textShadowRadius: 4 (soft blur for smooth shadow)
+    - Ensures white text readable over any background image
+  - **Border Removal**:
+    - **User Feedback**: "You put what appears to be a 1dp gray border around all of the plan boxes, please remove this."
+    - **Fix**: Removed `borderWidth: theme.layout.border.thin` from card styles
+    - **Fix**: Removed `borderColor: theme.colors.borderDefault` from card styles
+    - **Result**: Clean borderless cards with images edge-to-edge
+  - **Backward Compatibility**: Cards without imageSource still render with solid background
+
+- **PlanCardsScroller Image Mapping** (src/components/PlanCardsScroller.tsx):
+  - **New Helper Function**: `getPlanImage(planName: string): ImageSourcePropType | undefined`
+  - **Purpose**: Maps plan names to their corresponding image assets using require()
+  - **Implementation**:
+    ```typescript
+    const imageMap: Record<string, ImageSourcePropType> = {
+      'Lift 3-2-1': require('@/assets/images/plans/lift-3-2-1-plan.png'),
+      'Lift 3-2-GLP-1': require('@/assets/images/plans/lift-3-2-glp-1-plan.png'),
+      // ... all 11 plans mapped
+    };
+    return imageMap[planName];
+    ```
+  - **All 11 Plans Mapped**: Lift 3-2-1, Lift 3-2-GLP-1, Beginner/Advanced/Expert/Strength/Growth 3-2-1, Zero-to-SuperHero, Athlete, Weight Loss, Lean
+  - **Return Type**: Returns `ImageSourcePropType` if plan found, `undefined` if not (backward compatible)
+  - **Integration**: Passes `imageSource={getPlanImage(planName)}` to PlanCard component
+  - **Pattern**: Similar to exercise image mapping (bench-press.jpg, incline-bench-press.jpg, etc.)
+  - **File Location**: Helper function placed in === HELPERS === section before component
+  - **Metro Restart Required**: New image assets require Metro bundler restart with --reset-cache
+
+- **Logout Bug Fix** (src/features/main/screens/PlansPage.tsx):
+  - **Problem**: User reported uncaught error when logging out from PlansPage
+  - **Error Message**: `[TypeError: onSelect is not a function (it is undefined)]`
+  - **Root Cause**: PlansPage was passing `onOptionSelect={handleSidebarSelect}` to Sidebar component
+  - **Correct Prop Name**: Sidebar component expects `onSelect` prop (not `onOptionSelect`)
+  - **Fix**: Changed line 181 from `onOptionSelect={handleSidebarSelect}` to `onSelect={handleSidebarSelect}`
+  - **Verification**: HomePage already had correct prop name `onSelect` - only PlansPage needed fix
+  - **Impact**: Logout functionality now works correctly on PlansPage (matches HomePage behavior)
+  - **Commit**: Standalone commit with message "Fix logout error on PlansPage - correct Sidebar prop name"
+
+- **Metro Bundler Cache Reset**:
+  - **Why Needed**: New image assets (lift-3-2-1-plan.png) not recognized by Metro cache
+  - **Command**: `npm start -- --reset-cache`
+  - **Pattern**: Always restart Metro with cache reset when adding new assets (images, fonts, videos)
+  - **Alternative**: Could rebuild Android app, but cache reset is faster for asset additions
+  - **Result**: Image successfully loaded and displayed on plan card
+
+- **CLAUDE_DEV_STANDARDS Verification**:
+  - **All Files Already Compliant**: PlanCard.tsx, PlanCardsScroller.tsx, PlansPage.tsx written with standards from start
+  - **File Headers**: All files have proper headers with component name, purpose, dependencies, usage
+  - **Section Headers**: === TYPES ===, === COMPONENT ===, === HELPERS ===, === STYLES === format
+  - **Type Definitions**: All components have explicit type definitions in TYPES section
+  - **Theme Tokens**: All styling uses theme.* tokens (no magic numbers or hard-coded colors)
+  - **Absolute Imports**: All imports use @/ aliases (no relative paths)
+  - **Forward-Looking Comments**: Comments explain design intent ("Background image fills full 128dp height")
+  - **TypeScript Strict**: No any types (ImageSourcePropType properly typed)
+  - **No Verification Work Needed**: Simply confirmed existing compliance
+
+**User Decisions**:
+- **Image Naming**: Use -plan suffix in all image filenames (lift-3-2-1-plan.png not lift-3-2-1.png)
+- **Image Display**: Full 128dp height, centered horizontally with resizeMode="cover"
+- **Text Position**: Upper left corner with shadow for readability over images
+- **Border**: Remove gray border from plan cards (clean borderless look)
+- **Image Priority**: User added lift-3-2-1-plan.png first (main plan), will add remaining 10 later
+
+**Files Modified**:
+- src/components/PlanCard.tsx (added imageSource prop, background image, text overlay, shadow, removed border)
+- src/components/PlanCardsScroller.tsx (added getPlanImage() helper, imageSource integration)
+- src/features/main/screens/PlansPage.tsx (fixed Sidebar prop: onOptionSelect → onSelect)
+- src/assets/images/plans/lift-3-2-1-plan.png (added by user)
+
+**Commits**:
+1. "Fix logout error on PlansPage - correct Sidebar prop name"
+2. "Add plan card background images with full-height display"
+3. "Remove gray border from plan cards"
+
+**Key Learnings**:
+- **Image Assets Require Metro Restart**: New images always need `npm start -- --reset-cache` to be recognized
+- **Prop Name Consistency**: HomePage and PlansPage should use same prop names when calling same components (onSelect)
+- **Text Shadows Essential**: White text needs shadow (shadowColor/Offset/Radius) to be readable over images
+- **Absolute Positioning Pattern**: Background images use top/bottom: 0 instead of height: '100%' for more reliable fill
+- **Optional Props for Backward Compatibility**: imageSource?: optional keeps existing cards working without images
+- **User Naming Preferences**: Always confirm naming conventions with user (they chose -plan suffix)
+
+**Next Steps**:
+1. User needs to add remaining 10 plan images following established naming convention
+2. Consider plan card interactivity (tap to select/activate plan)
+3. Plan state management (store selected plan in Context or AsyncStorage)
+4. Plan details screen (show plan overview, schedule, difficulty, duration)
+
+---
+
 ### v1.1.7 - PlansPage Implementation (2025-11-22)
 **Branch**: Claude-v1.1.7
 
