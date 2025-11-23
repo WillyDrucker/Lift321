@@ -19,98 +19,81 @@ This file contains only critical architectural patterns and current session stat
 
 ---
 
-## Current Version: 1.1.7
+## Current Version: 1.1.8
 
-**Branch**: Claude-v1.1.7
-**Status**: PlansPage Implementation Complete
-**Last Updated**: 2025-11-22
+**Branch**: Claude-v1.1.8
+**Status**: Plan Card Background Images Complete
+**Last Updated**: 2025-11-23
 
 ---
 
 ## Session State
 
 ### Current Work
-- PlansPage created with 11 plan cards across 2 sections ("Lift 321 Plans" + "Popular Plans")
-- PlanCard and PlanCardsScroller components built for horizontal scrolling
-- Full HomePage-mirrored layout (top bars, bottom tabs, scrollable content)
-- Navigation between HomePage and PlansPage functional via bottom tab bar
-- Supabase mock client fixed with all auth methods (signUp, signInWithPassword, etc.)
-- Theme tokens added: planCard.height/width, interaction.cardActiveOpacity
-- CLAUDE_DEV_STANDARDS applied to all v1.1.7 files
-- GitHub issue #20 created for Coach/Training Plan integration
-- Ready to merge to main and create v1.1.8
+- Plan card background images implemented with full 128dp height
+- Image directory created at src/assets/images/plans/
+- First plan image (lift-3-2-1-plan.png) applied and displayed
+- Text overlay with shadow for readability over images
+- All files verified CLAUDE_DEV_STANDARDS compliant
+- Ready to merge to main and create v1.1.9
 
 ### Completed This Session
-**v1.1.7 - PlansPage Implementation** (2025-11-22):
-1. **Supabase Mock Client Fix** (src/services/supabaseClient.ts):
-   - Fixed "signUp is not a function" error when Supabase credentials not configured
-   - Added missing auth methods to mock client: signUp, signInWithPassword, resetPasswordForEmail, updateUser, onAuthStateChange
-   - All mock methods return appropriate error messages indicating credentials not configured
-   - Enables CreateAccountScreen to function without crashing (shows proper error UI)
+**v1.1.8 - Plan Card Background Images** (2025-11-23):
+1. **Plan Images Directory** (src/assets/images/plans/):
+   - Created dedicated directory for plan card background images
+   - Established naming convention: {plan-name}-plan.png (kebab-case)
+   - User added first image: lift-3-2-1-plan.png
+   - All 11 plan image filenames documented for future additions
 
-2. **PlansPage Screen** (src/features/main/screens/PlansPage.tsx):
-   - Full-featured plans selection screen mirroring HomePage layout
-   - Two plan sections: "Lift 321 Plans" (8 cards) + "Popular Plans" (3 cards)
-   - Fixed top bars: TopNavBar, WeekCalendar, PlanProgressBar with 1dp green border
-   - Fixed BottomTabBar with full tab navigation
-   - Sidebar integration with menu, settings, profile, logout
-   - Scrollable content with dynamic bottom padding for safe area insets
-   - Plans: Lift 3-2-1, Lift 3-2-GLP-1, Beginner/Advanced/Expert/Strength/Growth 3-2-1, Zero-to-SuperHero, Athlete, Weight Loss, Lean
+2. **PlanCard Background Images** (src/components/PlanCard.tsx):
+   - Added optional imageSource prop (ImageSourcePropType)
+   - Background image fills full 128dp height with resizeMode="cover"
+   - Absolute positioning for image layer (top: 0, bottom: 0, left: 0, right: 0)
+   - Text overlay positioned absolutely with padding
+   - Added text shadow for readability (shadowColor, shadowOffset, shadowRadius)
+   - Removed gray border per user feedback (borderWidth/borderColor deleted)
 
-3. **PlanCard Component** (src/components/PlanCard.tsx):
-   - Simple 330×128dp card with plan name in upper left corner
-   - Roboto Bold font, white text, UPPERCASE transform
-   - Solid background (backgroundCard) with subtle border
-   - Non-functional (visual only) for now - prepared for future interactivity
-   - Uses theme tokens: planCard.width/height, spacing.cardPadding, interaction.cardActiveOpacity
+3. **PlanCardsScroller Image Mapping** (src/components/PlanCardsScroller.tsx):
+   - Created getPlanImage() helper function mapping plan names to image assets
+   - All 11 plans mapped: Lift 3-2-1, Lift 3-2-GLP-1, Beginner/Advanced/Expert/Strength/Growth 3-2-1, Zero-to-SuperHero, Athlete, Weight Loss, Lean
+   - Passes imageSource prop to PlanCard component
+   - Returns undefined for plans without images (backward compatible)
 
-4. **PlanCardsScroller Component** (src/components/PlanCardsScroller.tsx):
-   - Horizontal scrolling container with snap-to-card behavior
-   - 8dp left margin, 8dp spacing between cards, 8dp peek on right
-   - Dynamic snap offsets for smooth scrolling
-   - Configurable card height (defaults to 128dp)
-   - Same scroll pattern as WorkoutCardsScroller
+4. **Logout Bug Fix** (src/features/main/screens/PlansPage.tsx):
+   - Fixed TypeError: "onSelect is not a function" on logout
+   - Changed Sidebar prop from onOptionSelect to onSelect (line 181)
+   - Matches Sidebar component's expected interface
+   - HomePage already had correct prop name
 
-5. **Theme Token Enhancements** (src/theme/layout.ts):
-   - Added planCard section: height (128), width (330)
-   - Added interaction.cardActiveOpacity (0.8) for consistent card press feedback
-   - Applied cardActiveOpacity to both PlanCard and WorkoutCard for consistency
-   - Comments explain design intent (compact cards, lighter press feedback)
+5. **Metro Cache Reset**:
+   - Restarted Metro bundler with --reset-cache flag
+   - Required for new image asset to be recognized
+   - Pattern: New assets always require Metro restart
 
-6. **Navigation Integration**:
-   - Updated MainNavigator.tsx: Added PlansPage screen with quickFadeTransition
-   - Updated types.ts: Added PlansPage to MainStackParamList
-   - Updated HomePage.tsx: handleTabPress navigates to PlansPage when Plans tab pressed
-   - Full bidirectional navigation: HomePage ↔ PlansPage via bottom tab bar
-
-7. **CLAUDE_DEV_STANDARDS Compliance**:
-   - All files follow section header format (=== TYPES ===, === COMPONENT ===, === STYLES ===)
-   - No magic numbers - all values use theme tokens
-   - Absolute imports (@/) throughout
-   - TypeScript strict (explicit types, no any except legacy mock client)
-   - Forward-looking comments (design intent, not history)
-   - Complete file headers with purpose and dependencies
-
-8. **Documentation & Planning**:
-   - Created USERPROMPT_Claude-v1.1.7.md with full user request
-   - Created GitHub issue #20 for Coach/Training Plan integration feature
+6. **CLAUDE_DEV_STANDARDS Verification**:
+   - All modified files already fully compliant (written with standards from start)
+   - File headers, section headers, type definitions present
+   - All theme tokens, absolute imports, forward-looking comments
+   - TypeScript strict typing throughout
 
 ### Next Session Should
-1. **Plan Selection Logic**: Make plan cards functional - tap to select/activate a plan
-2. **Active Plan State Management**: Store selected plan in Context or AsyncStorage
-3. **Plan Details Screen**: Show plan overview, workout schedule, difficulty, duration
-4. **Plan Data Structure**: Define plan structure (workouts/week, total weeks, exercises)
-5. **Coach/AI Integration**: Plan recommendations based on user goals (see GitHub issue #20)
-6. **Equipment Filtering**: Implement equipment selection logic in exercise service (carry-over from v1.1.5)
+1. **Add Remaining Plan Images**: User needs to add 10 more plan images following naming convention
+2. **Plan Selection Logic**: Make plan cards functional - tap to select/activate a plan
+3. **Active Plan State Management**: Store selected plan in Context or AsyncStorage
+4. **Plan Details Screen**: Show plan overview, workout schedule, difficulty, duration
+5. **Plan Data Structure**: Define plan structure (workouts/week, total weeks, exercises)
+6. **Coach/AI Integration**: Plan recommendations based on user goals (see GitHub issue #20)
+7. **Equipment Filtering**: Implement equipment selection logic in exercise service (carry-over from v1.1.5)
 
 ### User Decisions Made
+- Plan card images use naming convention: {plan-name}-plan.png with -plan suffix (user's choice)
+- Background images fill full 128dp card height, centered horizontally (resizeMode="cover")
+- Text overlay positioned in upper left corner with shadow for readability
+- No borders on plan cards (border removed per user feedback)
 - Plan cards are 128dp high (compact for browsing), same 330dp width as workout cards
-- Plan cards use simpler design than workout cards (name only, no images/buttons)
 - PlansPage layout mirrors HomePage exactly (top bars, bottom tabs, scroll behavior)
 - Bottom tab bar navigation is fully bidirectional (HomePage ↔ PlansPage)
-- Plans are visual-only for now - interactivity deferred to future version
 - Card active opacity should be lighter (0.8) for subtle press feedback vs heavier (0.6) for buttons
-- All plan-specific dimensions belong in theme.layout.planCard section
 
 ---
 
@@ -461,6 +444,6 @@ DB schema/tables | Supabase Auth config | TS types from DB | Actual authenticati
 
 ---
 
-**Version**: 1.1.5
-**Last Updated**: 2025-01-22
-**Status**: Data-Driven Exercise System Complete - Ready to Merge and Continue
+**Version**: 1.1.8
+**Last Updated**: 2025-11-23
+**Status**: Plan Card Background Images Complete - Ready to Merge and Continue
