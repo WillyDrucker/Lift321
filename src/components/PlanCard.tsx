@@ -56,8 +56,6 @@ const styles = StyleSheet.create({
     height: theme.layout.planCard.height,
     backgroundColor: theme.colors.backgroundCard,
     borderRadius: theme.layout.recommendedWorkout.borderRadius,
-    borderWidth: theme.layout.border.thin,
-    borderColor: theme.colors.borderDefault,
     overflow: 'hidden',
     position: 'relative',
   },
