@@ -8,8 +8,10 @@
 // Used by: HomePage
 // ==========================================================================
 
-import React, {useRef} from 'react';
+import React, {useMemo, useRef} from 'react';
 import {
+  Animated,
+  Dimensions,
   ScrollView,
   StyleSheet,
   View,
@@ -37,6 +39,7 @@ const CUSTOM_WORKOUTS: CustomWorkout[] = [
 const CARD_WIDTH = 330;
 const CARD_SPACING = theme.layout.recommendedWorkout.cardSpacing; // 8dp
 const LEFT_MARGIN = theme.layout.recommendedWorkout.leftMargin; // 8dp
+const SCREEN_WIDTH = Dimensions.get('window').width; // Dynamic screen width
 
 // Calculate snap offsets for each card to ensure 8dp peeks
 // Card 1: offset 0 (starts at 8dp from left)
@@ -47,7 +50,7 @@ const SNAP_OFFSETS = CUSTOM_WORKOUTS.map((_, index) => {
   if (index === CUSTOM_WORKOUTS.length - 1) {
     // Last card: right edge at screen width - right padding
     const cardStartPosition = LEFT_MARGIN + index * (CARD_WIDTH + CARD_SPACING);
-    return cardStartPosition - (360 - LEFT_MARGIN - CARD_WIDTH); // 360 = screen width
+    return cardStartPosition - (SCREEN_WIDTH - LEFT_MARGIN - CARD_WIDTH);
   }
   // Middle cards: show 8dp peek of previous card
   return CARD_WIDTH + (index - 1) * (CARD_WIDTH + CARD_SPACING);
@@ -60,17 +63,18 @@ export const CustomWorkoutCardsScroller: React.FC<CustomWorkoutCardsScrollerProp
     // === REFS ===
 
     const scrollViewRef = useRef<ScrollView>(null);
+    const scrollX = useRef(new Animated.Value(0)).current; // Track scroll position for animations
 
     // === RENDER ===
 
     return (
       <View style={styles.container}>
         {/* Horizontal Scroller */}
-        <ScrollView
+        <Animated.ScrollView
           ref={scrollViewRef}
           horizontal
           showsHorizontalScrollIndicator={false}
-          decelerationRate="fast"
+          decelerationRate={0.985}
           snapToOffsets={SNAP_OFFSETS}
           snapToAlignment="start"
           disableIntervalMomentum={true}
@@ -79,6 +83,10 @@ export const CustomWorkoutCardsScroller: React.FC<CustomWorkoutCardsScrollerProp
           nestedScrollEnabled={true}
           directionalLockEnabled={true}
           pagingEnabled={false}
+          onScroll={Animated.event(
+            [{nativeEvent: {contentOffset: {x: scrollX}}}],
+            {useNativeDriver: true}
+          )}
         >
           {CUSTOM_WORKOUTS.map((customWorkout, index) => (
             <WorkoutCard
@@ -86,9 +94,12 @@ export const CustomWorkoutCardsScroller: React.FC<CustomWorkoutCardsScrollerProp
               workoutType={customWorkout}
               isFirstCard={index === 0}
               isLastCard={index === CUSTOM_WORKOUTS.length - 1}
+              index={index + 5}
+              scrollX={scrollX}
+              cardIndex={index}
             />
           ))}
-        </ScrollView>
+        </Animated.ScrollView>
       </View>
     );
   });

@@ -8,7 +8,7 @@
 // Used by: Navigation stack (from LoginScreen guest login)
 // ==========================================================================
 
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useRef, useEffect, useCallback} from 'react';
 import {
   Animated,
   Easing,
@@ -97,54 +97,55 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
   }, []); // Run only once on mount
 
   // === EVENT HANDLERS ===
-  // User interaction callbacks
+  // User interaction callbacks - memoized to prevent re-renders in child components
 
-  const handleMenuPress = () => {
+  const handleMenuPress = useCallback(() => {
     setSidebarVisible(true);
-  };
+  }, []);
 
-  const handleSearchPress = () => {
+  const handleSearchPress = useCallback(() => {
     console.log('Search pressed');
     // TODO: Open search screen
-  };
+  }, []);
 
-  const handleDayPress = (date: string) => {
+  const handleDayPress = useCallback((date: string) => {
     setSelectedDay(date);
     console.log('Day pressed:', date);
     // TODO: Load workouts for selected day
-  };
+  }, []);
 
-  const handleTabPress = (tab: TabItem) => {
+  const handleTabPress = useCallback((tab: TabItem) => {
     setActiveTab(tab);
     console.log('Tab pressed:', tab);
     // TODO: Implement navigation to different sections
-  };
+  }, []);
 
-  const handleSidebarSelect = async (
-    option: 'profile' | 'settings' | 'help' | 'logout',
-  ) => {
-    console.log('Sidebar option selected:', option);
+  const handleSidebarSelect = useCallback(
+    async (option: 'profile' | 'settings' | 'help' | 'logout') => {
+      console.log('Sidebar option selected:', option);
 
-    switch (option) {
-      case 'profile':
-        navigation.navigate('ProfileScreen');
-        break;
-      case 'settings':
-        navigation.navigate('SettingsScreen');
-        break;
-      case 'help':
-        navigation.navigate('HelpScreen');
-        break;
-      case 'logout':
-        console.log('Logout - clearing auth state');
-        // Clear guest mode and sign out
-        const {disableGuestMode, signOut} = await import('@/services');
-        await disableGuestMode();
-        await signOut();
-        // Auth change will automatically trigger navigation to AuthNavigator
-        break;
-    }
-  };
+      switch (option) {
+        case 'profile':
+          navigation.navigate('ProfileScreen');
+          break;
+        case 'settings':
+          navigation.navigate('SettingsScreen');
+          break;
+        case 'help':
+          navigation.navigate('HelpScreen');
+          break;
+        case 'logout':
+          console.log('Logout - clearing auth state');
+          // Clear guest mode and sign out
+          const {disableGuestMode, signOut} = await import('@/services');
+          await disableGuestMode();
+          await signOut();
+          // Auth change will automatically trigger navigation to AuthNavigator
+          break;
+      }
+    },
+    [navigation],
+  );
 
   // === RENDER ===
   // Main component JSX structure
