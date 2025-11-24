@@ -1,7 +1,7 @@
 // ==========================================================================
 // BOTTOM TAB BAR COMPONENT
 //
-// Bottom navigation bar with Home, Plans, Performance, and Profile tabs.
+// Bottom navigation bar with Home, Plans, Performance, and Social tabs.
 // Highlights active tab and handles tab switching.
 //
 // Dependencies: theme tokens, navigation icons
@@ -16,7 +16,7 @@ import {HomeIcon, PlansIcon, StatsIcon, ProfileIcon} from '@/components/icons';
 
 // === TYPES ===
 
-export type TabItem = 'home' | 'plans' | 'performance' | 'profile';
+export type TabItem = 'home' | 'plans' | 'performance' | 'social';
 
 export type BottomTabBarProps = {
   activeTab: TabItem;
@@ -35,7 +35,7 @@ const TAB_CONFIG: TabConfig[] = [
   {id: 'home', label: 'Home', icon: HomeIcon},
   {id: 'plans', label: 'Plans', icon: PlansIcon},
   {id: 'performance', label: 'Performance', icon: StatsIcon},
-  {id: 'profile', label: 'Profile', icon: ProfileIcon},
+  {id: 'social', label: 'Social', icon: ProfileIcon},
 ];
 
 // === COMPONENT ===

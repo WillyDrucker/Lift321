@@ -13,6 +13,7 @@ export {EyeOpen} from './EyeOpen';
 export {EyeClosed} from './EyeClosed';
 export {HamburgerIcon} from './HamburgerIcon';
 export {SearchIcon} from './SearchIcon';
+export {InfoIcon} from './InfoIcon';
 export {HomeIcon} from './HomeIcon';
 export {PlansIcon} from './PlansIcon';
 export {HistoryIcon} from './HistoryIcon';

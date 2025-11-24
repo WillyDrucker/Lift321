@@ -23,7 +23,7 @@ import type {AppStateStatus} from 'react-native';
 import {navigationRef} from '@/navigation/navigationService';
 import {AuthNavigator} from '@/navigation/AuthNavigator';
 import {MainNavigator} from '@/navigation/MainNavigator';
-import {isAuthenticated, AUTH_CHANGE_EVENT} from '@/services';
+import {isAuthenticated, AUTH_CHANGE_EVENT, initializeOverride} from '@/services';
 import {theme} from '@/theme';
 
 // === TYPES ===
@@ -52,9 +52,11 @@ const App: React.FC<AppProps> = () => {
 
   // === EFFECTS ===
 
-  // Check auth status on mount
+  // Check auth status and initialize dev tools on mount
   useEffect(() => {
     checkAuth();
+    // Initialize day override system (loads any persisted override)
+    initializeOverride();
   }, [checkAuth]);
 
   // Re-check auth when app comes to foreground

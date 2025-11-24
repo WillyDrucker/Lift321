@@ -46,3 +46,15 @@ export type {
   PasswordResetRequest,
   PasswordUpdateRequest,
 } from './authService';
+
+// === NAVIGATION SERVICE ===
+export {handleTabNavigation} from './navigationService';
+
+// === DEVELOPER TOOLS SERVICE ===
+export {
+  setOverrideDay,
+  clearOverrideDay,
+  getOverrideDay,
+  getCurrentDay,
+  initializeOverride,
+} from './devToolsService';

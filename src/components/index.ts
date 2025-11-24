@@ -26,6 +26,7 @@ export {RecommendedWorkoutBox} from './RecommendedWorkoutBox';
 export {WorkoutCard} from './WorkoutCard';
 export {WorkoutCardsScroller} from './WorkoutCardsScroller';
 export {CustomWorkoutCardsScroller} from './CustomWorkoutCardsScroller';
+export {ActivityFeedCard} from './ActivityFeedCard';
 export {Sidebar} from './Sidebar';
 
 // === LAYOUT ===

@@ -10,21 +10,19 @@
 
 import React, {useState, useMemo} from 'react';
 import {
-  SafeAreaView,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   View,
   TouchableOpacity,
   Image,
 } from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {theme} from '@/theme';
 import type {RootStackScreenProps} from '@/navigation/types';
-import {TopNavBar, BottomTabBar, Sidebar, type TabItem} from '@/components';
+import type {TabItem} from '@/components';
 import {getExercisesForWorkout, type SessionType} from '@/services/exerciseService';
 import {getWorkoutDuration} from '@/utils/durationCalculator';
+import {WorkoutLayout} from '@/features/workout/components/WorkoutLayout';
 
 // ============================================================================
 // TYPES
@@ -45,7 +43,10 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
   // ==========================================================================
 
   const {workoutType} = route.params;
-  const insets = useSafeAreaInsets();
+
+  // Navigation: Workout screens are part of the Home flow.
+  // The Home tab remains active throughout the workout journey (Overview → Active → Complete)
+  // to indicate the user is still within the home workout experience.
   const [activeTab, setActiveTab] = useState<TabItem>('home');
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
   const [selectedPlanFocus, setSelectedPlanFocus] = useState<'strength' | 'balanced' | 'growth'>('balanced');
@@ -105,13 +106,6 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
     return totalHeight;
   }, [workoutData.exercises]);
 
-  // Calculate dynamic bottom padding to match BottomTabBar height
-  const dynamicBottomTabHeight = insets.bottom > theme.layout.bottomNav.gestureNavThreshold
-    ? theme.layout.bottomNav.height + theme.layout.bottomNav.buttonNavExtraHeight
-    : theme.layout.bottomNav.height;
-
-  // Total bottom padding accounts for tab bar height, safe area insets, and extra margin
-  const totalBottomPadding = dynamicBottomTabHeight + Math.max(insets.bottom, 50);
 
   // ==========================================================================
   // HELPER FUNCTIONS
@@ -236,15 +230,14 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
     setSidebarVisible(true);
   };
 
-  const handleSearchPress = () => {
-    console.log('Search pressed');
-    // TODO: Open search screen
+  const handleGuidePress = () => {
+    navigation.navigate('HelpScreen');
   };
 
   const handleTabPress = (tab: TabItem) => {
+    const {handleTabNavigation} = require('@/services');
+    handleTabNavigation(tab, activeTab, navigation);
     setActiveTab(tab);
-    console.log('Tab pressed:', tab);
-    // TODO: Implement navigation to different sections
   };
 
   const handleSidebarSelect = async (
@@ -304,54 +297,40 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
   // RENDER
   // ==========================================================================
 
+  const handleLetsGoPress = () => {
+    navigation.navigate('ActiveWorkout', {
+      workoutType,
+      sessionType,
+      planFocus: selectedPlanFocus,
+      selectedEquipment: selectedWeightTypes,
+      weekProgress: {
+        current: 2,
+        total: 15,
+      },
+    });
+  };
+
   return (
-    <>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor={theme.colors.pureBlack}
-        translucent={false}
-      />
-      <SafeAreaView style={styles.container}>
-        {/* Fixed Navigation Area */}
-        <View style={styles.navigationArea}>
-          <TopNavBar
-            onSearchPress={handleSearchPress}
-            onMenuPress={handleMenuPress}
-            onBackPress={handleBackPress}
-          />
-
-          {/* Workout Title Bar */}
-          <View style={styles.workoutTitleBar}>
-          {/* Workout Title */}
-          <Text style={styles.workoutTitleText}>{workoutType}</Text>
-
-          {/* Let's Go Button with Shadow */}
-          <View style={styles.letsGoButtonContainer}>
-            {/* Shadow Layer 3 - Darkest, furthest */}
-            <View style={[styles.letsGoButtonShadow, styles.shadowLayer3]} />
-            {/* Shadow Layer 2 - Medium darkness */}
-            <View style={[styles.letsGoButtonShadow, styles.shadowLayer2]} />
-            {/* Shadow Layer 1 - Lightest, closest */}
-            <View style={[styles.letsGoButtonShadow, styles.shadowLayer1]} />
-            {/* Actual Button */}
-            <TouchableOpacity
-              style={styles.letsGoButton}
-              onPress={() => console.log('Let\'s Go pressed')}
-              activeOpacity={0.8}>
-              <Text style={styles.letsGoButtonText}>LET'S GO!</Text>
-            </TouchableOpacity>
-          </View>
-          </View>
-        </View>
-
-        {/* Scrollable Content Area */}
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={[
-            styles.scrollContent,
-            {paddingBottom: 250} // Extra bottom padding ensures content clears navigation on all devices
-          ]}
-          showsVerticalScrollIndicator={false}>
+    <WorkoutLayout
+      workoutType={workoutType}
+      showLetsGoButton={true}
+      onLetsGoPress={handleLetsGoPress}
+      activeTab={activeTab}
+      onTabPress={handleTabPress}
+      sidebarVisible={sidebarVisible}
+      onSidebarClose={() => setSidebarVisible(false)}
+      onSidebarSelect={handleSidebarSelect}
+      onBackPress={handleBackPress}
+      onMenuPress={handleMenuPress}
+      onGuidePress={handleGuidePress}>
+      {/* Scrollable Content Area */}
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={[
+          styles.scrollContent,
+          {paddingBottom: 250} // Extra bottom padding ensures content clears navigation on all devices
+        ]}
+        showsVerticalScrollIndicator={false}>
           {/* Workout Overview Plan Card */}
           <View style={styles.workoutPlanCard}>
             {/* Current Plan Label */}
@@ -554,18 +533,7 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
             </View>
           </View>
         </ScrollView>
-
-        {/* Bottom Navigation */}
-        <BottomTabBar activeTab={activeTab} onTabPress={handleTabPress} />
-      </SafeAreaView>
-
-      {/* Sidebar Menu */}
-      <Sidebar
-        visible={sidebarVisible}
-        onClose={() => setSidebarVisible(false)}
-        onSelect={handleSidebarSelect}
-      />
-    </>
+    </WorkoutLayout>
   );
 };
 
@@ -577,112 +545,14 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
 const SELECTOR_TEXT_SIZE = 12;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.pureBlack,
-  },
-
-  navigationArea: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 10,
-    backgroundColor: theme.colors.pureBlack, // Pure black background (global standard)
-    // Contains both top nav and workout title bar as one fixed unit
-  },
-
   scrollView: {
     flex: 1,
   },
 
   scrollContent: {
     flexGrow: 1,
-    paddingTop: theme.layout.topNav.topSpacing + theme.layout.topNav.height + 66 + theme.spacing.s, // Start from bottom of title bar (32 + 32 + 66 + 8 = 138dp)
-    // paddingBottom is set dynamically via inline style to match BottomTabBar height (accounts for safe area insets)
     paddingLeft: theme.spacing.s, // Standard screen edge margin
     paddingRight: theme.spacing.s, // Standard screen edge margin
-  },
-
-  // === WORKOUT TITLE BAR ===
-  workoutTitleBar: {
-    marginTop: theme.layout.topNav.topSpacing + theme.layout.topNav.height, // Position below top nav (32 + 32 = 64dp)
-    height: 66, // 8dp top + 50dp button + 8dp bottom = perfectly balanced
-    backgroundColor: theme.colors.pureBlack, // Pure black background (global standard)
-    borderBottomWidth: theme.layout.border.thin, // Green border on bottom
-    borderBottomColor: theme.colors.actionSuccess, // Green border
-    flexDirection: 'row', // Horizontal layout for title and button
-    alignItems: 'center', // Center items vertically
-    justifyContent: 'space-between', // Space between title and button
-    paddingLeft: theme.spacing.s, // 8dp from left edge
-    paddingRight: theme.spacing.s, // 8dp from right edge
-    zIndex: 1, // Above navigation area background
-  },
-
-  workoutTitleText: {
-    fontSize: 36, // 36dp to match HomePage workout cards
-    fontFamily: theme.typography.fontFamily.workoutCard, // Zuume-ExtraBold
-    color: theme.colors.actionSuccess,
-    textTransform: 'uppercase',
-    includeFontPadding: false, // Eliminate Android font padding for precise alignment
-    transform: [{scaleX: 1.2}, {translateY: 2}], // 20% wider + 2dp down for balanced vertical centering (matches HomePage)
-    marginLeft: 11, // 11dp left margin to match HomePage balanced spacing
-    textShadowColor: theme.colors.shadowBlack, // Black shadow (matches HomePage)
-    textShadowOffset: {width: 0, height: 2}, // Drop shadow 2dp down (matches HomePage)
-    textShadowRadius: 4, // Shadow blur radius (matches HomePage)
-  },
-
-  // === LET'S GO BUTTON ===
-  letsGoButtonContainer: {
-    width: 100, // Same as Begin button
-    height: 50, // Fits in 66dp bar with 8dp spacing
-  },
-
-  letsGoButtonShadow: {
-    position: 'absolute',
-    width: 100,
-    height: 50,
-    backgroundColor: theme.colors.shadowBlack,
-    borderRadius: 8,
-  },
-
-  letsGoButton: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    width: 100,
-    height: 50,
-    backgroundColor: theme.colors.actionSuccess, // Green background
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  letsGoButtonText: {
-    fontSize: theme.typography.fontSize.l, // 20dp - Same as Begin button
-    fontFamily: theme.typography.fontFamily.primary, // Roboto
-    fontWeight: theme.typography.fontWeight.bold, // Bold
-    color: theme.colors.pureBlack, // Black text on green
-    textTransform: 'uppercase',
-  },
-
-  // Shadow layers for drop shadow effect
-  shadowLayer3: {
-    bottom: -6, // Furthest shadow layer
-    right: 0,
-    opacity: 0.15,
-  },
-
-  shadowLayer2: {
-    bottom: -4, // Middle shadow layer
-    right: 0,
-    opacity: 0.25,
-  },
-
-  shadowLayer1: {
-    bottom: -2, // Closest shadow layer
-    right: 0,
-    opacity: 0.4,
   },
 
   // === WORKOUT PLAN CARD ===

@@ -1,22 +1,22 @@
 // ==========================================================================
 // TOP NAVIGATION BAR COMPONENT
 //
-// Top navigation bar with search and hamburger menu icons.
-// Fixed position navigation for HomePage.
+// Top navigation bar with guide/help and hamburger menu icons.
+// Fixed position navigation for all main screens.
 //
 // Dependencies: theme tokens, icons
-// Used by: HomePage
+// Used by: HomePage, PlansPage, WorkoutOverviewScreen
 // ==========================================================================
 
 import React from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
 import {theme} from '@/theme';
-import {SearchIcon, HamburgerIcon, LeftChevron} from '@/components/icons';
+import {InfoIcon, HamburgerIcon, LeftChevron} from '@/components/icons';
 
 // === TYPES ===
 
 export type TopNavBarProps = {
-  onSearchPress: () => void;
+  onGuidePress: () => void; // Opens help/guide screen
   onMenuPress: () => void;
   onBackPress?: () => void; // Optional back button
 };
@@ -24,7 +24,7 @@ export type TopNavBarProps = {
 // === COMPONENT ===
 
 export const TopNavBar: React.FC<TopNavBarProps> = React.memo(
-  ({onSearchPress, onMenuPress, onBackPress}) => {
+  ({onGuidePress, onMenuPress, onBackPress}) => {
     return (
       <>
         {/* Status bar background extension */}
@@ -62,14 +62,14 @@ export const TopNavBar: React.FC<TopNavBarProps> = React.memo(
             )}
           </View>
 
-          {/* Search Icon - Right aligned */}
+          {/* Guide/Help Icon - Right aligned */}
           <Pressable
-            onPress={onSearchPress}
+            onPress={onGuidePress}
             style={({pressed}) => [
-              styles.searchButton,
+              styles.guideButton,
               pressed && styles.pressed,
             ]}>
-            <SearchIcon
+            <InfoIcon
               size={theme.layout.topNav.searchIconSize}
               color={theme.colors.textPrimary}
             />
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     padding: 0,
   },
 
-  searchButton: {
+  guideButton: {
     padding: 0,
   },
 

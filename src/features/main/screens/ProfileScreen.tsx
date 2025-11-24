@@ -1,8 +1,12 @@
 // ==========================================================================
 // PROFILE SCREEN
 //
-// User profile screen displaying user information and stats.
-// Shows workout history, achievements, and personal settings.
+// User profile/account management screen (accessed via sidebar hamburger menu).
+// Displays user information, settings, and account management features.
+//
+// NOTE: This is distinct from the bottom 'Social' tab:
+// - Sidebar 'Profile': Account management, settings, personal data (this screen)
+// - Bottom 'Social' tab: Social/community features, activity feed, public profile
 //
 // Dependencies: theme tokens, navigation types
 // Used by: Sidebar menu navigation

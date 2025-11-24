@@ -33,9 +33,12 @@ import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {theme} from '@/theme';
 import {authService, isGuestMode} from '@/services';
 
+// Import app version from package.json
+const packageJson = require('../../package.json');
+
 // === TYPES ===
 
-type MenuOption = 'profile' | 'settings' | 'help' | 'logout';
+type MenuOption = 'profile' | 'settings' | 'help' | 'logout' | 'devtools';
 
 type SidebarProps = {
   visible: boolean;
@@ -226,6 +229,7 @@ const SidebarComponent: React.FC<SidebarProps> = ({
           </View>
 
           {/* Menu Items */}
+          {/* Profile: Account management and settings (distinct from bottom 'Social' tab for community features) */}
           <Pressable
             style={({pressed}) => [styles.menuItem, pressed && styles.menuItemPressed]}
             onPress={() => handleSelect('profile')}>
@@ -255,6 +259,15 @@ const SidebarComponent: React.FC<SidebarProps> = ({
             onPress={() => handleSelect('logout')}>
             <Text style={styles.menuText}>Logout</Text>
           </Pressable>
+
+          {/* Footer - Version Number (tap to open DevTools) */}
+          <View style={styles.footer}>
+            <Pressable
+              style={({pressed}) => [styles.versionContainer, pressed && styles.versionPressed]}
+              onPress={() => handleSelect('devtools')}>
+              <Text style={styles.versionText}>v{packageJson.version}</Text>
+            </Pressable>
+          </View>
         </Animated.View>
       </GestureDetector>
     </View>
@@ -327,5 +340,28 @@ const styles = StyleSheet.create({
     height: theme.layout.border.thin,
     backgroundColor: theme.colors.borderDefault,
     marginHorizontal: theme.spacing.m,
+  },
+
+  footer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    paddingBottom: theme.spacing.l,
+    paddingHorizontal: theme.layout.sidebar.itemPaddingHorizontal,
+  },
+
+  versionContainer: {
+    paddingVertical: theme.spacing.s,
+    alignItems: 'center',
+    borderRadius: theme.spacing.xs,
+  },
+
+  versionPressed: {
+    backgroundColor: theme.colors.backgroundSecondary,
+  },
+
+  versionText: {
+    fontSize: theme.typography.fontSize.s,
+    fontFamily: theme.typography.fontFamily.primary,
+    color: theme.colors.textTertiary,
   },
 });

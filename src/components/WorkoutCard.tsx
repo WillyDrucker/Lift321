@@ -142,8 +142,8 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(
     // Get color for custom workout types
     const customWorkoutColor = getCustomWorkoutColor(workoutType);
 
-    // Consistent card width for smooth scrolling
-    const cardWidth = 330;
+    // Consistent card width for smooth scrolling (from theme)
+    const cardWidth = theme.layout.recommendedWorkout.cardWidth; // 310dp
 
     // === SCROLL INTERPOLATIONS ===
     // Calculate scroll-based animation values with non-linear easing curves
@@ -215,27 +215,11 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(
       : new Animated.Value(0);
 
     // === EFFECTS ===
-    // Card entrance animation
+    // Initialize card without entrance animation
     useEffect(() => {
-      const delay = index * theme.layout.workoutCard.animation.entranceStaggerDelay;
-
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: theme.layout.workoutCard.animation.entranceDuration,
-          delay,
-          easing: Easing.out(Easing.ease),
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: theme.layout.workoutCard.animation.entranceDuration,
-          delay,
-          easing: Easing.out(Easing.cubic),
-          useNativeDriver: true,
-        }),
-      ]).start();
-    }, [index, fadeAnim, slideAnim]);
+      fadeAnim.setValue(1);
+      slideAnim.setValue(0);
+    }, [fadeAnim, slideAnim]);
 
     // === EVENT HANDLERS ===
     // Card press animations
@@ -368,7 +352,7 @@ WorkoutCard.displayName = 'WorkoutCard';
 
 const styles = StyleSheet.create({
   workoutCard: {
-    // Width is set dynamically: 330dp for first/last, 320dp for middle cards
+    // Width is set dynamically using theme token (310dp)
     height: theme.layout.recommendedWorkout.height,
     backgroundColor: theme.colors.backgroundPrimary,
     borderRadius: theme.layout.recommendedWorkout.borderRadius,

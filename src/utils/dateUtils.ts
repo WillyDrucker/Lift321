@@ -12,6 +12,45 @@
 
 export type DayOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6; // 0 = Sunday, 6 = Saturday
 
+// === DEVELOPER TOOLS - DAY OVERRIDE ===
+// In-memory cache for day override (set by DevTools)
+let overrideDayOfWeek: DayOfWeek | null = null;
+
+/**
+ * Sets the override day of week (for testing/development)
+ * This updates the in-memory cache used by getCurrentDate()
+ */
+export const setOverrideDayCache = (dayOfWeek: DayOfWeek | null): void => {
+  overrideDayOfWeek = dayOfWeek;
+};
+
+/**
+ * Gets the current override day from cache
+ */
+export const getOverrideDayCache = (): DayOfWeek | null => {
+  return overrideDayOfWeek;
+};
+
+/**
+ * Gets the current date, respecting any day override set in DevTools
+ * This is the main function to use instead of `new Date()` for testing support
+ */
+export const getCurrentDate = (): Date => {
+  if (overrideDayOfWeek === null) {
+    return new Date();
+  }
+
+  // Create date with overridden day of week
+  const actualDate = new Date();
+  const actualDay = actualDate.getDay();
+  const dayDifference = overrideDayOfWeek - actualDay;
+
+  const overriddenDate = new Date(actualDate);
+  overriddenDate.setDate(actualDate.getDate() + dayDifference);
+
+  return overriddenDate;
+};
+
 export type DateInfo = {
   date: Date;
   dayOfWeek: DayOfWeek;
@@ -138,31 +177,37 @@ export const getMonthNameFull = (date: Date): string => {
 
 /**
  * Gets the start of the current week (Sunday)
+ * Uses getCurrentDate() to respect day override
  */
-export const getWeekStart = (date: Date = new Date()): Date => {
-  const currentDay = date.getDay();
-  const sunday = new Date(date);
-  sunday.setDate(date.getDate() - currentDay);
+export const getWeekStart = (date?: Date): Date => {
+  const referenceDate = date || getCurrentDate();
+  const currentDay = referenceDate.getDay();
+  const sunday = new Date(referenceDate);
+  sunday.setDate(referenceDate.getDate() - currentDay);
   sunday.setHours(0, 0, 0, 0);
   return sunday;
 };
 
 /**
  * Gets the end of the current week (Saturday)
+ * Uses getCurrentDate() to respect day override
  */
-export const getWeekEnd = (date: Date = new Date()): Date => {
-  const currentDay = date.getDay();
-  const saturday = new Date(date);
-  saturday.setDate(date.getDate() + (6 - currentDay));
+export const getWeekEnd = (date?: Date): Date => {
+  const referenceDate = date || getCurrentDate();
+  const currentDay = referenceDate.getDay();
+  const saturday = new Date(referenceDate);
+  saturday.setDate(referenceDate.getDate() + (6 - currentDay));
   saturday.setHours(23, 59, 59, 999);
   return saturday;
 };
 
 /**
  * Gets an array of dates for the current week (Sunday to Saturday)
+ * Uses getCurrentDate() to respect day override
  */
-export const getWeekDates = (date: Date = new Date()): Date[] => {
-  const sunday = getWeekStart(date);
+export const getWeekDates = (date?: Date): Date[] => {
+  const referenceDate = date || getCurrentDate();
+  const sunday = getWeekStart(referenceDate);
   const weekDates: Date[] = [];
 
   for (let i = 0; i < 7; i++) {
@@ -186,10 +231,10 @@ export const isSameDay = (date1: Date, date2: Date): boolean => {
 };
 
 /**
- * Checks if date is today
+ * Checks if date is today (respects day override)
  */
 export const isToday = (date: Date): boolean => {
-  return isSameDay(date, new Date());
+  return isSameDay(date, getCurrentDate());
 };
 
 /**
@@ -222,15 +267,17 @@ export const getDaysBetween = (date1: Date, date2: Date): number => {
 
 /**
  * Gets comprehensive date information
+ * Uses getCurrentDate() to respect day override
  */
-export const getDateInfo = (date: Date = new Date()): DateInfo => {
+export const getDateInfo = (date?: Date): DateInfo => {
+  const referenceDate = date || getCurrentDate();
   return {
-    date,
-    dayOfWeek: date.getDay() as DayOfWeek,
-    dayName: DAY_NAMES_FULL[date.getDay()],
-    monthName: MONTH_NAMES_FULL[date.getMonth()],
-    year: date.getFullYear(),
-    month: date.getMonth() + 1, // 1-based month
-    day: date.getDate(),
+    date: referenceDate,
+    dayOfWeek: referenceDate.getDay() as DayOfWeek,
+    dayName: DAY_NAMES_FULL[referenceDate.getDay()],
+    monthName: MONTH_NAMES_FULL[referenceDate.getMonth()],
+    year: referenceDate.getFullYear(),
+    month: referenceDate.getMonth() + 1, // 1-based month
+    day: referenceDate.getDate(),
   };
 };

@@ -12,10 +12,13 @@ import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {HomePage} from '@/features/main/screens/HomePage';
 import {PlansPage} from '@/features/main/screens/PlansPage';
+import {SocialScreen} from '@/features/main/screens/SocialScreen';
 import {ProfileScreen} from '@/features/main/screens/ProfileScreen';
 import {SettingsScreen} from '@/features/main/screens/SettingsScreen';
 import {HelpScreen} from '@/features/main/screens/HelpScreen';
+import {DevToolsScreen} from '@/features/main/screens/DevToolsScreen';
 import {WorkoutOverviewScreen} from '@/features/workout/screens/WorkoutOverviewScreen';
+import {ActiveWorkoutScreen} from '@/features/workout/screens/ActiveWorkoutScreen';
 import type {MainStackParamList} from './types';
 import {defaultTransition, quickFadeTransition} from './transitions';
 
@@ -42,34 +45,18 @@ export const MainNavigator: React.FC<MainNavigatorProps> = () => {
       initialRouteName="HomePage"
       screenOptions={{
         headerShown: false,
-        ...defaultTransition,
+        animation: 'none', // Disable all default animations
       }}
     >
       <Stack.Screen name="HomePage" component={HomePage} />
-      <Stack.Screen
-        name="PlansPage"
-        component={PlansPage}
-        options={quickFadeTransition}
-      />
-      <Stack.Screen
-        name="ProfileScreen"
-        component={ProfileScreen}
-        options={quickFadeTransition}
-      />
-      <Stack.Screen
-        name="SettingsScreen"
-        component={SettingsScreen}
-        options={quickFadeTransition}
-      />
-      <Stack.Screen
-        name="HelpScreen"
-        component={HelpScreen}
-        options={quickFadeTransition}
-      />
-      <Stack.Screen
-        name="WorkoutOverview"
-        component={WorkoutOverviewScreen}
-      />
+      <Stack.Screen name="PlansPage" component={PlansPage} />
+      <Stack.Screen name="SocialScreen" component={SocialScreen} />
+      <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+      <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
+      <Stack.Screen name="HelpScreen" component={HelpScreen} />
+      <Stack.Screen name="DevToolsScreen" component={DevToolsScreen} />
+      <Stack.Screen name="WorkoutOverview" component={WorkoutOverviewScreen} />
+      <Stack.Screen name="ActiveWorkout" component={ActiveWorkoutScreen} />
 
       {/* Placeholder screens - to be implemented */}
       {/* <Stack.Screen name="WorkoutList" component={WorkoutListScreen} /> */}

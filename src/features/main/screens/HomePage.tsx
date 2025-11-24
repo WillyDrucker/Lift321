@@ -34,6 +34,7 @@ import {
   type TabItem,
 } from '@/components';
 import {useSwipeGesture} from '@/hooks';
+import {getWelcomeMessage, getWorkoutIndexForDay} from '@/utils/workoutSchedule';
 
 // === TYPES ===
 
@@ -50,6 +51,12 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
   const [selectedDay, setSelectedDay] = useState<string>('');
   const [welcomeVisible, setWelcomeVisible] = useState<boolean>(true);
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
+
+  // === COMPUTED VALUES ===
+  // Day-of-week based workout recommendations
+
+  const welcomeMessage = getWelcomeMessage(); // Dynamic message based on rest day or workout day
+  const initialScrollIndex = getWorkoutIndexForDay(); // Auto-position scroller to today's workout
 
   // No animated positioning needed for flow layout - cards stack naturally
 
@@ -72,28 +79,12 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
   });
 
   // === EFFECTS ===
-  // Entrance animation for welcome box
+  // Initialize welcome box without animation
 
   useEffect(() => {
-    // Set initial position off-screen to the right
-    translateX.setValue(300);
-    opacity.setValue(0);
-
-    // Animate whoosh-in from right to left
-    Animated.parallel([
-      Animated.timing(translateX, {
-        toValue: 0,
-        duration: 500,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 400,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }),
-    ]).start();
+    // Set initial position without animation
+    translateX.setValue(0);
+    opacity.setValue(1);
   }, []); // Run only once on mount
 
   // === EVENT HANDLERS ===
@@ -103,10 +94,9 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
     setSidebarVisible(true);
   }, []);
 
-  const handleSearchPress = useCallback(() => {
-    console.log('Search pressed');
-    // TODO: Open search screen
-  }, []);
+  const handleGuidePress = useCallback(() => {
+    navigation.navigate('HelpScreen');
+  }, [navigation]);
 
   const handleDayPress = useCallback((date: string) => {
     setSelectedDay(date);
@@ -115,29 +105,13 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
   }, []);
 
   const handleTabPress = useCallback((tab: TabItem) => {
+    const {handleTabNavigation} = require('@/services');
+    handleTabNavigation(tab, activeTab, navigation);
     setActiveTab(tab);
-    console.log('Tab pressed:', tab);
-
-    // Navigate to different screens based on tab
-    switch (tab) {
-      case 'plans':
-        navigation.navigate('PlansPage');
-        break;
-      case 'home':
-        // Already on home page
-        break;
-      case 'performance':
-        // TODO: Navigate to performance screen
-        console.log('Performance screen not yet implemented');
-        break;
-      case 'profile':
-        navigation.navigate('ProfileScreen');
-        break;
-    }
-  }, [navigation]);
+  }, [activeTab, navigation]);
 
   const handleSidebarSelect = useCallback(
-    async (option: 'profile' | 'settings' | 'help' | 'logout') => {
+    async (option: 'profile' | 'settings' | 'help' | 'logout' | 'devtools') => {
       console.log('Sidebar option selected:', option);
 
       switch (option) {
@@ -149,6 +123,9 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
           break;
         case 'help':
           navigation.navigate('HelpScreen');
+          break;
+        case 'devtools':
+          navigation.navigate('DevToolsScreen');
           break;
         case 'logout':
           console.log('Logout - clearing auth state');
@@ -190,7 +167,7 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
           {/* Welcome Box */}
           <WelcomeBox
             userName="Willy"
-            message="We're glad you're here and value your time. Let's get started. Select a workout below."
+            message={welcomeMessage}
             visible={welcomeVisible}
             translateX={translateX}
             opacity={opacity}
@@ -203,7 +180,7 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
           </View>
 
           {/* Workout Cards Scroller */}
-          <WorkoutCardsScroller />
+          <WorkoutCardsScroller initialScrollIndex={initialScrollIndex} />
 
           {/* Specialized Workouts Section Header */}
           <View style={styles.sectionHeader}>
@@ -217,7 +194,7 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
         {/* Fixed Top Navigation (renders above ScrollView) */}
         <View style={styles.topBarsContainer}>
           <TopNavBar
-            onSearchPress={handleSearchPress}
+            onGuidePress={handleGuidePress}
             onMenuPress={handleMenuPress}
           />
 

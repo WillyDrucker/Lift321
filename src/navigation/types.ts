@@ -10,6 +10,7 @@
 
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import type {WorkoutType} from '@/components/WorkoutCard';
+import type {SessionType} from '@/services/exerciseService';
 
 // === AUTH STACK PARAM LIST ===
 // Authentication flow screens
@@ -27,10 +28,22 @@ export type AuthStackParamList = {
 export type MainStackParamList = {
   HomePage: undefined;
   PlansPage: undefined;
+  SocialScreen: undefined;
   ProfileScreen: undefined;
   SettingsScreen: undefined;
   HelpScreen: undefined;
+  DevToolsScreen: undefined;
   WorkoutOverview: {workoutType: WorkoutType};
+  ActiveWorkout: {
+    workoutType: WorkoutType;
+    sessionType: SessionType;
+    planFocus: 'strength' | 'balanced' | 'growth';
+    selectedEquipment: Set<string>;
+    weekProgress: {
+      current: number;
+      total: number;
+    };
+  };
   WorkoutList: undefined;
   WorkoutSession: {workoutId: string};
   PlanList: undefined;

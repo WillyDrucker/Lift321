@@ -72,31 +72,14 @@ export const PlansPage: React.FC<PlansPageProps> = ({navigation}) => {
     setSidebarVisible(true);
   };
 
-  const handleSearchPress = () => {
-    console.log('Search pressed');
-    // TODO: Open search screen
+  const handleGuidePress = () => {
+    navigation.navigate('HelpScreen');
   };
 
   const handleTabPress = (tab: TabItem) => {
+    const {handleTabNavigation} = require('@/services');
+    handleTabNavigation(tab, activeTab, navigation);
     setActiveTab(tab);
-    console.log('Tab pressed:', tab);
-
-    // Navigate to different screens based on tab
-    switch (tab) {
-      case 'home':
-        navigation.navigate('HomePage');
-        break;
-      case 'plans':
-        // Already on plans page
-        break;
-      case 'performance':
-        // TODO: Navigate to performance screen
-        console.log('Performance screen not yet implemented');
-        break;
-      case 'profile':
-        navigation.navigate('ProfileScreen');
-        break;
-    }
   };
 
   const handleSidebarSelect = async (
@@ -164,7 +147,7 @@ export const PlansPage: React.FC<PlansPageProps> = ({navigation}) => {
       <View style={styles.fixedTopBars}>
         <TopNavBar
           onMenuPress={handleMenuPress}
-          onSearchPress={handleSearchPress}
+          onGuidePress={handleGuidePress}
         />
         <View style={styles.divider} />
         <WeekCalendar />

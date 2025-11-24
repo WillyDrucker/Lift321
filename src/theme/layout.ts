@@ -181,12 +181,12 @@ export const layout = {
     topPositionWithoutWelcome: 128, // Position when welcome dismissed (same as welcome position + 8dp spacing)
     leftMargin: 8, // Left margin from screen edge (first card)
     rightMargin: 0, // Right margin from screen edge (last card's marginRight provides 8dp spacing)
-    peekAmount: 8, // Amount of next/prev card visible (partial card visibility pattern)
+    peekAmount: 40, // Amount of next/prev card visible (increased for better discoverability)
     height: 240, // Fixed card height (reduced from 256dp)
     borderRadius: 8, // Corner radius
     paddingLeft: 16, // Left inner padding
     paddingTop: 16, // Top inner padding
-    cardWidth: 330, // Individual card width (360dp - 8dp left - 8dp peek - 8dp spacing)
+    cardWidth: 310, // Individual card width (reduced to allow more peek visibility)
     cardSpacing: 8, // Gap between cards (marginRight on each card)
   },
 
