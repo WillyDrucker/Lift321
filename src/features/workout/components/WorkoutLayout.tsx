@@ -18,13 +18,22 @@ import {
   View,
   TouchableOpacity,
 } from 'react-native';
+import type {CompositeNavigationProp} from '@react-navigation/native';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {theme} from '@/theme';
-import {TopNavBar, Sidebar} from '@/components';
+import {TopNavBar, Sidebar, BottomTabBar} from '@/components';
 import type {WorkoutType} from '@/components/WorkoutCard';
+import type {MainStackParamList, TabParamList} from '@/navigation/types';
 
 // ============================================================================
 // TYPES
 // ============================================================================
+
+type WorkoutLayoutNavigation = CompositeNavigationProp<
+  NativeStackNavigationProp<MainStackParamList>,
+  BottomTabNavigationProp<TabParamList>
+>;
 
 type WorkoutLayoutProps = {
   workoutType: WorkoutType;
@@ -37,6 +46,7 @@ type WorkoutLayoutProps = {
   onBackPress: () => void;
   onMenuPress: () => void;
   onGuidePress: () => void;
+  navigation: WorkoutLayoutNavigation;
 };
 
 // ============================================================================
@@ -59,6 +69,7 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
   onBackPress,
   onMenuPress,
   onGuidePress,
+  navigation,
 }) => {
   return (
     <>
@@ -105,6 +116,23 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
         <View style={styles.contentArea}>
           {children}
         </View>
+
+        {/* Bottom Tab Bar - persists across all workout screens */}
+        <BottomTabBar
+          state={{
+            routes: [
+              {key: 'home', name: 'HomePage'},
+              {key: 'plans', name: 'PlansPage'},
+              {key: 'social', name: 'SocialScreen'},
+            ],
+            index: 0, // Default to home tab (workout screens are part of home flow)
+            type: 'tab' as const,
+            key: 'tab',
+            routeNames: ['HomePage', 'PlansPage', 'SocialScreen'],
+            stale: false,
+          }}
+          navigation={navigation as any}
+        />
       </SafeAreaView>
 
       {/* Sidebar Menu */}
@@ -221,5 +249,6 @@ const styles = StyleSheet.create({
   contentArea: {
     flex: 1,
     paddingTop: theme.layout.topNav.topSpacing + theme.layout.topNav.height + 66 + theme.spacing.s, // Clear navigation area (138dp)
+    paddingBottom: theme.layout.bottomNav.height, // Clear bottom tab bar (accounts for safe area in BottomTabBar component)
   },
 });

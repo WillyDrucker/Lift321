@@ -268,7 +268,8 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
       onSidebarSelect={handleSidebarSelect}
       onBackPress={handleBackPress}
       onMenuPress={handleMenuPress}
-      onGuidePress={handleGuidePress}>
+      onGuidePress={handleGuidePress}
+      navigation={navigation}>
       {/* Scrollable Content Area */}
       <ScrollView
         style={styles.scrollView}
