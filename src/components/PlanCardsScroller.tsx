@@ -9,7 +9,7 @@
 // ==========================================================================
 
 import React, {useRef} from 'react';
-import {ScrollView, StyleSheet, View, ImageSourcePropType} from 'react-native';
+import {ScrollView, StyleSheet, View, ImageSourcePropType, useWindowDimensions} from 'react-native';
 import {theme} from '@/theme';
 import {PlanCard} from './PlanCard';
 
@@ -35,18 +35,21 @@ const LEFT_MARGIN = theme.layout.recommendedWorkout.leftMargin; // 8dp
  * Returns default image if plan not found in mapping
  */
 const getPlanImage = (planName: string): ImageSourcePropType | undefined => {
+  // Fallback image for plans that don't have custom images yet
+  const fallbackImage = require('@/assets/images/plans/lift-3-2-1-plan.png');
+
   const imageMap: Record<string, ImageSourcePropType> = {
     'Lift 3-2-1': require('@/assets/images/plans/lift-3-2-1-plan.png'),
-    'Lift 3-2-GLP-1': require('@/assets/images/plans/lift-3-2-glp-1-plan.png'),
-    'Beginner 3-2-1': require('@/assets/images/plans/beginner-3-2-1-plan.png'),
-    'Advanced 3-2-1': require('@/assets/images/plans/advanced-3-2-1-plan.png'),
-    'Expert 3-2-1': require('@/assets/images/plans/expert-3-2-1-plan.png'),
-    'Strength 3-2-1': require('@/assets/images/plans/strength-3-2-1-plan.png'),
-    'Growth 3-2-1': require('@/assets/images/plans/growth-3-2-1-plan.png'),
-    'Zero-to-SuperHero': require('@/assets/images/plans/zero-to-superhero-plan.png'),
-    'Athlete': require('@/assets/images/plans/athlete-plan.png'),
-    'Weight Loss': require('@/assets/images/plans/weight-loss-plan.png'),
-    'Lean': require('@/assets/images/plans/lean-plan.png'),
+    'Lift 3-2-GLP-1': fallbackImage,
+    'Beginner 3-2-1': fallbackImage,
+    'Advanced 3-2-1': fallbackImage,
+    'Expert 3-2-1': fallbackImage,
+    'Strength 3-2-1': fallbackImage,
+    'Growth 3-2-1': fallbackImage,
+    'Zero-to-SuperHero': fallbackImage,
+    'Athlete': fallbackImage,
+    'Weight Loss': fallbackImage,
+    'Lean': fallbackImage,
   };
 
   return imageMap[planName];
@@ -60,6 +63,10 @@ export const PlanCardsScroller: React.FC<PlanCardsScrollerProps> = React.memo(
 
     const scrollViewRef = useRef<ScrollView>(null);
 
+    // === DIMENSIONS ===
+
+    const {width: screenWidth} = useWindowDimensions();
+
     // === SNAP OFFSETS ===
 
     // Calculate snap offsets for each card to ensure 8dp peeks
@@ -72,7 +79,7 @@ export const PlanCardsScroller: React.FC<PlanCardsScrollerProps> = React.memo(
         // Last card: right edge at screen width - right padding
         const cardStartPosition =
           LEFT_MARGIN + index * (CARD_WIDTH + CARD_SPACING);
-        return cardStartPosition - (360 - LEFT_MARGIN - CARD_WIDTH); // 360 = screen width
+        return cardStartPosition - (screenWidth - LEFT_MARGIN - CARD_WIDTH);
       }
       // Middle cards: show 8dp peek of previous card
       return CARD_WIDTH + (index - 1) * (CARD_WIDTH + CARD_SPACING);

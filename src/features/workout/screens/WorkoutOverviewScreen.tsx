@@ -19,7 +19,6 @@ import {
 } from 'react-native';
 import {theme} from '@/theme';
 import type {RootStackScreenProps} from '@/navigation/types';
-import type {TabItem} from '@/components';
 import {getExercisesForWorkout, type SessionType} from '@/services/exerciseService';
 import {getWorkoutDuration} from '@/utils/durationCalculator';
 import {WorkoutLayout} from '@/features/workout/components/WorkoutLayout';
@@ -44,10 +43,6 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
 
   const {workoutType} = route.params;
 
-  // Navigation: Workout screens are part of the Home flow.
-  // The Home tab remains active throughout the workout journey (Overview → Active → Complete)
-  // to indicate the user is still within the home workout experience.
-  const [activeTab, setActiveTab] = useState<TabItem>('home');
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
   const [selectedPlanFocus, setSelectedPlanFocus] = useState<'strength' | 'balanced' | 'growth'>('balanced');
   const [selectedWeightTypes, setSelectedWeightTypes] = useState<Set<string>>(
@@ -234,12 +229,6 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
     navigation.navigate('HelpScreen');
   };
 
-  const handleTabPress = (tab: TabItem) => {
-    const {handleTabNavigation} = require('@/services');
-    handleTabNavigation(tab, activeTab, navigation);
-    setActiveTab(tab);
-  };
-
   const handleSidebarSelect = async (
     option: 'profile' | 'settings' | 'help' | 'logout',
   ) => {
@@ -315,8 +304,6 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
       workoutType={workoutType}
       showLetsGoButton={true}
       onLetsGoPress={handleLetsGoPress}
-      activeTab={activeTab}
-      onTabPress={handleTabPress}
       sidebarVisible={sidebarVisible}
       onSidebarClose={() => setSidebarVisible(false)}
       onSidebarSelect={handleSidebarSelect}

@@ -8,10 +8,8 @@
 // Used by: Navigation stack (from LoginScreen guest login)
 // ==========================================================================
 
-import React, {useState, useRef, useEffect, useCallback} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
-  Animated,
-  Easing,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -21,24 +19,23 @@ import {
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {theme} from '@/theme';
-import type {RootStackScreenProps} from '@/navigation/types';
+import type {TabScreenProps} from '@/navigation/types';
 import {
   TopNavBar,
   WeekCalendar,
   PlanProgressBar,
-  BottomTabBar,
   WelcomeBox,
   WorkoutCardsScroller,
   CustomWorkoutCardsScroller,
   Sidebar,
-  type TabItem,
 } from '@/components';
 import {useSwipeGesture} from '@/hooks';
 import {getWelcomeMessage, getWorkoutIndexForDay} from '@/utils/workoutSchedule';
+import {disableGuestMode, signOut} from '@/services';
 
 // === TYPES ===
 
-type HomePageProps = RootStackScreenProps<'HomePage'>;
+type HomePageProps = TabScreenProps<'HomePage'>;
 
 // === COMPONENT ===
 
@@ -47,7 +44,6 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
   // Component state management
 
   const insets = useSafeAreaInsets();
-  const [activeTab, setActiveTab] = useState<TabItem>('home');
   const [selectedDay, setSelectedDay] = useState<string>('');
   const [welcomeVisible, setWelcomeVisible] = useState<boolean>(true);
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
@@ -104,11 +100,6 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
     // TODO: Load workouts for selected day
   }, []);
 
-  const handleTabPress = useCallback((tab: TabItem) => {
-    const {handleTabNavigation} = require('@/services');
-    handleTabNavigation(tab, activeTab, navigation);
-    setActiveTab(tab);
-  }, [activeTab, navigation]);
 
   const handleSidebarSelect = useCallback(
     async (option: 'profile' | 'settings' | 'help' | 'logout' | 'devtools') => {
@@ -130,7 +121,6 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
         case 'logout':
           console.log('Logout - clearing auth state');
           // Clear guest mode and sign out
-          const {disableGuestMode, signOut} = await import('@/services');
           await disableGuestMode();
           await signOut();
           // Auth change will automatically trigger navigation to AuthNavigator
@@ -159,9 +149,6 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
             {paddingBottom: dynamicBottomTabHeight + theme.spacing.s}
           ]}
           showsVerticalScrollIndicator={false}
-          snapToInterval={256 + 40} // Snap to each workout section (card height + header)
-          decelerationRate="fast"
-          snapToAlignment="start"
           directionalLockEnabled={true}
         >
           {/* Welcome Box */}
@@ -215,11 +202,6 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
           />
         </View>
 
-        {/* Bottom Navigation */}
-        <BottomTabBar
-          activeTab={activeTab}
-          onTabPress={handleTabPress}
-        />
       </SafeAreaView>
 
       {/* Sidebar Menu */}

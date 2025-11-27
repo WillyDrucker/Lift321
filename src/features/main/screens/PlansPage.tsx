@@ -19,18 +19,17 @@ import {
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {theme} from '@/theme';
-import type {RootStackScreenProps} from '@/navigation/types';
+import type {TabScreenProps} from '@/navigation/types';
 import {TopNavBar} from '@/components/Navigation/TopNavBar';
 import {WeekCalendar} from '@/components/Navigation/WeekCalendar';
 import {PlanProgressBar} from '@/components/Navigation/PlanProgressBar';
-import {BottomTabBar} from '@/components/Navigation/BottomTabBar';
 import {Sidebar} from '@/components/Sidebar';
 import {PlanCardsScroller} from '@/components/PlanCardsScroller';
-import type {TabItem} from '@/components';
+import {disableGuestMode, signOut} from '@/services';
 
 // === TYPES ===
 
-export type PlansPageProps = RootStackScreenProps<'PlansPage'>;
+export type PlansPageProps = TabScreenProps<'PlansPage'>;
 
 // === CONSTANTS ===
 
@@ -55,7 +54,6 @@ export const PlansPage: React.FC<PlansPageProps> = ({navigation}) => {
   // === STATE ===
 
   const insets = useSafeAreaInsets();
-  const [activeTab, setActiveTab] = useState<TabItem>('plans');
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
 
   // Calculate dynamic bottom tab bar height based on safe area insets
@@ -76,12 +74,6 @@ export const PlansPage: React.FC<PlansPageProps> = ({navigation}) => {
     navigation.navigate('HelpScreen');
   };
 
-  const handleTabPress = (tab: TabItem) => {
-    const {handleTabNavigation} = require('@/services');
-    handleTabNavigation(tab, activeTab, navigation);
-    setActiveTab(tab);
-  };
-
   const handleSidebarSelect = async (
     option: 'profile' | 'settings' | 'help' | 'logout',
   ) => {
@@ -100,7 +92,6 @@ export const PlansPage: React.FC<PlansPageProps> = ({navigation}) => {
       case 'logout':
         console.log('Logout - clearing auth state');
         // Clear guest mode and sign out
-        const {disableGuestMode, signOut} = await import('@/services');
         await disableGuestMode();
         await signOut();
         // Auth change will automatically trigger navigation to AuthNavigator
@@ -153,9 +144,6 @@ export const PlansPage: React.FC<PlansPageProps> = ({navigation}) => {
         <WeekCalendar />
         <PlanProgressBar />
       </View>
-
-      {/* Fixed Bottom Tab Bar */}
-      <BottomTabBar activeTab={activeTab} onTabPress={handleTabPress} />
 
       {/* Sidebar (Overlay) */}
       <Sidebar

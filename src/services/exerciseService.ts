@@ -64,6 +64,7 @@ export type ExerciseServiceResult = {
 const MUSCLE_GROUPS = {
   MAJOR1: 'Major1',
   MINOR1: 'Minor1',
+  MAJOR2: 'Major2',
   TERTIARY: 'Tertiary',
 } as const;
 
@@ -96,10 +97,23 @@ const SESSION_SET_LIMITS = {
 // ============================================================================
 
 /**
- * Filter exercises by body part
+ * Map workout type to body part(s) in exercise data
+ * Handles combined workouts like 'Back & Tris' that span multiple body parts
  */
-const filterByBodyPart = (exercises: Exercise[], bodyPart: string): Exercise[] => {
-  return exercises.filter((ex) => ex.body_part === bodyPart);
+const getBodyPartsForWorkout = (workoutType: string): string[] => {
+  if (workoutType === 'Back & Tris') {
+    return ['Back', 'Triceps'];
+  }
+  return [workoutType];
+};
+
+/**
+ * Filter exercises by body part(s)
+ * Supports combined workouts that target multiple body parts
+ */
+const filterByBodyPart = (exercises: Exercise[], workoutType: string): Exercise[] => {
+  const bodyParts = getBodyPartsForWorkout(workoutType);
+  return exercises.filter((ex) => bodyParts.includes(ex.body_part));
 };
 
 /**
@@ -130,10 +144,12 @@ const selectExerciseFromGroup = (exercises: Exercise[]): Exercise | null => {
 
 /**
  * Process exercise with adjusted sets based on session type
+ * For combined workouts, Major2 exercises are treated as Tertiary
  */
 const processExercise = (
   exercise: Exercise,
   sessionType: SessionType,
+  isCombinedWorkout: boolean = false,
 ): ProcessedExercise => {
   const originalSets = parseInt(exercise.sets, 10);
   const limits = SESSION_SET_LIMITS[sessionType];
@@ -146,7 +162,10 @@ const processExercise = (
   } else if (exercise.muscle_group === MUSCLE_GROUPS.MINOR1) {
     adjustedSets = Math.min(originalSets, limits.minor1);
   } else if (exercise.muscle_group === MUSCLE_GROUPS.TERTIARY) {
-    adjustedSets = limits.includeTertiary ? originalSets : 0;
+    adjustedSets = limits.includeTertiary ? Math.min(originalSets, limits.tertiary) : 0;
+  } else if (exercise.muscle_group === MUSCLE_GROUPS.MAJOR2 && isCombinedWorkout) {
+    // For combined workouts, Major2 exercises act as Tertiary (1 set)
+    adjustedSets = limits.includeTertiary ? Math.min(originalSets, limits.tertiary) : 0;
   }
 
   return {
@@ -184,6 +203,7 @@ export const getExercisesForWorkout = (
 
   // Select one exercise from each group
   const selectedExercises: Exercise[] = [];
+  const isCombinedWorkout = bodyPart === 'Back & Tris';
 
   // Major1 exercises
   if (grouped[MUSCLE_GROUPS.MAJOR1]) {
@@ -199,14 +219,19 @@ export const getExercisesForWorkout = (
 
   // Tertiary exercises (only if session includes them)
   const limits = SESSION_SET_LIMITS[sessionType];
-  if (limits.includeTertiary && grouped[MUSCLE_GROUPS.TERTIARY]) {
-    const tertiary = selectExerciseFromGroup(grouped[MUSCLE_GROUPS.TERTIARY]);
-    if (tertiary) selectedExercises.push(tertiary);
+  if (limits.includeTertiary) {
+    // For combined workouts like "Back & Tris", use Major2 (Triceps) as Tertiary
+    // Standard workouts use the Tertiary muscle group
+    const tertiaryGroup = isCombinedWorkout ? MUSCLE_GROUPS.MAJOR2 : MUSCLE_GROUPS.TERTIARY;
+    if (grouped[tertiaryGroup]) {
+      const tertiary = selectExerciseFromGroup(grouped[tertiaryGroup]);
+      if (tertiary) selectedExercises.push(tertiary);
+    }
   }
 
   // Process exercises with adjusted sets
   const processedExercises = selectedExercises.map((ex) =>
-    processExercise(ex, sessionType),
+    processExercise(ex, sessionType, isCombinedWorkout),
   );
 
   // Calculate totals and breakdown
@@ -220,6 +245,9 @@ export const getExercisesForWorkout = (
     } else if (ex.muscle_group === MUSCLE_GROUPS.MINOR1) {
       minor1Sets += ex.adjustedSets;
     } else if (ex.muscle_group === MUSCLE_GROUPS.TERTIARY) {
+      tertiarySets += ex.adjustedSets;
+    } else if (ex.muscle_group === MUSCLE_GROUPS.MAJOR2 && isCombinedWorkout) {
+      // For combined workouts, Major2 counts toward Tertiary sets
       tertiarySets += ex.adjustedSets;
     }
   });

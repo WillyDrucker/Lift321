@@ -15,31 +15,31 @@
 import React, {useState, useCallback} from 'react';
 import {
   SafeAreaView,
-  ScrollView,
+  FlatList,
   StatusBar,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import type {ActivityItem} from '@/data/mockActivityData';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {theme} from '@/theme';
-import type {RootStackScreenProps} from '@/navigation/types';
+import type {TabScreenProps} from '@/navigation/types';
 import {
   TopNavBar,
   WeekCalendar,
   PlanProgressBar,
-  BottomTabBar,
   Sidebar,
   ActivityFeedCard,
-  type TabItem,
 } from '@/components';
 import {MOCK_ACTIVITY_DATA} from '@/data/mockActivityData';
+import {disableGuestMode, signOut} from '@/services';
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-type SocialScreenProps = RootStackScreenProps<'SocialScreen'>;
+type SocialScreenProps = TabScreenProps<'SocialScreen'>;
 
 // ============================================================================
 // COMPONENT
@@ -51,7 +51,6 @@ export const SocialScreen: React.FC<SocialScreenProps> = ({navigation}) => {
   // ==========================================================================
 
   const insets = useSafeAreaInsets();
-  const [activeTab, setActiveTab] = useState<TabItem>('social');
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
 
   // Calculate dynamic bottom padding to match BottomTabBar height
@@ -70,12 +69,6 @@ export const SocialScreen: React.FC<SocialScreenProps> = ({navigation}) => {
   const handleGuidePress = useCallback(() => {
     navigation.navigate('HelpScreen');
   }, [navigation]);
-
-  const handleTabPress = useCallback((tab: TabItem) => {
-    const {handleTabNavigation} = require('@/services');
-    handleTabNavigation(tab, activeTab, navigation);
-    setActiveTab(tab);
-  }, [activeTab, navigation]);
 
   const handleSidebarSelect = useCallback(
     async (option: 'profile' | 'settings' | 'help' | 'logout' | 'devtools') => {
@@ -96,7 +89,6 @@ export const SocialScreen: React.FC<SocialScreenProps> = ({navigation}) => {
           break;
         case 'logout':
           console.log('Logout - clearing auth state');
-          const {disableGuestMode, signOut} = await import('@/services');
           await disableGuestMode();
           await signOut();
           break;
@@ -121,6 +113,27 @@ export const SocialScreen: React.FC<SocialScreenProps> = ({navigation}) => {
   }, []);
 
   // ==========================================================================
+  // RENDER HELPERS
+  // ==========================================================================
+
+  const renderActivityItem = useCallback(({item}: {item: ActivityItem}) => (
+    <ActivityFeedCard
+      activity={item}
+      onPress={() => handleActivityPress(item.id)}
+      onLikePress={() => handleLikePress(item.id)}
+      onCommentPress={() => handleCommentPress(item.id)}
+    />
+  ), [handleActivityPress, handleLikePress, handleCommentPress]);
+
+  const keyExtractor = useCallback((item: ActivityItem) => item.id, []);
+
+  const ListHeader = useCallback(() => (
+    <View style={styles.sectionHeader}>
+      <Text style={styles.sectionHeaderText}>Recent Activity</Text>
+    </View>
+  ), []);
+
+  // ==========================================================================
   // RENDER
   // ==========================================================================
 
@@ -132,33 +145,23 @@ export const SocialScreen: React.FC<SocialScreenProps> = ({navigation}) => {
         translucent={false}
       />
       <SafeAreaView style={styles.container}>
-        {/* Scrollable Content Area */}
-        <ScrollView
+        {/* Activity Feed with FlatList for virtualization */}
+        <FlatList
+          data={MOCK_ACTIVITY_DATA}
+          renderItem={renderActivityItem}
+          keyExtractor={keyExtractor}
+          ListHeaderComponent={ListHeader}
           style={styles.scrollView}
           contentContainerStyle={[
             styles.scrollContent,
             {paddingBottom: dynamicBottomTabHeight + theme.spacing.s}
           ]}
-          showsVerticalScrollIndicator={false}>
-
-          {/* Activity Feed Section Header */}
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionHeaderText}>Recent Activity</Text>
-          </View>
-
-          {/* Activity Feed Cards */}
-          <View style={styles.activityFeed}>
-            {MOCK_ACTIVITY_DATA.map((activity) => (
-              <ActivityFeedCard
-                key={activity.id}
-                activity={activity}
-                onPress={() => handleActivityPress(activity.id)}
-                onLikePress={() => handleLikePress(activity.id)}
-                onCommentPress={() => handleCommentPress(activity.id)}
-              />
-            ))}
-          </View>
-        </ScrollView>
+          showsVerticalScrollIndicator={false}
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={5}
+          initialNumToRender={5}
+          windowSize={5}
+        />
 
         {/* Fixed Top Navigation (renders above ScrollView) */}
         <View style={styles.topBarsContainer}>
@@ -177,11 +180,6 @@ export const SocialScreen: React.FC<SocialScreenProps> = ({navigation}) => {
           <PlanProgressBar />
         </View>
 
-        {/* Bottom Navigation */}
-        <BottomTabBar
-          activeTab={activeTab}
-          onTabPress={handleTabPress}
-        />
       </SafeAreaView>
 
       {/* Sidebar Menu */}
@@ -236,9 +234,5 @@ const styles = StyleSheet.create({
     ...theme.textStyles.heading2,
     color: theme.colors.textPrimary,
     textTransform: 'uppercase',
-  },
-
-  activityFeed: {
-    // Activity cards have their own marginBottom
   },
 });

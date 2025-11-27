@@ -29,7 +29,7 @@ type ActivityFeedCardProps = {
 // COMPONENT
 // ============================================================================
 
-export const ActivityFeedCard: React.FC<ActivityFeedCardProps> = ({
+export const ActivityFeedCard: React.FC<ActivityFeedCardProps> = React.memo(({
   activity,
   onPress,
   onLikePress,
@@ -133,7 +133,9 @@ export const ActivityFeedCard: React.FC<ActivityFeedCardProps> = ({
       </View>
     </TouchableOpacity>
   );
-};
+});
+
+ActivityFeedCard.displayName = 'ActivityFeedCard';
 
 // ============================================================================
 // STYLES

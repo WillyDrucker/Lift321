@@ -9,6 +9,8 @@
 // ==========================================================================
 
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
+import type {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
+import type {CompositeScreenProps, NavigatorScreenParams} from '@react-navigation/native';
 import type {WorkoutType} from '@/components/WorkoutCard';
 import type {SessionType} from '@/services/exerciseService';
 
@@ -23,12 +25,18 @@ export type AuthStackParamList = {
   WelcomeScreen: undefined;
 };
 
-// === MAIN STACK PARAM LIST ===
-// Main application screens (authenticated users only)
-export type MainStackParamList = {
+// === TAB PARAM LIST ===
+// Bottom tab navigator screens (kept mounted for instant switching)
+export type TabParamList = {
   HomePage: undefined;
   PlansPage: undefined;
   SocialScreen: undefined;
+};
+
+// === MAIN STACK PARAM LIST ===
+// Main application screens (authenticated users only)
+export type MainStackParamList = {
+  Tabs: NavigatorScreenParams<TabParamList>;
   ProfileScreen: undefined;
   SettingsScreen: undefined;
   HelpScreen: undefined;
@@ -75,12 +83,23 @@ export type AuthStackScreenProps<T extends keyof AuthStackParamList> =
   NativeStackScreenProps<AuthStackParamList, T>;
 
 /**
- * Type helper for main screen components
+ * Type helper for main stack screen components
  * @example
- * const HomePage: React.FC<MainStackScreenProps<'HomePage'>> = ({ navigation }) => { ... }
+ * const SettingsScreen: React.FC<MainStackScreenProps<'SettingsScreen'>> = ({ navigation }) => { ... }
  */
 export type MainStackScreenProps<T extends keyof MainStackParamList> =
   NativeStackScreenProps<MainStackParamList, T>;
+
+/**
+ * Type helper for tab screen components
+ * Provides access to both tab navigation and parent stack navigation
+ * @example
+ * const HomePage: React.FC<TabScreenProps<'HomePage'>> = ({ navigation }) => { ... }
+ */
+export type TabScreenProps<T extends keyof TabParamList> = CompositeScreenProps<
+  BottomTabScreenProps<TabParamList, T>,
+  NativeStackScreenProps<MainStackParamList>
+>;
 
 /**
  * Type helper for screen components (backward compatibility)

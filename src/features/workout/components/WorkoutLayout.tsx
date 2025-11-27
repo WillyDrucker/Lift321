@@ -19,7 +19,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {theme} from '@/theme';
-import {TopNavBar, BottomTabBar, Sidebar, type TabItem} from '@/components';
+import {TopNavBar, Sidebar} from '@/components';
 import type {WorkoutType} from '@/components/WorkoutCard';
 
 // ============================================================================
@@ -31,9 +31,6 @@ type WorkoutLayoutProps = {
   children: ReactNode;
   showLetsGoButton?: boolean;
   onLetsGoPress?: () => void;
-  /** Active tab to highlight in bottom navigation. Workout screens should use 'home' to indicate they're part of the Home flow. */
-  activeTab: TabItem;
-  onTabPress: (tab: TabItem) => void;
   sidebarVisible: boolean;
   onSidebarClose: () => void;
   onSidebarSelect: (option: 'profile' | 'settings' | 'help' | 'logout') => void;
@@ -56,8 +53,6 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
   children,
   showLetsGoButton = false,
   onLetsGoPress,
-  activeTab,
-  onTabPress,
   sidebarVisible,
   onSidebarClose,
   onSidebarSelect,
@@ -110,9 +105,6 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
         <View style={styles.contentArea}>
           {children}
         </View>
-
-        {/* Bottom Navigation */}
-        <BottomTabBar activeTab={activeTab} onTabPress={onTabPress} />
       </SafeAreaView>
 
       {/* Sidebar Menu */}

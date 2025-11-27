@@ -40,21 +40,14 @@ export const handleTabNavigation = (
   }
 
   // Navigate to the root screen of each tab
+  // Uses navigate() instead of reset() to preserve screen state and avoid full remount
   switch (tab) {
     case 'home':
-      // Reset to HomePage (clears any nested workout screens)
-      navigation.reset({
-        index: 0,
-        routes: [{name: 'HomePage'}],
-      });
+      navigation.navigate('HomePage');
       break;
 
     case 'plans':
-      // Reset to PlansPage
-      navigation.reset({
-        index: 0,
-        routes: [{name: 'PlansPage'}],
-      });
+      navigation.navigate('PlansPage');
       break;
 
     case 'performance':
@@ -63,12 +56,7 @@ export const handleTabNavigation = (
       break;
 
     case 'social':
-      // Reset to SocialScreen
-      // Note: 'social' tab focuses on community/social features vs sidebar 'profile' for account management
-      navigation.reset({
-        index: 0,
-        routes: [{name: 'SocialScreen'}],
-      });
+      navigation.navigate('SocialScreen');
       break;
 
     default:
