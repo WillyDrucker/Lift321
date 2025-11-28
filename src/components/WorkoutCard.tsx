@@ -29,6 +29,7 @@ export type WorkoutCardProps = {
   index?: number; // Card index for staggered entrance animation
   scrollX?: Animated.Value; // Scroll position for scroll-based animations
   cardIndex?: number; // Card position in scroller for interpolation calculations
+  cardWidth?: number; // Dynamic card width from parent scroller
 };
 
 // === HELPERS ===
@@ -117,7 +118,7 @@ const getWorkoutImage = (workoutType: WorkoutType): ImageSourcePropType | null =
 // === COMPONENT ===
 
 export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(
-  ({workoutType, animatedTop, isFirstCard = false, isLastCard = false, index = 0, scrollX, cardIndex = 0}) => {
+  ({workoutType, animatedTop, isFirstCard = false, isLastCard = false, index = 0, scrollX, cardIndex = 0, cardWidth: propCardWidth}) => {
     // === HOOKS ===
     // Navigation hook for screen transitions
 
@@ -142,8 +143,8 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(
     // Get color for custom workout types
     const customWorkoutColor = getCustomWorkoutColor(workoutType);
 
-    // Consistent card width for smooth scrolling (from theme)
-    const cardWidth = theme.layout.recommendedWorkout.cardWidth; // 310dp
+    // Use prop width if provided (dynamic sizing), otherwise fall back to theme token
+    const cardWidth = propCardWidth ?? theme.layout.recommendedWorkout.cardWidth;
 
     // === SCROLL INTERPOLATIONS ===
     // Calculate scroll-based animation values with non-linear easing curves
@@ -356,7 +357,7 @@ const styles = StyleSheet.create({
     height: theme.layout.recommendedWorkout.height,
     backgroundColor: theme.colors.backgroundPrimary,
     borderRadius: theme.layout.recommendedWorkout.borderRadius,
-    marginRight: theme.layout.recommendedWorkout.cardSpacing,
+    marginRight: 8, // 8dp gap between cards (explicit value)
     overflow: 'hidden', // Clip image to border radius
   },
 

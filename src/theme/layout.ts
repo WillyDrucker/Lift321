@@ -160,8 +160,8 @@ export const layout = {
   // === WELCOME BOX ===
   // Swipeable welcome message box for new sessions
   welcomeBox: {
-    topPosition: 128, // Position below plan progress bar (96dp + 24dp + 8dp spacing)
-    leftMargin: 8, // Left margin from screen edge
+    topPosition: 136, // Position below plan progress bar (96dp + 24dp + 8dp spacing)
+    leftMargin: 8, // Left margin from screen edge (8dp)
     rightMargin: 0, // Right margin (flush to edge for swipe affordance)
     borderRadius: 8, // Corner radius for left side only
     paddingLeft: 16, // Left inner padding
@@ -177,17 +177,17 @@ export const layout = {
   // === RECOMMENDED WORKOUT BOX ===
   // Daily recommended workout card with animated positioning
   recommendedWorkout: {
-    topPositionWithWelcome: 222, // Position when welcome box visible (128dp + 86dp welcome + 8dp spacing)
-    topPositionWithoutWelcome: 128, // Position when welcome dismissed (same as welcome position + 8dp spacing)
-    leftMargin: 8, // Left margin from screen edge (first card)
-    rightMargin: 0, // Right margin from screen edge (last card's marginRight provides 8dp spacing)
-    peekAmount: 40, // Amount of next/prev card visible (increased for better discoverability)
+    topPositionWithWelcome: 230, // Position when welcome box visible (136dp + 86dp welcome + 8dp spacing)
+    topPositionWithoutWelcome: 136, // Position when welcome dismissed (96 + 24 + 8dp spacing)
+    leftMargin: 8, // Left margin (8dp)
+    rightMargin: 8, // Right margin (8dp)
+    peekAmount: 8, // Not used - keeping for compatibility (8dp)
     height: 240, // Fixed card height (reduced from 256dp)
     borderRadius: 8, // Corner radius
     paddingLeft: 16, // Left inner padding
     paddingTop: 16, // Top inner padding
-    cardWidth: 310, // Individual card width (reduced to allow more peek visibility)
-    cardSpacing: 8, // Gap between cards (marginRight on each card)
+    cardWidth: 328, // All cards same width
+    cardSpacing: 8, // Gap between cards (8dp)
   },
 
   // === CUSTOM WORKOUT CARDS ===

@@ -247,9 +247,9 @@ const styles = StyleSheet.create({
   },
 
   sectionHeader: {
-    marginTop: theme.spacing.s, // 8dp spacing from element above
+    marginTop: theme.layout.recommendedWorkout.cardSpacing, // 8dp spacing from element above
     marginBottom: theme.spacing.xs,
-    marginLeft: theme.layout.recommendedWorkout.leftMargin, // Align with workout cards
+    marginLeft: theme.layout.recommendedWorkout.leftMargin, // Align with workout cards (8dp)
   },
 
   sectionHeaderText: {

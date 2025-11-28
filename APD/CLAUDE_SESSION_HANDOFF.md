@@ -19,85 +19,67 @@ This file contains only critical architectural patterns and current session stat
 
 ---
 
-## Current Version: 1.1.8
+## Current Version: 1.1.9
 
-**Branch**: Claude-v1.1.8
-**Status**: Plan Card Background Images Complete
-**Last Updated**: 2025-11-23
+**Branch**: Claude-v1.1.9
+**Status**: Dynamic Workout Card Sizing Complete
+**Last Updated**: 2025-11-27
 
 ---
 
 ## Session State
 
 ### Current Work
-- Plan card background images implemented with full 128dp height
-- Image directory created at src/assets/images/plans/
-- First plan image (lift-3-2-1-plan.png) applied and displayed
-- Text overlay with shadow for readability over images
+- Dynamic workout card sizing based on screen width minus margins
+- Cards now fill screen width with 8dp visual margins (CARD_MARGIN = 12 for visual 8dp)
+- Unified approach for WorkoutCardsScroller and CustomWorkoutCardsScroller
+- Initial scroll defaults to last card (Legs) for testing edge spacing
 - All files verified CLAUDE_DEV_STANDARDS compliant
-- Ready to merge to main and create v1.1.9
+- Ready to merge to main and create v1.1.10
 
 ### Completed This Session
-**v1.1.8 - Plan Card Background Images** (2025-11-23):
-1. **Plan Images Directory** (src/assets/images/plans/):
-   - Created dedicated directory for plan card background images
-   - Established naming convention: {plan-name}-plan.png (kebab-case)
-   - User added first image: lift-3-2-1-plan.png
-   - All 11 plan image filenames documented for future additions
+**v1.1.9 - Dynamic Workout Card Sizing** (2025-11-27):
+1. **Dynamic Card Width Calculation** (WorkoutCardsScroller.tsx, CustomWorkoutCardsScroller.tsx):
+   - Card width now calculated as: SCREEN_WIDTH - (CARD_MARGIN * 2)
+   - CARD_MARGIN = 12 achieves 8dp visual margin on each side
+   - Removed fixed cardWidth from theme tokens in favor of dynamic sizing
+   - Snap interval calculated dynamically: CARD_WIDTH + CARD_SPACING
 
-2. **PlanCard Background Images** (src/components/PlanCard.tsx):
-   - Added optional imageSource prop (ImageSourcePropType)
-   - Background image fills full 128dp height with resizeMode="cover"
-   - Absolute positioning for image layer (top: 0, bottom: 0, left: 0, right: 0)
-   - Text overlay positioned absolutely with padding
-   - Added text shadow for readability (shadowColor, shadowOffset, shadowRadius)
-   - Removed gray border per user feedback (borderWidth/borderColor deleted)
+2. **WorkoutCard Props Enhancement** (WorkoutCard.tsx):
+   - Added optional cardWidth prop for dynamic sizing from parent
+   - Falls back to theme token if prop not provided (backward compatible)
+   - Scroll interpolations updated to use dynamic cardWidth
 
-3. **PlanCardsScroller Image Mapping** (src/components/PlanCardsScroller.tsx):
-   - Created getPlanImage() helper function mapping plan names to image assets
-   - All 11 plans mapped: Lift 3-2-1, Lift 3-2-GLP-1, Beginner/Advanced/Expert/Strength/Growth 3-2-1, Zero-to-SuperHero, Athlete, Weight Loss, Lean
-   - Passes imageSource prop to PlanCard component
-   - Returns undefined for plans without images (backward compatible)
+3. **Scroller Simplification**:
+   - Replaced snapToOffsets with simpler snapToInterval approach
+   - Removed unused scrollContent styles
+   - Inline contentContainerStyle with CARD_MARGIN padding
 
-4. **Logout Bug Fix** (src/features/main/screens/PlansPage.tsx):
-   - Fixed TypeError: "onSelect is not a function" on logout
-   - Changed Sidebar prop from onOptionSelect to onSelect (line 181)
-   - Matches Sidebar component's expected interface
-   - HomePage already had correct prop name
-
-5. **Metro Cache Reset**:
-   - Restarted Metro bundler with --reset-cache flag
-   - Required for new image asset to be recognized
-   - Pattern: New assets always require Metro restart
-
-6. **CLAUDE_DEV_STANDARDS Verification**:
-   - All modified files already fully compliant (written with standards from start)
+4. **CLAUDE_DEV_STANDARDS Verification**:
+   - All modified files comply with standards
    - File headers, section headers, type definitions present
    - All theme tokens, absolute imports, forward-looking comments
-   - TypeScript strict typing throughout
 
 ### Next Session Should
-1. **Add Remaining Plan Images**: User needs to add 10 more plan images following naming convention
-2. **Plan Selection Logic**: Make plan cards functional - tap to select/activate a plan
-3. **Active Plan State Management**: Store selected plan in Context or AsyncStorage
-4. **Plan Details Screen**: Show plan overview, workout schedule, difficulty, duration
-5. **Plan Data Structure**: Define plan structure (workouts/week, total weeks, exercises)
-6. **Coach/AI Integration**: Plan recommendations based on user goals (see GitHub issue #20)
-7. **Equipment Filtering**: Implement equipment selection logic in exercise service (carry-over from v1.1.5)
+1. **Fine-tune card margins**: Currently 12 gives ~8dp visual, may need adjustment
+2. **Restore initial scroll to day-based**: Currently defaults to Legs for testing
+3. **Add Remaining Plan Images**: User needs to add 10 more plan images
+4. **Plan Selection Logic**: Make plan cards functional - tap to select/activate
+5. **Equipment Filtering**: Implement equipment selection logic in exercise service
 
 ### User Decisions Made
-- Plan card images use naming convention: {plan-name}-plan.png with -plan suffix (user's choice)
-- Background images fill full 128dp card height, centered horizontally (resizeMode="cover")
-- Text overlay positioned in upper left corner with shadow for readability
-- No borders on plan cards (border removed per user feedback)
-- Plan cards are 128dp high (compact for browsing), same 330dp width as workout cards
-- PlansPage layout mirrors HomePage exactly (top bars, bottom tabs, scroll behavior)
-- Bottom tab bar navigation is fully bidirectional (HomePage ↔ PlansPage)
-- Card active opacity should be lighter (0.8) for subtle press feedback vs heavier (0.6) for buttons
+- Dynamic card sizing based on screen width minus margins (no fixed card widths)
+- CARD_MARGIN = 12 for 8dp visual margins (scaling factor discovered through testing)
+- Initial scroll to last card (Legs) for testing right edge spacing
+- Plan card images use naming convention: {plan-name}-plan.png with -plan suffix
+- Card active opacity 0.8 for subtle press feedback vs 0.6 for buttons
 
 ---
 
 ## Previous Sessions (Recent)
+
+### v1.1.8 - Plan Card Background Images (2025-11-23)
+Implemented background image support for plan cards with full 128dp height display. Created dedicated image directory at src/assets/images/plans/ with naming convention {plan-name}-plan.png. Updated PlanCard component with optional imageSource prop, text overlay with shadow for readability. Created getPlanImage() helper in PlanCardsScroller mapping all 11 plans. Fixed logout bug on PlansPage (Sidebar prop mismatch). Removed gray border from plan cards. All files CLAUDE_DEV_STANDARDS compliant.
 
 ### v1.1.7 - PlansPage Implementation (2025-11-22)
 Created complete PlansPage with 11 plan cards across 2 sections ("Lift 321 Plans" + "Popular Plans"). Built PlanCard (330×128dp simple cards) and PlanCardsScroller (horizontal scroll with peeks) components. Full HomePage-mirrored layout with fixed top/bottom bars and scrollable content. Bidirectional navigation via bottom tab bar. Fixed Supabase mock client with all auth methods. Added theme tokens: planCard section, interaction.cardActiveOpacity. Applied CLAUDE_DEV_STANDARDS to all v1.1.7 files. Created GitHub issue #20 for Coach/Training Plan integration.
@@ -425,11 +407,11 @@ DB schema/tables | Supabase Auth config | TS types from DB | Actual authenticati
 - **GitHub**: https://github.com/WillyDrucker/Lift321
 - **GitHub Issues**: 8 EPICs + 10 features/tasks tracking future work
 - **Historical Context**: Fresh React Native build informed by previous project learnings (reference code at C:\Dev\Wills321 - untouched)
-- **Branch**: Claude-v1.1.5 (Data-driven exercise system complete, ready to merge)
+- **Branch**: Claude-v1.1.9 (Dynamic workout card sizing complete, ready to merge)
 
 ### Next Steps
-1. **Merge v1.1.5 to main**: Complete data-driven exercise system
-2. **Create v1.1.6**: Start next feature development
+1. **Merge v1.1.9 to main**: Complete dynamic workout card sizing
+2. **Create v1.1.10**: Start next feature development
 3. **Equipment Filtering**: Implement equipment selection logic in exercise service
 4. **Rep Count Integration**: Load rep counts from plans.json based on week
 5. **Exercise Images**: Expand image mapping for all exercises
@@ -444,6 +426,6 @@ DB schema/tables | Supabase Auth config | TS types from DB | Actual authenticati
 
 ---
 
-**Version**: 1.1.8
-**Last Updated**: 2025-11-23
-**Status**: Plan Card Background Images Complete - Ready to Merge and Continue
+**Version**: 1.1.9
+**Last Updated**: 2025-11-27
+**Status**: Dynamic Workout Card Sizing Complete - Ready to Merge and Continue
