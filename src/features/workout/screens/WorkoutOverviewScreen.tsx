@@ -309,7 +309,8 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
       onSidebarSelect={handleSidebarSelect}
       onBackPress={handleBackPress}
       onMenuPress={handleMenuPress}
-      onGuidePress={handleGuidePress}>
+      onGuidePress={handleGuidePress}
+      navigation={navigation}>
       {/* Scrollable Content Area */}
       <ScrollView
         style={styles.scrollView}

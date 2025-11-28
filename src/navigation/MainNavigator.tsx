@@ -18,6 +18,7 @@ import {HelpScreen} from '@/features/main/screens/HelpScreen';
 import {DevToolsScreen} from '@/features/main/screens/DevToolsScreen';
 import {WorkoutOverviewScreen} from '@/features/workout/screens/WorkoutOverviewScreen';
 import {ActiveWorkoutScreen} from '@/features/workout/screens/ActiveWorkoutScreen';
+import {ActiveWorkoutProvider} from '@/features/workout/context/ActiveWorkoutContext';
 import type {MainStackParamList} from './types';
 
 // === TYPES ===
@@ -40,23 +41,25 @@ const Stack = createNativeStackNavigator<MainStackParamList>();
  */
 export const MainNavigator: React.FC<MainNavigatorProps> = () => {
   return (
-    <Stack.Navigator
-      initialRouteName="Tabs"
-      screenOptions={{
-        headerShown: false,
-        animation: 'none', // Disable all default animations
-      }}
-    >
-      {/* Tab Navigator - Home, Plans, Social screens */}
-      <Stack.Screen name="Tabs" component={TabNavigator} />
+    <ActiveWorkoutProvider>
+      <Stack.Navigator
+        initialRouteName="Tabs"
+        screenOptions={{
+          headerShown: false,
+          animation: 'none', // Disable all default animations
+        }}
+      >
+        {/* Tab Navigator - Home, Plans, Social screens */}
+        <Stack.Screen name="Tabs" component={TabNavigator} />
 
-      {/* Modal/Overlay screens - pushed on top of tabs */}
-      <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
-      <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
-      <Stack.Screen name="HelpScreen" component={HelpScreen} />
-      <Stack.Screen name="DevToolsScreen" component={DevToolsScreen} />
-      <Stack.Screen name="WorkoutOverview" component={WorkoutOverviewScreen} />
-      <Stack.Screen name="ActiveWorkout" component={ActiveWorkoutScreen} />
-    </Stack.Navigator>
+        {/* Modal/Overlay screens - pushed on top of tabs */}
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+        <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
+        <Stack.Screen name="HelpScreen" component={HelpScreen} />
+        <Stack.Screen name="DevToolsScreen" component={DevToolsScreen} />
+        <Stack.Screen name="WorkoutOverview" component={WorkoutOverviewScreen} />
+        <Stack.Screen name="ActiveWorkout" component={ActiveWorkoutScreen} />
+      </Stack.Navigator>
+    </ActiveWorkoutProvider>
   );
 };
