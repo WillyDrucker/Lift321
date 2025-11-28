@@ -121,17 +121,24 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
         <BottomTabBar
           state={{
             routes: [
-              {key: 'home', name: 'HomePage'},
-              {key: 'plans', name: 'PlansPage'},
-              {key: 'social', name: 'SocialScreen'},
+              {key: 'home', name: 'HomePage', params: undefined},
+              {key: 'plans', name: 'PlansPage', params: undefined},
+              {key: 'social', name: 'SocialScreen', params: undefined},
             ],
             index: 0, // Default to home tab (workout screens are part of home flow)
             type: 'tab' as const,
             key: 'tab',
             routeNames: ['HomePage', 'PlansPage', 'SocialScreen'],
             stale: false,
+            history: [],
           }}
-          navigation={navigation as any}
+          navigation={{
+            ...navigation,
+            navigate: (name: string, params?: any) => {
+              // Navigate to Tabs screen with specific tab as nested screen
+              navigation.navigate('Tabs' as any, {screen: name, params});
+            },
+          } as any}
         />
       </SafeAreaView>
 
