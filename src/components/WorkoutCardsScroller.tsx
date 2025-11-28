@@ -35,33 +35,22 @@ const BODY_PARTS: BodyPart[] = [
   'Legs',
 ];
 
-// Card sizing with increased peek visibility
-// Cards are 310dp with 8dp spacing and 40dp peeks for better discoverability
-const CARD_WIDTH = theme.layout.recommendedWorkout.cardWidth; // 310dp
-const CARD_SPACING = theme.layout.recommendedWorkout.cardSpacing; // 8dp
-const LEFT_MARGIN = theme.layout.recommendedWorkout.leftMargin; // 8dp
-const PEEK_AMOUNT = theme.layout.recommendedWorkout.peekAmount; // 40dp
-const SCREEN_WIDTH = Dimensions.get('window').width; // Dynamic screen width
+// Screen dimensions for dynamic card sizing
+const SCREEN_WIDTH = Dimensions.get('window').width;
 
-// Calculate snap offsets for each card to show 40dp peeks of adjacent cards
-// Card 1: offset 0 (starts at left margin)
-// Card 2+: offset ensures visible peek of previous card
-// Last card: offset ensures right margin
-const SNAP_OFFSETS = BODY_PARTS.map((_, index) => {
-  if (index === 0) return 0; // First card at left margin
-  if (index === BODY_PARTS.length - 1) {
-    // Last card: right edge at screen width - right margin
-    const cardStartPosition = LEFT_MARGIN + index * (CARD_WIDTH + CARD_SPACING);
-    return cardStartPosition - (SCREEN_WIDTH - LEFT_MARGIN - CARD_WIDTH);
-  }
-  // Middle cards: show peek of previous card on left
-  return CARD_WIDTH + (index - 1) * (CARD_WIDTH + CARD_SPACING);
-});
+// Card sizing based on margins - card fills screen minus left/right margins
+const CARD_MARGIN = 12; // Adjusted to achieve 8dp visual margin on each side
+const CARD_WIDTH = SCREEN_WIDTH - (CARD_MARGIN * 2); // Full screen width minus margins
+const CARD_SPACING = theme.layout.recommendedWorkout.cardSpacing; // 8dp gap between cards
+
+// Dynamic snap interval for uniform cards
+// Snaps at regular intervals (card width + spacing)
+const SNAP_INTERVAL = CARD_WIDTH + CARD_SPACING;
 
 // === COMPONENT ===
 
 export const WorkoutCardsScroller: React.FC<WorkoutCardsScrollerProps> =
-  React.memo(({initialScrollIndex = 0}) => {
+  React.memo(({initialScrollIndex = BODY_PARTS.length - 1}) => { // Default to last card (Legs) for testing
     // === REFS ===
 
     const scrollViewRef = useRef<ScrollView>(null);
@@ -71,11 +60,11 @@ export const WorkoutCardsScroller: React.FC<WorkoutCardsScrollerProps> =
 
     /**
      * Calculate initial scroll offset based on initialScrollIndex
-     * Uses SNAP_OFFSETS to align with same snap points used during scrolling
+     * Uses SNAP_INTERVAL to align with same snap points used during scrolling
      */
     const scrollOffset = useMemo(() => {
       const clampedIndex = Math.max(0, Math.min(initialScrollIndex, BODY_PARTS.length - 1));
-      return SNAP_OFFSETS[clampedIndex];
+      return clampedIndex * SNAP_INTERVAL; // Dynamic calculation based on interval
     }, [initialScrollIndex]);
 
     // === EFFECTS ===
@@ -107,10 +96,10 @@ export const WorkoutCardsScroller: React.FC<WorkoutCardsScrollerProps> =
           horizontal
           showsHorizontalScrollIndicator={false}
           decelerationRate={0.985}
-          snapToOffsets={SNAP_OFFSETS}
+          snapToInterval={SNAP_INTERVAL}
           snapToAlignment="start"
           disableIntervalMomentum={true}
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={{paddingLeft: CARD_MARGIN, paddingRight: CARD_MARGIN}}
           scrollEventThrottle={16}
           nestedScrollEnabled={true}
           directionalLockEnabled={true}
@@ -129,6 +118,7 @@ export const WorkoutCardsScroller: React.FC<WorkoutCardsScrollerProps> =
               index={index}
               scrollX={scrollX}
               cardIndex={index}
+              cardWidth={CARD_WIDTH}
             />
           ))}
         </Animated.ScrollView>
@@ -146,10 +136,5 @@ const styles = StyleSheet.create({
     height: theme.layout.recommendedWorkout.height,
     overflow: 'visible',
     marginBottom: 0, // No bottom margin - section header controls spacing
-  },
-
-  scrollContent: {
-    paddingLeft: theme.layout.recommendedWorkout.leftMargin,
-    paddingRight: theme.layout.recommendedWorkout.cardSpacing, // 8dp peek to show next card edge when scrolled
   },
 });

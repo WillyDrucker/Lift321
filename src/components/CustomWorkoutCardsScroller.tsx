@@ -34,27 +34,16 @@ const CUSTOM_WORKOUTS: CustomWorkout[] = [
   'Partner Mode',
 ];
 
-// Consistent card width for smooth scrolling with snapToOffsets
-// All cards are 330dp with 8dp spacing and 8dp peeks
-const CARD_WIDTH = 330;
-const CARD_SPACING = theme.layout.recommendedWorkout.cardSpacing; // 8dp
-const LEFT_MARGIN = theme.layout.recommendedWorkout.leftMargin; // 8dp
-const SCREEN_WIDTH = Dimensions.get('window').width; // Dynamic screen width
+// Screen dimensions for dynamic card sizing
+const SCREEN_WIDTH = Dimensions.get('window').width;
 
-// Calculate snap offsets for each card to ensure 8dp peeks
-// Card 1: offset 0 (starts at 8dp from left)
-// Card 2+: offset ensures previous card shows 8dp peek on left
-// Last card: offset ensures 8dp margin on right
-const SNAP_OFFSETS = CUSTOM_WORKOUTS.map((_, index) => {
-  if (index === 0) return 0; // First card at left margin
-  if (index === CUSTOM_WORKOUTS.length - 1) {
-    // Last card: right edge at screen width - right padding
-    const cardStartPosition = LEFT_MARGIN + index * (CARD_WIDTH + CARD_SPACING);
-    return cardStartPosition - (SCREEN_WIDTH - LEFT_MARGIN - CARD_WIDTH);
-  }
-  // Middle cards: show 8dp peek of previous card
-  return CARD_WIDTH + (index - 1) * (CARD_WIDTH + CARD_SPACING);
-});
+// Card sizing based on margins - card fills screen minus left/right margins
+const CARD_MARGIN = 12; // Adjusted to achieve 8dp visual margin on each side
+const CARD_WIDTH = SCREEN_WIDTH - (CARD_MARGIN * 2); // Full screen width minus margins
+const CARD_SPACING = theme.layout.recommendedWorkout.cardSpacing; // 8dp gap between cards
+
+// Dynamic snap interval for uniform cards
+const SNAP_INTERVAL = CARD_WIDTH + CARD_SPACING;
 
 // === COMPONENT ===
 
@@ -75,10 +64,10 @@ export const CustomWorkoutCardsScroller: React.FC<CustomWorkoutCardsScrollerProp
           horizontal
           showsHorizontalScrollIndicator={false}
           decelerationRate={0.985}
-          snapToOffsets={SNAP_OFFSETS}
+          snapToInterval={SNAP_INTERVAL}
           snapToAlignment="start"
           disableIntervalMomentum={true}
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={{paddingLeft: CARD_MARGIN, paddingRight: CARD_MARGIN}}
           scrollEventThrottle={16}
           nestedScrollEnabled={true}
           directionalLockEnabled={true}
@@ -97,6 +86,7 @@ export const CustomWorkoutCardsScroller: React.FC<CustomWorkoutCardsScrollerProp
               index={index + 5}
               scrollX={scrollX}
               cardIndex={index}
+              cardWidth={CARD_WIDTH}
             />
           ))}
         </Animated.ScrollView>
@@ -114,10 +104,5 @@ const styles = StyleSheet.create({
     height: theme.layout.recommendedWorkout.height,
     overflow: 'visible',
     marginBottom: 0, // No bottom margin - scrollView paddingBottom controls spacing
-  },
-
-  scrollContent: {
-    paddingLeft: theme.layout.recommendedWorkout.leftMargin,
-    paddingRight: theme.layout.recommendedWorkout.cardSpacing, // 8dp peek to show next card edge when scrolled
   },
 });

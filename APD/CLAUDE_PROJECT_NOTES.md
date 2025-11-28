@@ -16,6 +16,45 @@ This file contains the historical record of version changes for Lift 3-2-1. Deta
 
 ## Version History
 
+### v1.1.9 - Dynamic Workout Card Sizing (2025-11-27)
+**Branch**: Claude-v1.1.9
+
+**Summary**: Implemented dynamic workout card sizing based on screen width minus margins. Cards now fill screen width with configurable margins instead of fixed pixel widths. Unified approach across WorkoutCardsScroller and CustomWorkoutCardsScroller components. Added cardWidth prop to WorkoutCard for parent-controlled sizing. Simplified snap behavior using snapToInterval. Initial scroll defaults to last card (Legs) for edge spacing testing.
+
+**What Was Built**:
+- **Dynamic Card Width Calculation** (WorkoutCardsScroller.tsx, CustomWorkoutCardsScroller.tsx):
+  - Card width calculated as: SCREEN_WIDTH - (CARD_MARGIN * 2)
+  - CARD_MARGIN = 12 achieves 8dp visual margin on each side (scaling factor discovered through testing)
+  - Snap interval calculated dynamically: CARD_WIDTH + CARD_SPACING
+  - Removed dependency on fixed cardWidth theme token
+  - Replaced snapToOffsets with simpler snapToInterval approach
+  - Inline contentContainerStyle with CARD_MARGIN padding
+
+- **WorkoutCard Props Enhancement** (WorkoutCard.tsx):
+  - Added optional `cardWidth?: number` prop for dynamic sizing from parent
+  - Falls back to theme.layout.recommendedWorkout.cardWidth if prop not provided
+  - Maintains backward compatibility with existing usage
+  - Scroll interpolations use dynamic cardWidth for accurate calculations
+
+- **Testing Configuration**:
+  - Initial scroll index defaults to last card (Legs) for testing right edge spacing
+  - Easy to verify margin consistency on both edges
+
+**Files Modified**:
+- src/components/WorkoutCardsScroller.tsx - Dynamic sizing, snapToInterval
+- src/components/CustomWorkoutCardsScroller.tsx - Same dynamic sizing approach
+- src/components/WorkoutCard.tsx - cardWidth prop addition
+- src/components/WelcomeBox.tsx - Minor cleanup
+- src/features/main/screens/HomePage.tsx - Minor cleanup
+- src/theme/layout.ts - Token adjustments
+
+**Technical Decisions**:
+- **Why CARD_MARGIN = 12 for 8dp visual**: Through testing, discovered that setting margin values to 12 produces 8dp visual spacing. This appears to be a density-related scaling factor on the test device.
+- **Why snapToInterval over snapToOffsets**: Simpler calculation, works with dynamic widths, and provides consistent snap behavior across all cards.
+- **Why cardWidth as prop**: Allows parent scroller to control card sizing while maintaining backward compatibility for cards used outside scrollers.
+
+---
+
 ### v1.1.8 - Plan Card Background Images (2025-11-23)
 **Branch**: Claude-v1.1.8
 
