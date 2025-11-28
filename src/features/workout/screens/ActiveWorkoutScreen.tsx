@@ -331,11 +331,14 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.actionWarning,
   },
   editButton: {
-    marginLeft: theme.spacing.xs,
+    position: 'absolute',
+    right: 0,
   },
   todaysWorkoutHeader: {
+    position: 'relative',
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 13,
     marginBottom: 13,
   },
