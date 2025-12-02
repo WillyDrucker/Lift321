@@ -19,3 +19,5 @@ export {PlansIcon} from './PlansIcon';
 export {HistoryIcon} from './HistoryIcon';
 export {StatsIcon} from './StatsIcon';
 export {ProfileIcon} from './ProfileIcon';
+export {PencilIcon} from './PencilIcon';
+export {TrashIcon} from './TrashIcon';
