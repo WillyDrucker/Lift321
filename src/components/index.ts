@@ -26,6 +26,8 @@ export {RecommendedWorkoutBox} from './RecommendedWorkoutBox';
 export {WorkoutCard} from './WorkoutCard';
 export {WorkoutCardsScroller} from './WorkoutCardsScroller';
 export {CustomWorkoutCardsScroller} from './CustomWorkoutCardsScroller';
+export {PlanCard} from './PlanCard';
+export {PlanCardsScroller} from './PlanCardsScroller';
 export {ActivityFeedCard} from './ActivityFeedCard';
 export {Sidebar} from './Sidebar';
 

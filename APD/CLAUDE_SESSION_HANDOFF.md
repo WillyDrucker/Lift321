@@ -5,10 +5,10 @@ Primary context restoration file for Claude Code sessions. Contains current sess
 
 ---
 
-## Current Version: 1.1.10
+## Current Version: 1.1.12
 
-**Branch**: Claude-v1.1.10
-**Status**: CLAUDE_DEV_STANDARDS Audit Complete
+**Branch**: Claude-v1.1.12
+**Status**: Ready for New Development
 **Last Updated**: 2025-12-02
 
 ---
@@ -16,16 +16,8 @@ Primary context restoration file for Claude Code sessions. Contains current sess
 ## Session State
 
 ### Current Work
-- Complete CLAUDE_DEV_STANDARDS audit (105 files, 98 compliant, 7 fixed)
-- Added 6 new theme tokens: controlSuccessBackground, controlWarningBackground, achievementGold, customWorkoutBlue/Yellow/Cyan
-- Merged son's active workout implementation from main
-- Installed react-native-youtube-iframe + react-native-webview
-
-### Completed This Session
-- **Theme Tokens**: 6 new color tokens for control states, achievements, custom workouts
-- **File Headers**: Added to PencilIcon.tsx, TrashIcon.tsx
-- **Color Fixes**: Replaced hardcoded colors in RepsControlCard, WeightControlCard, WorkoutTimer, ActivityFeedCard, WorkoutCard
-- **Merged**: Son's active workout, VideoCard, icon components, bottom nav fixes
+- New branch created from v1.1.11 (major style refactoring complete)
+- Ready for next feature development
 
 ### Next Session Should
 1. Test active workout flow
@@ -36,6 +28,12 @@ Primary context restoration file for Claude Code sessions. Contains current sess
 ---
 
 ## Previous Sessions (5 Recent)
+
+### v1.1.11 - Major Style Refactoring (2025-12-02)
+File cleanup and style extraction. Moved USERPROMPT/ to APD/USERPROMPT/. Deleted stale files. Extracted styles from 4 large components: WorkoutOverviewScreen (950→528), WorkoutCard (467→276), ActiveWorkoutScreen (402→306), Sidebar (368→279). Created pattern: Component.tsx + Component.styles.ts + Component.helpers.ts.
+
+### v1.1.10 - CLAUDE_DEV_STANDARDS Audit (2025-12-02)
+Complete codebase audit (105 files, 98 compliant, 7 fixed). Added 6 theme tokens for control states, achievements, custom workouts. Fixed file headers and hardcoded colors. Merged son's active workout implementation. Purged APD files to ~100-130 lines.
 
 ### v1.1.9 - Dynamic Workout Card Sizing (2025-11-27)
 Dynamic card sizing based on screen width minus margins. Cards fill screen with 8dp visual margins. Unified approach for both scrollers. Added cardWidth prop to WorkoutCard. Simplified to snapToInterval.
@@ -48,9 +46,6 @@ PlansPage with 11 plan cards in 2 sections. PlanCard (330×128dp) and PlanCardsS
 
 ### v1.1.5 - Data-Driven Exercise System (2025-01-22)
 Exercise service with session type filtering. Duration calculator utility. WorkoutOverviewScreen refactor. Eliminated 180+ lines hardcoded JSX.
-
-### v1.1.0-1.1.4 - Foundation (2025-11-15 to 2025-01-19)
-Environment setup, guest login, WorkoutOverviewScreen, font management, navigation complete.
 
 ---
 
@@ -82,6 +77,12 @@ v1.0.8-1.0.15: Complete tokenization, component library (ShadowButton, FormInput
 | Utils | src/utils/ | dateUtils, validationUtils, durationCalculator |
 | Theme | src/theme/ | colors, spacing, typography, layout |
 
+### File Organization Pattern (New)
+Large components follow this structure:
+- `Component.tsx` - Component logic (~200-300 lines)
+- `Component.styles.ts` - StyleSheet definitions
+- `Component.helpers.ts` - Helper functions (if needed)
+
 ### Critical Patterns
 - **Design Tokens**: ALL styling via `theme.*` - no magic numbers
 - **Absolute Imports**: Use `@/` aliases only
@@ -105,4 +106,4 @@ v1.0.8-1.0.15: Complete tokenization, component library (ShadowButton, FormInput
 
 ---
 
-**Version**: 1.1.10 | **Updated**: 2025-12-02
+**Version**: 1.1.12 | **Updated**: 2025-12-02
