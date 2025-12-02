@@ -130,7 +130,6 @@ See APD/CLAUDE_DEV_STANDARDS.md for detailed pattern documentation.
 ## Git Workflow
 
 - Branch Naming: Claude-vX.X.X
-- Current Branch: Claude-v1.0.4
 - Main Branch: main
 - Commit Policy: Do not commit unless explicitly requested by user
 - **Important**: Do not prompt user to commit changes unless explicitly requested - focus on development and let user control git operations

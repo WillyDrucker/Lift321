@@ -11,7 +11,7 @@
 import React, {useRef} from 'react';
 import {ScrollView, StyleSheet, View, ImageSourcePropType, useWindowDimensions} from 'react-native';
 import {theme} from '@/theme';
-import {PlanCard} from './PlanCard';
+import {PlanCard} from '@/components';
 
 // === TYPES ===
 
