@@ -170,11 +170,11 @@ const styles = StyleSheet.create({
   },
   timerRunning: {
     borderColor: theme.colors.actionSuccess,
-    backgroundColor: 'rgba(0, 255, 0, 0.1)',
+    backgroundColor: theme.colors.controlSuccessBackground,
   },
   timerFinished: {
       borderColor: theme.colors.actionWarning,
-      backgroundColor: 'rgba(255, 170, 0, 0.1)',
+      backgroundColor: theme.colors.controlWarningBackground,
   },
   timerLabel: {
     fontSize: 10,

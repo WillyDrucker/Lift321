@@ -212,6 +212,39 @@ export const colors = {
   facebookBlue: '#1877F2',
   // Facebook Blue (#1877F2) - Official Facebook brand color
   // Use for: Facebook logo, Facebook-branded buttons and elements
+
+  // === CONTROL STATE BACKGROUNDS ===
+  // Semi-transparent background colors for interactive controls
+
+  controlSuccessBackground: 'rgba(0, 255, 0, 0.1)',
+  // Green 10% opacity - Success state background
+  // Use for: Active timer background, completed control states
+
+  controlWarningBackground: 'rgba(255, 170, 0, 0.1)',
+  // Orange 10% opacity - Warning state background
+  // Use for: Finished timer background, warning control states
+
+  // === ACHIEVEMENT COLORS ===
+  // Colors for achievements, badges, and special accomplishments
+
+  achievementGold: '#FFD700',
+  // Gold (#FFD700) - Achievement/badge color
+  // Use for: Achievement icons, milestone badges, special accomplishments
+
+  // === CUSTOM WORKOUT COLORS ===
+  // Distinctive colors for custom workout types
+
+  customWorkoutBlue: '#0099FF',
+  // Blue (#0099FF) - Custom and Work-As-You-Go workouts
+  // Use for: Custom workout cards, Work-As-You-Go mode indicators
+
+  customWorkoutYellow: '#FFFF00',
+  // Yellow (#FFFF00) - SuperSet workout mode
+  // Use for: SuperSet mode cards and indicators
+
+  customWorkoutCyan: '#00FFEE',
+  // Cyan (#00FFEE) - Partner Mode workouts
+  // Use for: Partner Mode cards and indicators
 } as const;
 
 // TypeScript helper for autocomplete

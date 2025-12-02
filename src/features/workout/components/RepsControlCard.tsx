@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   },
   incrementButton: {
      borderColor: theme.colors.actionSuccess,
-     backgroundColor: 'rgba(0, 255, 0, 0.1)',
+     backgroundColor: theme.colors.controlSuccessBackground,
   },
   adjustButtonTextSmall: {
     color: theme.colors.textSecondary,

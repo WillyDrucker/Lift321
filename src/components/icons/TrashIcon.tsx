@@ -1,3 +1,12 @@
+// ==========================================================================
+// TRASH ICON COMPONENT
+//
+// SVG trash/delete icon for UI interactions.
+//
+// Dependencies: react-native-svg
+// Used by: ActiveWorkoutScreen
+// ==========================================================================
+
 import React from 'react';
 import {Svg, Path, SvgProps} from 'react-native-svg';
 import {theme} from '@/theme';
