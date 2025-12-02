@@ -73,13 +73,13 @@ const getCustomWorkoutColor = (workoutType: WorkoutType): string | null => {
 
   switch (workoutType) {
     case 'Custom':
-      return '#0099FF'; // Blue
+      return theme.colors.customWorkoutBlue;
     case 'Work-As-You-Go':
-      return '#0099FF'; // Blue
+      return theme.colors.customWorkoutBlue;
     case 'SuperSet':
-      return '#FFFF00'; // Yellow
+      return theme.colors.customWorkoutYellow;
     case 'Partner Mode':
-      return '#00ffee'; // Cyan
+      return theme.colors.customWorkoutCyan;
     default:
       return null;
   }

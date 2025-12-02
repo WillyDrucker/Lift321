@@ -41,7 +41,7 @@ export const ActivityFeedCard: React.FC<ActivityFeedCardProps> = React.memo(({
       case 'personal_record':
         return theme.colors.actionSuccess; // Green for PRs
       case 'achievement':
-        return '#FFD700'; // Gold for achievements
+        return theme.colors.achievementGold;
       case 'workout_completed':
       default:
         return theme.colors.textSecondary; // Gray for regular workouts
