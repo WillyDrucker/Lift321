@@ -7,6 +7,32 @@ Version history and changelog for Lift 3-2-1. Recent versions (5) are detailed, 
 
 ## Version History
 
+### v1.1.11 - Major Style Refactoring (2025-12-02)
+**Branch**: Claude-v1.1.11
+
+**Summary**: File cleanup and major style extraction refactor. Moved USERPROMPT/ to APD/USERPROMPT/. Deleted stale files (REFACTORING_FEATURES.md, .gitkeep). Extracted styles from 4 large components to separate files, establishing new file organization pattern.
+
+**What Was Built**:
+- **File Cleanup**: Reorganized USERPROMPT folder, deleted stale documentation
+- **Style Extraction**: Created 5 new style/helper files
+- **WorkoutOverviewScreen**: 950→528 lines (44% reduction)
+- **WorkoutCard**: 467→276 lines (41% reduction), also extracted helpers
+- **ActiveWorkoutScreen**: 402→306 lines (24% reduction)
+- **Sidebar**: 368→279 lines (24% reduction)
+
+**New Pattern Established**:
+```
+Component.tsx        # Logic (~200-300 lines)
+Component.styles.ts  # StyleSheet definitions
+Component.helpers.ts # Helper functions (if needed)
+```
+
+**Files Created**: WorkoutOverviewScreen.styles.ts, WorkoutCard.styles.ts, WorkoutCard.helpers.ts, ActiveWorkoutScreen.styles.ts, Sidebar.styles.ts
+
+**Files Modified**: WorkoutOverviewScreen.tsx, WorkoutCard.tsx, ActiveWorkoutScreen.tsx, Sidebar.tsx, components/index.ts, PlanCardsScroller.tsx, CLAUDE.md
+
+---
+
 ### v1.1.10 - CLAUDE_DEV_STANDARDS Audit (2025-12-02)
 **Branch**: Claude-v1.1.10
 

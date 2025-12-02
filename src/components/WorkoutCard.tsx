@@ -9,110 +9,36 @@
 // ==========================================================================
 
 import React, {useEffect, useRef} from 'react';
-import {Animated, StyleSheet, Text, Image, View, ImageSourcePropType, Pressable, Easing} from 'react-native';
+import {Animated, Text, Image, View, Pressable} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {theme} from '@/theme';
 import type {MainStackParamList} from '@/navigation/types';
+import {styles} from './WorkoutCard.styles';
+import {
+  type WorkoutType,
+  type BodyPart,
+  type CustomWorkout,
+  isBodyPart,
+  getWorkoutTitle,
+  getCustomWorkoutColor,
+  getWorkoutImage,
+} from './WorkoutCard.helpers';
+
+// Re-export types for external consumers
+export type {BodyPart, CustomWorkout, WorkoutType};
 
 // === TYPES ===
-
-export type BodyPart = 'Chest' | 'Arms' | 'Shoulders' | 'Back & Tris' | 'Legs';
-export type CustomWorkout = 'Custom' | 'Work-As-You-Go' | 'SuperSet' | 'Partner Mode';
-export type WorkoutType = BodyPart | CustomWorkout;
 
 export type WorkoutCardProps = {
   workoutType: WorkoutType;
   animatedTop?: Animated.Value;
   isFirstCard?: boolean;
   isLastCard?: boolean;
-  index?: number; // Card index for staggered entrance animation
-  scrollX?: Animated.Value; // Scroll position for scroll-based animations
-  cardIndex?: number; // Card position in scroller for interpolation calculations
-  cardWidth?: number; // Dynamic card width from parent scroller
-};
-
-// === HELPERS ===
-
-/**
- * Helper to check if workout type is a body part
- */
-const isBodyPart = (workoutType: WorkoutType): workoutType is BodyPart => {
-  return ['Chest', 'Arms', 'Shoulders', 'Back & Tris', 'Legs'].includes(workoutType);
-};
-
-/**
- * Gets workout card title based on workout type
- */
-const getWorkoutTitle = (workoutType: WorkoutType): string => {
-  // Body part workouts show just the body part name
-  if (isBodyPart(workoutType)) {
-    return workoutType;
-  }
-
-  // Custom workouts show specific names
-  switch (workoutType) {
-    case 'Custom':
-      return 'Custom Workout';
-    case 'Work-As-You-Go':
-      return 'Work-As-You-Go';
-    case 'SuperSet':
-      return 'SuperSet Mode';
-    case 'Partner Mode':
-      return 'Partner Mode';
-  }
-};
-
-/**
- * Gets custom workout color based on workout type
- */
-const getCustomWorkoutColor = (workoutType: WorkoutType): string | null => {
-  if (isBodyPart(workoutType)) {
-    return null;
-  }
-
-  switch (workoutType) {
-    case 'Custom':
-      return theme.colors.customWorkoutBlue;
-    case 'Work-As-You-Go':
-      return theme.colors.customWorkoutBlue;
-    case 'SuperSet':
-      return theme.colors.customWorkoutYellow;
-    case 'Partner Mode':
-      return theme.colors.customWorkoutCyan;
-    default:
-      return null;
-  }
-};
-
-/**
- * Gets workout image source based on workout type
- * Returns null if image doesn't exist yet
- */
-const getWorkoutImage = (workoutType: WorkoutType): ImageSourcePropType | null => {
-  switch (workoutType) {
-    // Body part workouts
-    case 'Chest':
-      return require('@/assets/images/workouts/chest.png');
-    case 'Arms':
-      return require('@/assets/images/workouts/arms.png');
-    case 'Shoulders':
-      return require('@/assets/images/workouts/shoulders.png');
-    case 'Back & Tris':
-      return require('@/assets/images/workouts/back.png');
-    case 'Legs':
-      return require('@/assets/images/workouts/legs.png');
-
-    // Custom workouts
-    case 'Custom':
-      return require('@/assets/images/workouts/custom.png');
-    case 'Work-As-You-Go':
-      return require('@/assets/images/workouts/work-as-you-go.png');
-    case 'SuperSet':
-      return require('@/assets/images/workouts/superset.png');
-    case 'Partner Mode':
-      return require('@/assets/images/workouts/partner-mode.png');
-  }
+  index?: number;
+  scrollX?: Animated.Value;
+  cardIndex?: number;
+  cardWidth?: number;
 };
 
 // === COMPONENT ===
@@ -347,120 +273,3 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(
 );
 
 WorkoutCard.displayName = 'WorkoutCard';
-
-// === STYLES ===
-// StyleSheet definitions using global theme tokens
-
-const styles = StyleSheet.create({
-  workoutCard: {
-    // Width is set dynamically using theme token (310dp)
-    height: theme.layout.recommendedWorkout.height,
-    backgroundColor: theme.colors.backgroundPrimary,
-    borderRadius: theme.layout.recommendedWorkout.borderRadius,
-    marginRight: 8, // 8dp gap between cards (explicit value)
-    overflow: 'hidden', // Clip image to border radius
-  },
-
-  headerArea: {
-    height: 48, // Fixed header area for card title (reduced from 64dp)
-    paddingLeft: theme.layout.recommendedWorkout.paddingLeft,
-    paddingTop: 0, // Vertical centering handled by justifyContent
-    justifyContent: 'center', // Center title vertically in header
-    alignItems: 'flex-start', // Left align title horizontally
-  },
-
-  workoutTitle: {
-    fontSize: theme.typography.fontSize.m,
-    fontFamily: theme.typography.fontFamily.primary,
-    color: theme.colors.pureWhite,
-  },
-
-  bodyPartTitle: {
-    fontSize: 36, // 36dp for primary workouts
-    fontFamily: theme.typography.fontFamily.workoutCard,
-    color: theme.colors.actionSuccess,
-    textTransform: 'uppercase',
-    includeFontPadding: false, // Eliminate Android font padding for precise alignment
-    transform: [{scaleX: 1.2}, {translateY: 2}], // 20% wider + 2dp down for balanced vertical centering (32px = ~11dp)
-    marginLeft: 11, // 11dp left margin to match balanced vertical spacing
-    textShadowColor: theme.colors.shadowBlack, // Black shadow
-    textShadowOffset: {width: 0, height: 2}, // Drop shadow 2dp down
-    textShadowRadius: 4, // Shadow blur radius
-  },
-
-  customWorkoutTitle: {
-    fontSize: 36, // 36dp to match primary workouts
-    fontFamily: theme.typography.fontFamily.workoutCard, // Same font as primary workouts (Zuume-ExtraBold)
-    textTransform: 'uppercase', // All caps
-    includeFontPadding: false, // Eliminate Android font padding for precise alignment
-    transform: [{scaleX: 1.2}, {translateY: 2}], // 20% wider + 2dp down for balanced vertical centering
-    marginLeft: 22, // Adjusted to maintain 16dp visual alignment from card edge
-    textShadowColor: theme.colors.shadowBlack, // Black shadow
-    textShadowOffset: {width: 0, height: 2}, // Drop shadow 2dp down
-    textShadowRadius: 4, // Shadow blur radius
-  },
-
-  imageArea: {
-    flex: 1, // Fill remaining card height below header
-    width: '100%',
-  },
-
-  workoutImage: {
-    width: '100%',
-    height: '100%',
-  },
-
-  beginButtonContainer: {
-    position: 'absolute',
-    bottom: theme.layout.recommendedWorkout.cardSpacing, // 8dp from bottom edge
-    right: theme.layout.recommendedWorkout.cardSpacing, // 8dp from right edge
-    width: 100, // 100dp width
-    height: 32, // 32dp height
-  },
-
-  beginButtonShadow: {
-    position: 'absolute',
-    width: 100,
-    height: 32,
-    backgroundColor: theme.colors.shadowBlack,
-    borderRadius: 8,
-  },
-
-  shadowLayer3: {
-    top: 6, // Furthest shadow layer (offset down)
-    right: 0,
-    opacity: 0.15,
-  },
-
-  shadowLayer2: {
-    top: 4, // Middle shadow layer (offset down)
-    right: 0,
-    opacity: 0.25,
-  },
-
-  shadowLayer1: {
-    top: 2, // Closest shadow layer (offset down)
-    right: 0,
-    opacity: 0.4,
-  },
-
-  beginButton: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    width: 100,
-    height: 32,
-    backgroundColor: theme.colors.actionSuccess, // Green background
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  beginButtonText: {
-    fontSize: theme.typography.fontSize.l, // 20dp
-    fontFamily: theme.typography.fontFamily.primary,
-    fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.pureBlack, // Black text
-    textTransform: 'uppercase',
-  },
-});
