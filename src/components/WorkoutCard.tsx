@@ -19,19 +19,23 @@ import {
   type WorkoutType,
   type BodyPart,
   type CustomWorkout,
+  type WorkoutSuggester,
+  type BodyPartOrRest,
   isBodyPart,
   getWorkoutTitle,
   getCustomWorkoutColor,
   getWorkoutImage,
 } from './WorkoutCard.helpers';
+import {getBodyPartForDay} from '@/utils/workoutSchedule';
 
 // Re-export types for external consumers
-export type {BodyPart, CustomWorkout, WorkoutType};
+export type {BodyPart, CustomWorkout, WorkoutType, WorkoutSuggester};
 
 // === TYPES ===
 
 export type WorkoutCardProps = {
-  workoutType: WorkoutType;
+  suggester?: WorkoutSuggester;  // NEW: Suggester-based mode
+  workoutType?: WorkoutType;     // LEGACY: Keep for backward compat
   animatedTop?: Animated.Value;
   isFirstCard?: boolean;
   isLastCard?: boolean;
@@ -44,7 +48,7 @@ export type WorkoutCardProps = {
 // === COMPONENT ===
 
 export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(
-  ({workoutType, animatedTop, isFirstCard = false, isLastCard = false, index = 0, scrollX, cardIndex = 0, cardWidth: propCardWidth}) => {
+  ({suggester, workoutType, animatedTop, isFirstCard = false, isLastCard = false, index = 0, scrollX, cardIndex = 0, cardWidth: propCardWidth}) => {
     // === HOOKS ===
     // Navigation hook for screen transitions
 
@@ -57,17 +61,126 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(
 
     // Press animation values
     const cardScale = useRef(new Animated.Value(1)).current;
-    const buttonScale = useRef(new Animated.Value(1)).current;
 
     // === DERIVED STATE ===
-    // Determine workout title and image based on workout type
+    // Determine content based on mode: suggester-based or legacy workoutType
 
-    const workoutTitle = getWorkoutTitle(workoutType);
-    const workoutImage = getWorkoutImage(workoutType);
-    const isBodyPartWorkout = isBodyPart(workoutType);
+    // === CARD CONTENT CONFIGURATION ===
+    // All cards now follow uniform pattern: title + overlay strip + pill
 
-    // Get color for custom workout types
-    const customWorkoutColor = getCustomWorkoutColor(workoutType);
+    // Determine if this card uses day-based rotation or static content
+    const usesDayRotation = suggester === '3-2-1 A.I. Trainer';
+
+    // Get body part for day-rotating cards
+    const bodyPart: BodyPartOrRest = usesDayRotation
+      ? getBodyPartForDay()
+      : (workoutType as BodyPart) || 'Chest'; // Default fallback
+
+    // Card title - displayed in header area
+    const workoutTitle = (() => {
+      switch (suggester) {
+        case '3-2-1 A.I. Trainer':
+          return getWorkoutTitle(bodyPart); // Day-based rotation
+        case 'Personal Trainer (Jax Mercer)':
+          return 'BICEPS + TRIS';
+        case 'Coach (Coach Schwarz)':
+          return 'BOOTCAMP';
+        case 'Partner (Willy D.)':
+          return 'CHEST';
+        case 'Custom Workout (Willy D.)':
+          return 'CHEST';
+        default:
+          return getWorkoutTitle(bodyPart);
+      }
+    })();
+
+    // Overlay strip text - displayed on semi-transparent bar at top of image
+    const overlayStripText = (() => {
+      switch (suggester) {
+        case '3-2-1 A.I. Trainer':
+          return 'A.I. Guided';
+        case 'Personal Trainer (Jax Mercer)':
+          return 'Personal Trainer';
+        case 'Coach (Coach Schwarz)':
+          return 'New Fairfield High School';
+        case 'Partner (Willy D.)':
+          return 'Partner';
+        case 'Custom Workout (Willy D.)':
+          return 'Custom';
+        default:
+          return null;
+      }
+    })();
+
+    // Card image - background image for card
+    const workoutImage = (() => {
+      switch (suggester) {
+        case '3-2-1 A.I. Trainer':
+          return getWorkoutImage(bodyPart); // Day-based rotation
+        case 'Personal Trainer (Jax Mercer)':
+          return require('@/assets/images/workouts/personal-trainer.png');
+        case 'Coach (Coach Schwarz)':
+          return require('@/assets/images/workouts/coach.png');
+        case 'Partner (Willy D.)':
+          return require('@/assets/images/workouts/partner.png'); // Static image
+        case 'Custom Workout (Willy D.)':
+          return require('@/assets/images/workouts/custom.png');
+        default:
+          return getWorkoutImage(bodyPart);
+      }
+    })();
+
+    const isBodyPartWorkout = bodyPart !== 'Rest';
+
+    // Pill text - displayed in bottom right corner pill
+    const suggesterDisplayText = (() => {
+      switch (suggester) {
+        case '3-2-1 A.I. Trainer':
+          return '3-2-1 Training';
+        case 'Personal Trainer (Jax Mercer)':
+          return 'Jax Mercer';
+        case 'Coach (Coach Schwarz)':
+          return 'Coach Schwarz';
+        case 'Partner (Willy D.)':
+          return 'Willy D.';
+        case 'Custom Workout (Willy D.)':
+          return 'Willy D.';
+        default:
+          return null;
+      }
+    })();
+
+    // Get color for custom workout types (legacy mode only)
+    const customWorkoutColor = workoutType ? getCustomWorkoutColor(workoutType) : null;
+
+    // Card accent color - used for title and pill text
+    const cardAccentColor = (() => {
+      switch (suggester) {
+        case '3-2-1 A.I. Trainer':
+          return theme.colors.actionSuccess; // Green
+        case 'Personal Trainer (Jax Mercer)':
+          return theme.colors.customWorkoutBlue;
+        case 'Coach (Coach Schwarz)':
+          return theme.colors.coachSteelBlue;
+        case 'Partner (Willy D.)':
+          return theme.colors.customWorkoutCyan;
+        case 'Custom Workout (Willy D.)':
+          return theme.colors.customWorkoutBlue;
+        default:
+          // Legacy mode: use customWorkoutColor if available, otherwise green
+          return customWorkoutColor || theme.colors.actionSuccess;
+      }
+    })();
+
+    // For navigation - static cards always go to Chest, day-rotating cards use bodyPart
+    const navigationWorkoutType: BodyPart = (() => {
+      // Only 3-2-1 A.I. Trainer uses day-based rotation
+      if (suggester === '3-2-1 A.I. Trainer') {
+        return bodyPart === 'Rest' ? 'Chest' : bodyPart as BodyPart;
+      }
+      // All other cards (static) default to Chest
+      return 'Chest';
+    })();
 
     // Use prop width if provided (dynamic sizing), otherwise fall back to theme token
     const cardWidth = propCardWidth ?? theme.layout.recommendedWorkout.cardWidth;
@@ -166,56 +279,46 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(
       }).start();
     };
 
-    // Button press animations
-    const handleButtonPressIn = () => {
-      Animated.spring(buttonScale, {
-        toValue: theme.layout.workoutCard.animation.buttonPressScaleMin,
-        friction: theme.layout.workoutCard.animation.pressSpringFriction,
-        useNativeDriver: true,
-      }).start();
-    };
-
-    const handleButtonPressOut = () => {
-      Animated.spring(buttonScale, {
-        toValue: 1,
-        friction: theme.layout.workoutCard.animation.pressSpringFriction,
-        useNativeDriver: true,
-      }).start();
-    };
-
     const handleWorkoutPress = () => {
-      navigation.navigate('WorkoutOverview', {workoutType});
+      navigation.navigate('WorkoutOverview', {
+        workoutType: navigationWorkoutType,
+        suggester: suggester,
+      });
+    };
+
+    // Spacing wrapper - handles margin between cards
+    const spacingStyle = {
+      marginRight: isLastCard ? 0 : theme.layout.recommendedWorkout.cardSpacing,
     };
 
     return (
-      <Pressable
-        onPressIn={handleCardPressIn}
-        onPressOut={handleCardPressOut}
-        onPress={handleWorkoutPress}
-      >
-        <Animated.View
-          style={[
-            styles.workoutCard,
-            {
-              width: cardWidth,
-              opacity: Animated.multiply(fadeAnim, scrollOpacity), // Combine entrance fade with scroll opacity
-              transform: [
-                {translateY: slideAnim},
-                {scale: Animated.multiply(cardScale, scrollScale)}, // Combine press scale with scroll scale
-              ],
-            },
-            animatedTop ? {top: animatedTop} : undefined,
-            isLastCard && {marginRight: 0}, // Remove right margin from last card
-          ]}
+      <View style={spacingStyle}>
+        <Pressable
+          onPressIn={handleCardPressIn}
+          onPressOut={handleCardPressOut}
+          onPress={handleWorkoutPress}
         >
-          {/* Header Area - 64dp */}
+          <Animated.View
+            style={[
+              styles.workoutCard,
+              {
+                width: cardWidth,
+                opacity: Animated.multiply(fadeAnim, scrollOpacity),
+                transform: [
+                  {translateY: slideAnim},
+                  {scale: Animated.multiply(cardScale, scrollScale)},
+                ],
+              },
+              animatedTop ? {top: animatedTop} : undefined,
+            ]}
+          >
+          {/* Header Area - title with accent color */}
           <View style={styles.headerArea}>
             <Text
               style={[
                 styles.workoutTitle,
-                isBodyPartWorkout && styles.bodyPartTitle,
-                !isBodyPartWorkout && styles.customWorkoutTitle,
-                !isBodyPartWorkout && customWorkoutColor && {color: customWorkoutColor},
+                styles.bodyPartTitle,
+                {color: cardAccentColor},
               ]}
             >
               {workoutTitle}
@@ -234,40 +337,38 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(
               >
                 <Image
                   source={workoutImage}
-                  style={styles.workoutImage}
+                  style={[
+                    styles.workoutImage,
+                    (suggester === 'Personal Trainer (Jax Mercer)' || suggester === 'Partner (Willy D.)') && styles.topAlignedImage,
+                  ]}
                   resizeMode="cover"
                 />
               </Animated.View>
+              {/* Image overlay bar - semi-transparent strip at top of image */}
+              {overlayStripText && (
+                <View style={styles.imageOverlayBar}>
+                  <Text style={styles.imageOverlayText}>{overlayStripText}</Text>
+                </View>
+              )}
             </View>
           )}
 
-          {/* Begin Button - Bottom right corner with multi-layer shadow */}
-          <View style={styles.beginButtonContainer}>
-            {/* Shadow Layer 3 - Darkest, furthest */}
-            <View style={[styles.beginButtonShadow, styles.shadowLayer3]} />
-            {/* Shadow Layer 2 - Medium darkness */}
-            <View style={[styles.beginButtonShadow, styles.shadowLayer2]} />
-            {/* Shadow Layer 1 - Lightest, closest */}
-            <View style={[styles.beginButtonShadow, styles.shadowLayer1]} />
-            {/* Actual Button */}
-            <Pressable
-              onPressIn={handleButtonPressIn}
-              onPressOut={handleButtonPressOut}
-              onPress={handleWorkoutPress}
-            >
-              <Animated.View
+          {/* Pill - Bottom right corner with accent color */}
+          {suggesterDisplayText && (
+            <View style={styles.suggesterPill}>
+              <Text
                 style={[
-                  styles.beginButton,
-                  !isBodyPartWorkout && customWorkoutColor && {backgroundColor: customWorkoutColor},
-                  {transform: [{scale: buttonScale}]},
+                  styles.suggesterText,
+                  {color: cardAccentColor},
                 ]}
               >
-                <Text style={styles.beginButtonText}>BEGIN</Text>
-              </Animated.View>
-            </Pressable>
-          </View>
+                {suggesterDisplayText}
+              </Text>
+            </View>
+          )}
       </Animated.View>
       </Pressable>
+      </View>
     );
   },
 );

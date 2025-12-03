@@ -8,7 +8,7 @@
 // Used by: HomePage
 // ==========================================================================
 
-import React, {useMemo, useRef, useEffect} from 'react';
+import React, {useRef} from 'react';
 import {
   Animated,
   Dimensions,
@@ -17,74 +17,52 @@ import {
   View,
 } from 'react-native';
 import {theme} from '@/theme';
-import {WorkoutCard, type BodyPart} from './WorkoutCard';
+import {WorkoutCard, type WorkoutSuggester} from './WorkoutCard';
 
 // === TYPES ===
 
 export type WorkoutCardsScrollerProps = {
-  initialScrollIndex?: number; // Optional index (0-4) to start scroll position at specific card
+  // No props needed - always starts at first card
 };
 
 // === CONSTANTS ===
 
-const BODY_PARTS: BodyPart[] = [
-  'Chest',
-  'Arms',
-  'Shoulders',
-  'Back & Tris',
-  'Legs',
+const SUGGESTED_WORKOUTS: WorkoutSuggester[] = [
+  '3-2-1 A.I. Trainer',
+  'Personal Trainer (Jax Mercer)',
+  'Coach (Coach Schwarz)',
+  'Partner (Willy D.)',
+  'Custom Workout (Willy D.)',
 ];
 
-// Screen dimensions for dynamic card sizing
+// === DYNAMIC CARD SIZING ===
+// All values derived from theme tokens for cross-device consistency
+// Future: Adjust CARD_WIDTH calculation to add peek amount for adjacent card visibility
+
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
-// Card sizing based on margins - card fills screen minus left/right margins
-const CARD_MARGIN = 12; // Adjusted to achieve 8dp visual margin on each side
-const CARD_WIDTH = SCREEN_WIDTH - (CARD_MARGIN * 2); // Full screen width minus margins
-const CARD_SPACING = theme.layout.recommendedWorkout.cardSpacing; // 8dp gap between cards
+// Margin configuration - derived from theme tokens
+const VISUAL_MARGIN = theme.layout.recommendedWorkout.leftMargin; // 8dp - desired visual margin from screen edges
+const SCROLL_PADDING_OFFSET = 4; // Compensation for ScrollView content padding behavior
+const CARD_MARGIN = VISUAL_MARGIN + SCROLL_PADDING_OFFSET; // Calculation value to achieve visual margin
+const CARD_SPACING = theme.layout.recommendedWorkout.cardSpacing; // 8dp - gap between cards
 
-// Dynamic snap interval for uniform cards
-// Snaps at regular intervals (card width + spacing)
+// Card dimensions - dynamically calculated based on screen width
+const CARD_WIDTH = SCREEN_WIDTH - (CARD_MARGIN * 2);
+
+// Snap interval - ensures cards snap to proper position when scrolling
 const SNAP_INTERVAL = CARD_WIDTH + CARD_SPACING;
 
 // === COMPONENT ===
 
 export const WorkoutCardsScroller: React.FC<WorkoutCardsScrollerProps> =
-  React.memo(({initialScrollIndex = BODY_PARTS.length - 1}) => { // Default to last card (Legs) for testing
+  React.memo(() => {
     // === REFS ===
 
     const scrollViewRef = useRef<ScrollView>(null);
     const scrollX = useRef(new Animated.Value(0)).current; // Track scroll position for animations
 
-    // === COMPUTED VALUES ===
-
-    /**
-     * Calculate initial scroll offset based on initialScrollIndex
-     * Uses SNAP_INTERVAL to align with same snap points used during scrolling
-     */
-    const scrollOffset = useMemo(() => {
-      const clampedIndex = Math.max(0, Math.min(initialScrollIndex, BODY_PARTS.length - 1));
-      return clampedIndex * SNAP_INTERVAL; // Dynamic calculation based on interval
-    }, [initialScrollIndex]);
-
-    // === EFFECTS ===
-
-    /**
-     * Scroll to initial position when component mounts or index changes
-     * Uses scrollTo method for proper scroll positioning
-     */
-    useEffect(() => {
-      // Small delay to ensure ScrollView is fully rendered before scrolling
-      const timeoutId = setTimeout(() => {
-        scrollViewRef.current?.scrollTo({
-          x: scrollOffset,
-          y: 0,
-          animated: false, // No animation on initial load for instant positioning
-        });
-      }, 100);
-
-      return () => clearTimeout(timeoutId);
-    }, [scrollOffset]);
+    // Always starts at first card - no initial scroll needed
 
     // === RENDER ===
 
@@ -109,12 +87,12 @@ export const WorkoutCardsScroller: React.FC<WorkoutCardsScrollerProps> =
             {useNativeDriver: true}
           )}
         >
-          {BODY_PARTS.map((bodyPart, index) => (
+          {SUGGESTED_WORKOUTS.map((suggester, index) => (
             <WorkoutCard
-              key={`${bodyPart}-${index}`}
-              workoutType={bodyPart}
+              key={`${suggester}-${index}`}
+              suggester={suggester}
               isFirstCard={index === 0}
-              isLastCard={index === BODY_PARTS.length - 1}
+              isLastCard={index === SUGGESTED_WORKOUTS.length - 1}
               index={index}
               scrollX={scrollX}
               cardIndex={index}

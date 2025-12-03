@@ -182,7 +182,7 @@ export const layout = {
     leftMargin: 8, // Left margin (8dp)
     rightMargin: 8, // Right margin (8dp)
     peekAmount: 8, // Not used - keeping for compatibility (8dp)
-    height: 240, // Fixed card height (reduced from 256dp)
+    height: 243, // Fixed card height (43dp header + 200dp image)
     borderRadius: 8, // Corner radius
     paddingLeft: 16, // Left inner padding
     paddingTop: 16, // Top inner padding

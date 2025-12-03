@@ -8,7 +8,8 @@
 // Used by: HomePage for welcome messages and workout card positioning
 // ==========================================================================
 
-import type {BodyPart} from '@/components/WorkoutCard';
+import type {BodyPart, BodyPartOrRest} from '@/components/WorkoutCard';
+import {getCurrentDate} from '@/utils/dateUtils';
 
 // ============================================================================
 // CONSTANTS
@@ -16,39 +17,28 @@ import type {BodyPart} from '@/components/WorkoutCard';
 
 /**
  * Weekly workout schedule mapping day of week to body part
- * Monday = 1, Tuesday = 2, ..., Friday = 5
- * Saturday (6) and Sunday (0) are rest days
+ * Monday = 1, Tuesday = 2, Wednesday = 3, Thursday = 4, Saturday = 6
+ * Friday (5) and Sunday (0) are rest days
  */
 const WORKOUT_SCHEDULE: Record<number, BodyPart> = {
   1: 'Chest',          // Monday
   2: 'Arms',           // Tuesday
   3: 'Shoulders',      // Wednesday
   4: 'Back & Tris',    // Thursday
-  5: 'Legs',           // Friday
+  6: 'Legs',           // Saturday
 };
 
-/**
- * Ordered list of body parts for indexing
- * Used to calculate scroll positions in WorkoutCardsScroller
- */
-const BODY_PARTS_ORDER: BodyPart[] = [
-  'Chest',
-  'Arms',
-  'Shoulders',
-  'Back & Tris',
-  'Legs',
-];
 
 // ============================================================================
 // DAY OF WEEK FUNCTIONS
 // ============================================================================
 
 /**
- * Gets current day of week
+ * Gets current day of week (respects dev tools day override)
  * @returns 0-6 where 0 = Sunday, 1 = Monday, ..., 6 = Saturday
  */
 export const getCurrentDayOfWeek = (): number => {
-  return new Date().getDay();
+  return getCurrentDate().getDay();
 };
 
 /**
@@ -65,32 +55,22 @@ export const isRestDay = (): boolean => {
 // ============================================================================
 
 /**
- * Gets recommended workout for current day
- * On rest days (Sat/Sun), returns Monday's workout (Chest) as the next scheduled workout
+ * Gets body part workout for a specific day of week
+ * Used by suggested workout cards to display day-based content
  *
- * @returns Recommended body part workout for today
+ * @param dayOfWeek - Optional day (0=Sun, 1=Mon, ..., 6=Sat). Defaults to current day.
+ * @returns Body part or 'Rest' for the specified day
  */
-export const getRecommendedWorkout = (): BodyPart => {
-  const day = getCurrentDayOfWeek();
+export const getBodyPartForDay = (dayOfWeek?: number): BodyPartOrRest => {
+  const day = dayOfWeek ?? getCurrentDayOfWeek();
 
-  // Rest days default to Monday's workout (Chest)
-  if (day === 0 || day === 6) {
-    return 'Chest';
+  // Friday (5) and Sunday (0) are rest days
+  if (day === 5 || day === 0) {
+    return 'Rest';
   }
 
-  // Return scheduled workout for weekdays
-  return WORKOUT_SCHEDULE[day];
-};
-
-/**
- * Gets array index for recommended workout
- * Used to calculate initial scroll position in WorkoutCardsScroller
- *
- * @returns Index (0-4) of recommended workout in BODY_PARTS_ORDER array
- */
-export const getWorkoutIndexForDay = (): number => {
-  const recommendedWorkout = getRecommendedWorkout();
-  return BODY_PARTS_ORDER.indexOf(recommendedWorkout);
+  // Return scheduled workout or default to Chest
+  return WORKOUT_SCHEDULE[day] ?? 'Chest';
 };
 
 // ============================================================================

@@ -30,7 +30,7 @@ import {
   Sidebar,
 } from '@/components';
 import {useSwipeGesture} from '@/hooks';
-import {getWelcomeMessage, getWorkoutIndexForDay} from '@/utils/workoutSchedule';
+import {getWelcomeMessage} from '@/utils/workoutSchedule';
 import {disableGuestMode, signOut} from '@/services';
 
 // === TYPES ===
@@ -52,7 +52,6 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
   // Day-of-week based workout recommendations
 
   const welcomeMessage = getWelcomeMessage(); // Dynamic message based on rest day or workout day
-  const initialScrollIndex = getWorkoutIndexForDay(); // Auto-position scroller to today's workout
 
   // No animated positioning needed for flow layout - cards stack naturally
 
@@ -161,13 +160,13 @@ export const HomePage: React.FC<HomePageProps> = ({navigation}) => {
             panHandlers={panHandlers}
           />
 
-          {/* Primary Workouts Section Header */}
+          {/* My Workouts Section Header */}
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionHeaderText}>Primary Workouts</Text>
+            <Text style={styles.sectionHeaderText}>My Workouts</Text>
           </View>
 
           {/* Workout Cards Scroller */}
-          <WorkoutCardsScroller initialScrollIndex={initialScrollIndex} />
+          <WorkoutCardsScroller />
 
           {/* Specialized Workouts Section Header */}
           <View style={styles.sectionHeader}>
