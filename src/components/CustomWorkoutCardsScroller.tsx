@@ -34,15 +34,22 @@ const CUSTOM_WORKOUTS: CustomWorkout[] = [
   'Partner Mode',
 ];
 
-// Screen dimensions for dynamic card sizing
+// === DYNAMIC CARD SIZING ===
+// All values derived from theme tokens for cross-device consistency
+// Future: Adjust CARD_WIDTH calculation to add peek amount for adjacent card visibility
+
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
-// Card sizing based on margins - card fills screen minus left/right margins
-const CARD_MARGIN = 12; // Adjusted to achieve 8dp visual margin on each side
-const CARD_WIDTH = SCREEN_WIDTH - (CARD_MARGIN * 2); // Full screen width minus margins
-const CARD_SPACING = theme.layout.recommendedWorkout.cardSpacing; // 8dp gap between cards
+// Margin configuration - derived from theme tokens
+const VISUAL_MARGIN = theme.layout.recommendedWorkout.leftMargin; // 8dp - desired visual margin from screen edges
+const SCROLL_PADDING_OFFSET = 4; // Compensation for ScrollView content padding behavior
+const CARD_MARGIN = VISUAL_MARGIN + SCROLL_PADDING_OFFSET; // Calculation value to achieve visual margin
+const CARD_SPACING = theme.layout.recommendedWorkout.cardSpacing; // 8dp - gap between cards
 
-// Dynamic snap interval for uniform cards
+// Card dimensions - dynamically calculated based on screen width
+const CARD_WIDTH = SCREEN_WIDTH - (CARD_MARGIN * 2);
+
+// Snap interval - ensures cards snap to proper position when scrolling
 const SNAP_INTERVAL = CARD_WIDTH + CARD_SPACING;
 
 // === COMPONENT ===

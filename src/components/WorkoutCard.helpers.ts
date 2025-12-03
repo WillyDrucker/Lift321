@@ -17,6 +17,15 @@ export type BodyPart = 'Chest' | 'Arms' | 'Shoulders' | 'Back & Tris' | 'Legs';
 export type CustomWorkout = 'Custom' | 'Work-As-You-Go' | 'SuperSet' | 'Partner Mode';
 export type WorkoutType = BodyPart | CustomWorkout;
 
+export type WorkoutSuggester =
+  | '3-2-1 A.I. Trainer'
+  | 'Personal Trainer (Jax Mercer)'
+  | 'Coach (Coach Schwarz)'
+  | 'Partner (Willy D.)'
+  | 'Custom Workout (Willy D.)';
+
+export type BodyPartOrRest = BodyPart | 'Rest';
+
 // === HELPER FUNCTIONS ===
 
 /**
@@ -29,7 +38,12 @@ export const isBodyPart = (workoutType: WorkoutType): workoutType is BodyPart =>
 /**
  * Gets workout card title based on workout type
  */
-export const getWorkoutTitle = (workoutType: WorkoutType): string => {
+export const getWorkoutTitle = (workoutType: BodyPartOrRest | CustomWorkout): string => {
+  // Handle rest day
+  if (workoutType === 'Rest') {
+    return 'Rest';
+  }
+
   if (isBodyPart(workoutType)) {
     return workoutType;
   }
@@ -70,9 +84,14 @@ export const getCustomWorkoutColor = (workoutType: WorkoutType): string | null =
 
 /**
  * Gets workout image source based on workout type
- * Returns null if image doesn't exist yet
+ * Returns null if image doesn't exist yet or for rest days
  */
-export const getWorkoutImage = (workoutType: WorkoutType): ImageSourcePropType | null => {
+export const getWorkoutImage = (workoutType: BodyPartOrRest | CustomWorkout): ImageSourcePropType | null => {
+  // Rest day - no image
+  if (workoutType === 'Rest') {
+    return null;
+  }
+
   switch (workoutType) {
     // Body part workouts
     case 'Chest':
@@ -88,7 +107,7 @@ export const getWorkoutImage = (workoutType: WorkoutType): ImageSourcePropType |
 
     // Custom workouts
     case 'Custom':
-      return require('@/assets/images/workouts/custom.png');
+      return require('@/assets/images/workouts/custom-mode.png');
     case 'Work-As-You-Go':
       return require('@/assets/images/workouts/work-as-you-go.png');
     case 'SuperSet':

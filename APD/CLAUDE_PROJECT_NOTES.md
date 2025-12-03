@@ -7,6 +7,35 @@ Version history and changelog for Lift 3-2-1. Recent versions (5) are detailed, 
 
 ## Version History
 
+### v1.1.12 - Unified Workout Card System (2025-12-03)
+**Branch**: Claude-v1.1.12
+
+**Summary**: Complete unification of My Workouts card system. New overlay strip pattern for all cards with semi-transparent bar at top of image. Suggester-based architecture with centralized accent colors. Static images for Personal Trainer, Coach, Partner, Custom cards. Day-based rotation only for 3-2-1 A.I. Trainer. Transform origin fix for consistent text alignment.
+
+**What Was Built**:
+- **Overlay Strip Pattern**: Semi-transparent bar at top of image area with category text
+- **Suggester Architecture**: Centralized card configuration via switch statements
+- **Accent Color System**: Per-card colors for title and pill (green, blue, steel blue, cyan)
+- **Static Card Images**: personal-trainer.png, coach.png, partner.png, custom.png
+- **Day Rotation**: Only 3-2-1 A.I. Trainer uses getBodyPartForDay()
+- **Transform Origin Fix**: `transformOrigin: 'left center'` for consistent left alignment
+- **Legacy Mode Support**: Specialized Workouts still use workoutType prop with proper colors
+
+**Card Configuration**:
+| Card | Title | Overlay Strip | Pill | Color |
+|------|-------|---------------|------|-------|
+| 3-2-1 A.I. Trainer | Day-based | A.I. Guided | 3-2-1 Training | Green |
+| Personal Trainer | BICEPS + TRIS | Personal Trainer | Jax Mercer | Blue |
+| Coach | BOOTCAMP | New Fairfield High School | Coach Schwarz | Steel Blue |
+| Partner | CHEST | Partner | Willy D. | Cyan |
+| Custom | CHEST | Custom | Willy D. | Blue |
+
+**Files Created**: partner.png, custom.png (new images)
+
+**Files Modified**: WorkoutCard.tsx, WorkoutCard.styles.ts, WorkoutCard.helpers.ts, WorkoutCardsScroller.tsx, layout.ts (height: 243)
+
+---
+
 ### v1.1.11 - Major Style Refactoring (2025-12-02)
 **Branch**: Claude-v1.1.11
 
@@ -79,37 +108,11 @@ Component.helpers.ts # Helper functions (if needed)
 
 ---
 
-### v1.1.7 - PlansPage Implementation (2025-11-22)
-**Branch**: Claude-v1.1.7
-
-**Summary**: Complete PlansPage with 11 plan cards across 2 sections. PlanCard (330×128dp) and PlanCardsScroller components. Bidirectional bottom tab navigation. Fixed Supabase mock client with all auth methods. Created GitHub issue #20.
-
-**What Was Built**:
-- PlansPage mirroring HomePage layout
-- PlanCard and PlanCardsScroller components
-- Bottom tab navigation between HomePage ↔ PlansPage
-- Supabase mock client with signUp, signInWithPassword, etc.
-
-**Files Modified**: PlansPage.tsx, PlanCard.tsx, PlanCardsScroller.tsx, supabaseClient.ts, HomePage.tsx
-
----
-
-### v1.1.5 - Data-Driven Exercise System (2025-01-22)
-**Branch**: Claude-v1.1.5
-
-**Summary**: Created data-driven exercise system with duration calculator, exercise service for session filtering, and WorkoutOverviewScreen refactor. Duration formula: (totalSets × 6) - 2 for accurate estimates. Eliminated 180+ lines hardcoded JSX.
-
-**What Was Built**:
-- exerciseService with getExercisesForWorkout()
-- durationCalculator with calculateWorkoutDuration()
-- Session type logic: Standard (3+2+1), Express (3+2), Maintenance (2+2)
-- Dynamic exercise rendering replacing hardcoded JSX
-
-**Files Modified**: exerciseService.ts, durationCalculator.ts, WorkoutOverviewScreen.tsx
-
----
-
 ## Archived Versions (Condensed)
+
+### v1.1.5-1.1.7 - Core Features (2025-11-22 to 2025-01-22)
+- **v1.1.7**: PlansPage with 11 plan cards, PlanCard/PlanCardsScroller, bidirectional bottom tabs
+- **v1.1.5**: Data-driven exercise system, duration calculator, session type filtering, 180+ lines JSX eliminated
 
 ### v1.1.0-1.1.4 - Core Features (2025-11-15 to 2025-01-19)
 - **v1.1.4**: Font management (Zuume-ExtraBold 20% scaling), title bar refinements (66dp), dynamic duration selector
@@ -137,6 +140,7 @@ Project scaffolding, React Native 0.82.1, TypeScript strict mode, Supabase integ
 ### Technical Patterns Discovered
 - **Custom Fonts**: Never use fontWeight with custom fonts (breaks loading)
 - **Transforms**: Use translateY not marginTop with scaleX (avoids sub-pixel artifacts)
+- **Transform Origin**: Use `transformOrigin: 'left center'` with scaleX for consistent left alignment
 - **Font Metrics**: Reduce margins by ~3dp to compensate for intrinsic spacing
 - **Android Shadows**: Use multi-layer View pattern (native shadows unreliable)
 - **Metro Cache**: Reset with --reset-cache when adding new assets
@@ -146,7 +150,8 @@ Project scaffolding, React Native 0.82.1, TypeScript strict mode, Supabase integ
 - **Service Layer**: Components never query backend directly
 - **Absolute Imports**: @/ aliases only - no relative imports
 - **Session Logic**: Lift 3-2-1 = Standard(3+2+1), Express(3+2), Maintenance(2+2)
+- **Card Architecture**: Suggester-based for My Workouts, workoutType for Specialized Workouts
 
 ---
 
-**Last Updated**: 2025-12-02
+**Last Updated**: 2025-12-03

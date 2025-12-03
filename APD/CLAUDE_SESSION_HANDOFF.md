@@ -5,18 +5,18 @@ Primary context restoration file for Claude Code sessions. Contains current sess
 
 ---
 
-## Current Version: 1.1.12
+## Current Version: 1.1.13
 
-**Branch**: Claude-v1.1.12
+**Branch**: Claude-v1.1.13
 **Status**: Ready for New Development
-**Last Updated**: 2025-12-02
+**Last Updated**: 2025-12-03
 
 ---
 
 ## Session State
 
 ### Current Work
-- New branch created from v1.1.11 (major style refactoring complete)
+- New branch created from v1.1.12 (unified workout card system)
 - Ready for next feature development
 
 ### Next Session Should
@@ -29,6 +29,9 @@ Primary context restoration file for Claude Code sessions. Contains current sess
 
 ## Previous Sessions (5 Recent)
 
+### v1.1.12 - Unified Workout Card System (2025-12-03)
+Complete unification of My Workouts cards. New overlay strip pattern for all cards (semi-transparent bar at top of image). Suggester-based architecture with centralized accent colors. Static images for Personal Trainer, Coach, Partner, Custom cards. Day-based rotation only for 3-2-1 A.I. Trainer. Transform origin fix for consistent left alignment.
+
 ### v1.1.11 - Major Style Refactoring (2025-12-02)
 File cleanup and style extraction. Moved USERPROMPT/ to APD/USERPROMPT/. Deleted stale files. Extracted styles from 4 large components: WorkoutOverviewScreen (950→528), WorkoutCard (467→276), ActiveWorkoutScreen (402→306), Sidebar (368→279). Created pattern: Component.tsx + Component.styles.ts + Component.helpers.ts.
 
@@ -40,12 +43,6 @@ Dynamic card sizing based on screen width minus margins. Cards fill screen with 
 
 ### v1.1.8 - Plan Card Background Images (2025-11-23)
 Background image support for plan cards (128dp height). Image directory at src/assets/images/plans/. Text overlay with shadow. Fixed logout bug on PlansPage. Removed gray border.
-
-### v1.1.7 - PlansPage Implementation (2025-11-22)
-PlansPage with 11 plan cards in 2 sections. PlanCard (330×128dp) and PlanCardsScroller components. Bidirectional bottom tab navigation. Fixed Supabase mock client.
-
-### v1.1.5 - Data-Driven Exercise System (2025-01-22)
-Exercise service with session type filtering. Duration calculator utility. WorkoutOverviewScreen refactor. Eliminated 180+ lines hardcoded JSX.
 
 ---
 
@@ -83,6 +80,14 @@ Large components follow this structure:
 - `Component.styles.ts` - StyleSheet definitions
 - `Component.helpers.ts` - Helper functions (if needed)
 
+### WorkoutCard Architecture (v1.1.12)
+- **Suggester mode**: Cards configured via `suggester` prop
+- **Legacy mode**: Cards configured via `workoutType` prop
+- **Overlay strip**: Semi-transparent bar at top of image with category text
+- **Pill**: Bottom right corner with suggester name
+- **Accent color**: Centralized per-card color for title and pill
+- **Transform origin**: `left center` for consistent text alignment
+
 ### Critical Patterns
 - **Design Tokens**: ALL styling via `theme.*` - no magic numbers
 - **Absolute Imports**: Use `@/` aliases only
@@ -106,4 +111,4 @@ Large components follow this structure:
 
 ---
 
-**Version**: 1.1.12 | **Updated**: 2025-12-02
+**Version**: 1.1.13 | **Updated**: 2025-12-03

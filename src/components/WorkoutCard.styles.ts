@@ -16,15 +16,13 @@ export const styles = StyleSheet.create({
     height: theme.layout.recommendedWorkout.height,
     backgroundColor: theme.colors.backgroundPrimary,
     borderRadius: theme.layout.recommendedWorkout.borderRadius,
-    marginRight: 8,
     overflow: 'hidden',
   },
 
   headerArea: {
-    height: 48,
-    paddingLeft: theme.layout.recommendedWorkout.paddingLeft,
-    paddingTop: 0,
-    justifyContent: 'center',
+    height: 44, // 8dp top + ~28dp visible text + 8dp bottom to strip
+    paddingLeft: 8,
+    paddingTop: 7,
     alignItems: 'flex-start',
   },
 
@@ -40,20 +38,8 @@ export const styles = StyleSheet.create({
     color: theme.colors.actionSuccess,
     textTransform: 'uppercase',
     includeFontPadding: false,
-    transform: [{scaleX: 1.2}, {translateY: 2}],
-    marginLeft: 11,
-    textShadowColor: theme.colors.shadowBlack,
-    textShadowOffset: {width: 0, height: 2},
-    textShadowRadius: 4,
-  },
-
-  customWorkoutTitle: {
-    fontSize: 36,
-    fontFamily: theme.typography.fontFamily.workoutCard,
-    textTransform: 'uppercase',
-    includeFontPadding: false,
-    transform: [{scaleX: 1.2}, {translateY: 2}],
-    marginLeft: 22,
+    transform: [{scaleX: 1.2}],
+    transformOrigin: 'left center',
     textShadowColor: theme.colors.shadowBlack,
     textShadowOffset: {width: 0, height: 2},
     textShadowRadius: 4,
@@ -62,6 +48,7 @@ export const styles = StyleSheet.create({
   imageArea: {
     flex: 1,
     width: '100%',
+    overflow: 'hidden', // Prevent scaled images from clipping into header
   },
 
   workoutImage: {
@@ -69,57 +56,58 @@ export const styles = StyleSheet.create({
     height: '100%',
   },
 
-  beginButtonContainer: {
-    position: 'absolute',
-    bottom: theme.layout.recommendedWorkout.cardSpacing,
-    right: theme.layout.recommendedWorkout.cardSpacing,
-    width: 100,
-    height: 32,
-  },
-
-  beginButtonShadow: {
-    position: 'absolute',
-    width: 100,
-    height: 32,
-    backgroundColor: theme.colors.shadowBlack,
-    borderRadius: 8,
-  },
-
-  shadowLayer3: {
-    top: 6,
-    right: 0,
-    opacity: 0.15,
-  },
-
-  shadowLayer2: {
-    top: 4,
-    right: 0,
-    opacity: 0.25,
-  },
-
-  shadowLayer1: {
-    top: 2,
-    right: 0,
-    opacity: 0.4,
-  },
-
-  beginButton: {
+  // Top-aligned image - shows top of image, crops bottom
+  topAlignedImage: {
     position: 'absolute',
     top: 0,
-    right: 0,
-    width: 100,
-    height: 32,
-    backgroundColor: theme.colors.actionSuccess,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
+    left: 0,
+    width: '100%',
+    height: '160%',
   },
 
-  beginButtonText: {
-    fontSize: theme.typography.fontSize.l,
+  suggesterPill: {
+    position: 'absolute',
+    bottom: 8,
+    right: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)', // Semi-transparent black background
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+
+  suggesterText: {
+    fontSize: 24,
+    lineHeight: 24,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.pureBlack,
+    color: theme.colors.actionSuccess,
     textTransform: 'uppercase',
+    includeFontPadding: false,
+    textShadowColor: theme.colors.shadowBlack,
+    textShadowOffset: {width: 0, height: 2},
+    textShadowRadius: 3,
+  },
+
+  // Image overlay bar - semi-transparent strip at top of image
+  imageOverlayBar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    paddingTop: 3,
+    paddingBottom: 3,
+    paddingLeft: 8,
+  },
+
+  imageOverlayText: {
+    fontSize: 11,
+    lineHeight: 11,
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.textSecondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    includeFontPadding: false,
   },
 });

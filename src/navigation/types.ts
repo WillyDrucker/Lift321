@@ -11,7 +11,7 @@
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import type {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
 import type {CompositeScreenProps, NavigatorScreenParams} from '@react-navigation/native';
-import type {WorkoutType} from '@/components/WorkoutCard';
+import type {WorkoutType, WorkoutSuggester} from '@/components/WorkoutCard';
 import type {SessionType} from '@/services/exerciseService';
 
 // === AUTH STACK PARAM LIST ===
@@ -41,7 +41,10 @@ export type MainStackParamList = {
   SettingsScreen: undefined;
   HelpScreen: undefined;
   DevToolsScreen: undefined;
-  WorkoutOverview: {workoutType: WorkoutType};
+  WorkoutOverview: {
+    workoutType: WorkoutType;
+    suggester?: WorkoutSuggester;
+  };
   ActiveWorkout: {
     workoutType: WorkoutType;
     sessionType: SessionType;

@@ -245,6 +245,10 @@ export const colors = {
   customWorkoutCyan: '#00FFEE',
   // Cyan (#00FFEE) - Partner Mode workouts
   // Use for: Partner Mode cards and indicators
+
+  coachSteelBlue: '#708090',
+  // Steel Blue (#708090) - Coach/training activities (slate grey with blue undertone)
+  // Use for: Coach cards, coaching mode indicators, professional training sessions
 } as const;
 
 // TypeScript helper for autocomplete
