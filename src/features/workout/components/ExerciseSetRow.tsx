@@ -149,11 +149,13 @@ export const ExerciseSetRow: React.FC<ExerciseSetRowProps> = ({
                 <TrashIcon width={20} height={20} />
               </TouchableOpacity>
             ) : (
-              <View style={[
-                  styles.statusIndicator, 
-                  completed ? {backgroundColor: sessionColor} : {borderColor: theme.colors.textSecondary, borderWidth: 1}
-              ]}>
-                  {completed && <Text style={styles.checkmark}>✓</Text>}
+              <View style={styles.statusIndicator}>
+                {completed && (
+                  <>
+                    <View style={[StyleSheet.absoluteFill, {backgroundColor: sessionColor, borderRadius: 10}]} />
+                    <Text style={styles.checkmark}>✓</Text>
+                  </>
+                )}
               </View>
             )}
         </View>
@@ -205,7 +207,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   exerciseName: {
-    fontSize: 10, 
+    fontSize: theme.typography.fontSize.xs,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.actionSuccess,
@@ -215,13 +217,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   label: {
-    fontSize: 10,
+    fontSize: theme.typography.fontSize.xxs,
     color: theme.colors.textSecondary,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
   },
   highlight: {
-    fontSize: 10,
+    fontSize: theme.typography.fontSize.xxs,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
   },
@@ -236,7 +238,7 @@ const styles = StyleSheet.create({
     width: 36,
   },
   valueLabel: {
-    fontSize: 8,
+    fontSize: theme.typography.fontSize.xxs,
     color: theme.colors.textSecondary,
     marginBottom: 2,
     fontFamily: theme.typography.fontFamily.primary,
@@ -255,7 +257,7 @@ const styles = StyleSheet.create({
   },
   valueText: {
     color: theme.colors.pureWhite,
-    fontSize: 12,
+    fontSize: theme.typography.fontSize.xs,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: 'bold',
   },

@@ -9,7 +9,7 @@
 // Used by: Navigation stack (from WorkoutOverview LET'S GO button)
 // ==========================================================================
 
-import React, {useState, useMemo, useCallback} from 'react';
+import React, {useState, useMemo, useCallback, useEffect} from 'react';
 import {
   ScrollView,
   Text,
@@ -24,8 +24,7 @@ import {WorkoutLayout} from '@/features/workout/components/WorkoutLayout';
 import {ExerciseSetRow} from '@/features/workout/components/ExerciseSetRow';
 import {WorkoutActionCard} from '@/features/workout/components/WorkoutActionCard';
 import {VideoCard} from '@/features/workout/components/VideoCard';
-import {WeightControlCard} from '@/features/workout/components/WeightControlCard';
-import {RepsControlCard} from '@/features/workout/components/RepsControlCard';
+import {WorkoutControlsCard} from '@/features/workout/components/WorkoutControlsCard';
 import {ActionButton} from '@/components';
 import {PencilIcon} from '@/components/icons';
 import {useActiveWorkout} from '@/features/workout/context/ActiveWorkoutContext';
@@ -56,6 +55,7 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
     currentGlobalReps,
     isResting,
     isWorkoutComplete,
+    startWorkout,
     updateSet,
     logSet,
     endRest,
@@ -72,6 +72,16 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
   // Fallback if context is empty (shouldn't happen in normal flow)
   const workoutType = config?.workoutType || route.params.workoutType;
   const sessionType = config?.sessionType || route.params.sessionType;
+
+  // Initialize workout on mount
+  useEffect(() => {
+    if (!config) {
+      startWorkout({
+        workoutType,
+        sessionType,
+      });
+    }
+  }, []); // Empty deps - only run on mount
 
   // ==========================================================================
   // COMPUTED VALUES
@@ -243,20 +253,16 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
           {/* 1. Video Card (Collapsible) */}
           <VideoCard exerciseName={currentExerciseName} />
 
-          {/* 2. Weight Control Card */}
-          <WeightControlCard 
+          {/* 2. Combined Weight & Reps Control Card */}
+          <WorkoutControlsCard
             initialWeight={currentGlobalWeight}
             onWeightChange={setGlobalWeight}
-          />
-
-          {/* 3. Reps Control Card */}
-          <RepsControlCard
             initialReps={currentGlobalReps}
             onRepsChange={setGlobalReps}
           />
 
-          {/* 4. Action Card (Log Set / Rest Timer / Finish) */}
-          <WorkoutActionCard 
+          {/* 3. Action Card (Log Set / Rest Timer / Finish) */}
+          <WorkoutActionCard
             isResting={isResting}
             isComplete={isWorkoutComplete}
             onLogSet={logSet}
@@ -264,7 +270,7 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
             onFinish={handleFinishWorkout}
           />
 
-          {/* 5. Today's Workout (Exercise List) */}
+          {/* 4. Today's Workout (Exercise List) */}
           <View style={[styles.todaysWorkoutCard, isEditing && styles.cardEditing]}>
             <View style={styles.todaysWorkoutHeader}>
               <Text style={styles.todaysWorkoutText}>TODAY'S WORKOUT</Text>
@@ -291,8 +297,8 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
           {/* End Workout Button (Visible ONLY if not complete) */}
           {!isWorkoutComplete && (
             <View style={styles.finishButtonContainer}>
-               <ActionButton 
-                  text="END WORKOUT" 
+               <ActionButton
+                  text="END WORKOUT EARLY"
                   onPress={handleFinishWorkout}
                   style={{backgroundColor: theme.colors.actionWarning}}
                   textStyle={styles.finishButtonText}

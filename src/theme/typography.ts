@@ -29,6 +29,7 @@ export const typography = {
   // === FONT SIZES ===
   // Based on 16dp baseline following rem-like scaling
   fontSize: {
+    xxs: 10, // 0.625× base - Extra small labels, tiny meta text
     xs: 12, // 0.75× base - Small labels, captions, meta text
     s: 14, // 0.875× base - Secondary text, helper text
     m: 16, // 1× base - Body text, standard UI text

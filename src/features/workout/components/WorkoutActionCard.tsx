@@ -10,6 +10,11 @@
 
 import React, {useState, useEffect, useRef} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
 import {theme} from '@/theme';
 
 // ============================================================================
@@ -42,19 +47,35 @@ export const WorkoutActionCard: React.FC<WorkoutActionCardProps> = ({
   const [secondsLeft, setSecondsLeft] = useState(initialSeconds);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Animated progress value (0 to 1)
+  const progress = useSharedValue(0);
+
+  // Animated style for fill bar
+  const fillAnimatedStyle = useAnimatedStyle(() => ({
+    width: `${progress.value * 100}%`,
+  }));
+
   // Reset timer when entering rest mode
   useEffect(() => {
     if (isResting && !isComplete) {
       setSecondsLeft(initialSeconds);
-      
+      progress.value = 0; // Reset to 0 at start
+
       intervalRef.current = setInterval(() => {
         setSecondsLeft((prev) => {
           if (prev <= 1) {
             if (intervalRef.current) clearInterval(intervalRef.current);
+            progress.value = withTiming(1, {duration: 1000}); // Fill to 100%
             onEndRest();
             return 0;
           }
-          return prev - 1;
+
+          // Update progress smoothly
+          const newSeconds = prev - 1;
+          const elapsed = initialSeconds - newSeconds;
+          progress.value = withTiming(elapsed / initialSeconds, {duration: 1000});
+
+          return newSeconds;
         });
       }, 1000);
     } else {
@@ -62,6 +83,7 @@ export const WorkoutActionCard: React.FC<WorkoutActionCardProps> = ({
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
+      progress.value = 0; // Reset when not resting
     }
 
     return () => {
@@ -95,13 +117,13 @@ export const WorkoutActionCard: React.FC<WorkoutActionCardProps> = ({
   if (!isResting) {
     return (
       <View style={styles.container}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.logButton}
           onPress={onLogSet}
           activeOpacity={0.8}
         >
-          <Text style={styles.logButtonTitle}>BEGIN EXERCISE</Text>
-          <Text style={styles.logButtonSubtitle}>TAP TO LOG RESULTS</Text>
+          <Text style={styles.logButtonTitle}>LOG SET</Text>
+          <Text style={styles.logButtonSubtitle}>TAP AFTER COMPLETING SET</Text>
         </TouchableOpacity>
       </View>
     );
@@ -110,14 +132,20 @@ export const WorkoutActionCard: React.FC<WorkoutActionCardProps> = ({
   // === RENDER: REST MODE ===
   return (
     <View style={styles.container}>
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.restButton}
-        onPress={onEndRest} 
+        onPress={onEndRest}
         activeOpacity={0.8}
       >
-        <Text style={styles.restLabel}>RESTING...</Text>
-        <Text style={styles.restValue}>{formatTime(secondsLeft)}</Text>
-        <Text style={styles.restHint}>TAP TO SKIP</Text>
+        {/* Animated Fill Bar */}
+        <Animated.View style={[styles.fillBar, fillAnimatedStyle]} />
+
+        {/* Text Content (on top of fill) */}
+        <View style={styles.restContent}>
+          <Text style={styles.restLabel}>RESTING...</Text>
+          <Text style={styles.restValue}>{formatTime(secondsLeft)}</Text>
+          <Text style={styles.restHint}>TAP TO SKIP</Text>
+        </View>
       </TouchableOpacity>
     </View>
   );
@@ -138,7 +166,7 @@ const styles = StyleSheet.create({
     padding: theme.spacing.m,
     alignItems: 'center',
     justifyContent: 'center',
-    height: 100, // Consistent height
+    height: 80, // Reduced from 100
     shadowColor: theme.colors.shadowBlack,
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.3,
@@ -146,7 +174,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   logButtonTitle: {
-    fontSize: 24,
+    fontSize: 20, // Reduced from 24
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: 'bold',
     color: theme.colors.pureBlack, // Contrast on green
@@ -154,7 +182,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   logButtonSubtitle: {
-    fontSize: 14,
+    fontSize: 12, // Reduced from 14
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: 'bold',
     color: theme.colors.pureBlack,
@@ -171,6 +199,22 @@ const styles = StyleSheet.create({
     height: 100,
     borderWidth: 2,
     borderColor: theme.colors.actionWarning, // Orange/Yellow for rest/wait
+    overflow: 'hidden', // Clip fill to button bounds
+    position: 'relative', // Enable absolute positioning for fill
+  },
+  fillBar: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: theme.colors.actionWarning, // Orange fill
+    opacity: 0.2, // Subtle, doesn't obscure text
+    borderRadius: theme.spacing.s - 2, // Match button radius minus border
+  },
+  restContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1, // Ensure text stays on top
   },
   restLabel: {
     fontSize: 12,
