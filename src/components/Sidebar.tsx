@@ -16,6 +16,7 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {
   Image,
   Pressable,
+  StyleSheet,
   Text,
   View,
   useWindowDimensions,
