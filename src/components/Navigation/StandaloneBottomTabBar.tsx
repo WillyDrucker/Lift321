@@ -1,75 +1,65 @@
 // ==========================================================================
-// BOTTOM TAB BAR COMPONENT
+// STANDALONE BOTTOM TAB BAR COMPONENT
 //
-// Bottom navigation bar with Home, Plans, Performance, and Social tabs.
-// Integrates with React Navigation's Bottom Tab Navigator for instant switching.
+// Bottom navigation bar for use in stack screens (outside TabNavigator).
+// Provides same UI as BottomTabBar but navigates via stack navigation.
 //
 // Dependencies: theme tokens, navigation icons, React Navigation
-// Used by: TabNavigator
+// Used by: BodyPartSelectorScreen and other stack screens needing tab bar
 // ==========================================================================
 
 import React from 'react';
 import {Pressable, StyleSheet, Text, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import type {BottomTabBarProps as NavigatorTabBarProps} from '@react-navigation/bottom-tabs';
+import {useNavigation} from '@react-navigation/native';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {theme} from '@/theme';
 import {HomeIcon, PlansIcon, StatsIcon, ProfileIcon} from '@/components/icons';
+import type {MainStackParamList} from '@/navigation/types';
 
 // === TYPES ===
 
-export type TabItem = 'home' | 'plans' | 'performance' | 'social';
+type TabItem = 'home' | 'plans' | 'performance' | 'social';
 
 type TabConfig = {
   id: TabItem;
-  routeName: string | null; // null for tabs without screens (like Performance)
+  screen: keyof MainStackParamList | null;
+  tabScreen?: string; // Screen name within Tabs navigator
   label: string;
   icon: typeof HomeIcon;
+};
+
+type StandaloneBottomTabBarProps = {
+  activeTab?: TabItem;
 };
 
 // === CONFIGURATION ===
 
 const TAB_CONFIG: TabConfig[] = [
-  {id: 'home', routeName: 'HomePage', label: 'Home', icon: HomeIcon},
-  {id: 'plans', routeName: 'PlansPage', label: 'Plans', icon: PlansIcon},
-  {id: 'performance', routeName: null, label: 'Performance', icon: StatsIcon},
-  {id: 'social', routeName: 'SocialScreen', label: 'Social', icon: ProfileIcon},
+  {id: 'home', screen: 'Tabs', tabScreen: 'HomePage', label: 'Home', icon: HomeIcon},
+  {id: 'plans', screen: 'Tabs', tabScreen: 'PlansPage', label: 'Plans', icon: PlansIcon},
+  {id: 'performance', screen: null, label: 'Performance', icon: StatsIcon},
+  {id: 'social', screen: 'Tabs', tabScreen: 'SocialScreen', label: 'Social', icon: ProfileIcon},
 ];
-
-// Map route names to tab IDs for determining active state
-const ROUTE_TO_TAB: Record<string, TabItem> = {
-  HomePage: 'home',
-  PlansPage: 'plans',
-  SocialScreen: 'social',
-};
 
 // === COMPONENT ===
 
-export const BottomTabBar: React.FC<NavigatorTabBarProps> = React.memo(
-  ({state, navigation}) => {
+export const StandaloneBottomTabBar: React.FC<StandaloneBottomTabBarProps> = React.memo(
+  ({activeTab = 'home'}) => {
     const insets = useSafeAreaInsets();
-
-    // Get current route name from navigator state
-    const currentRouteName = state.routes[state.index].name;
-    const activeTab = ROUTE_TO_TAB[currentRouteName] || 'home';
+    const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList>>();
 
     // Calculate dynamic height based on bottom inset
-    // Gesture nav: small inset (~20-30px), Button nav: larger inset (~48px)
     const dynamicHeight = insets.bottom > theme.layout.bottomNav.gestureNavThreshold
       ? theme.layout.bottomNav.height + theme.layout.bottomNav.buttonNavExtraHeight
       : theme.layout.bottomNav.height;
 
     const handleTabPress = (tab: TabConfig) => {
-      if (tab.routeName) {
-        // Use jumpTo for tab navigation (more reliable than navigate)
-        const event = navigation.emit({
-          type: 'tabPress',
-          target: state.routes.find(r => r.name === tab.routeName)?.key ?? '',
-          canPreventDefault: true,
-        });
-
-        if (!event.defaultPrevented) {
-          navigation.navigate(tab.routeName);
-        }
+      if (tab.screen === 'Tabs' && tab.tabScreen) {
+        // Navigate to Tabs with specific screen
+        navigation.navigate('Tabs', {screen: tab.tabScreen} as any);
+      } else if (tab.screen) {
+        navigation.navigate(tab.screen as any);
       } else {
         // Performance tab - not implemented yet
         console.log('Performance screen not yet implemented');
@@ -105,10 +95,9 @@ export const BottomTabBar: React.FC<NavigatorTabBarProps> = React.memo(
   },
 );
 
-BottomTabBar.displayName = 'BottomTabBar';
+StandaloneBottomTabBar.displayName = 'StandaloneBottomTabBar';
 
 // === STYLES ===
-// StyleSheet definitions using global theme tokens
 
 const styles = StyleSheet.create({
   container: {
@@ -117,8 +106,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     flexDirection: 'row',
-    // Height is dynamic - set via inline style based on safe area insets
-    backgroundColor: theme.colors.pureBlack, // Pure black background (global standard)
+    backgroundColor: theme.colors.pureBlack,
     paddingHorizontal: theme.layout.bottomNav.paddingHorizontal,
     justifyContent: 'space-around',
     alignItems: 'flex-start',

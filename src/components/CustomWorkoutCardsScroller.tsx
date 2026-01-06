@@ -46,8 +46,8 @@ const SCROLL_PADDING_OFFSET = 4; // Compensation for ScrollView content padding 
 const CARD_MARGIN = VISUAL_MARGIN + SCROLL_PADDING_OFFSET; // Calculation value to achieve visual margin
 const CARD_SPACING = theme.layout.recommendedWorkout.cardSpacing; // 8dp - gap between cards
 
-// Card dimensions - dynamically calculated based on screen width
-const CARD_WIDTH = SCREEN_WIDTH - (CARD_MARGIN * 2);
+// Card dimensions - from theme token for consistent sizing
+const CARD_WIDTH = theme.layout.recommendedWorkout.cardWidth;
 
 // Snap interval - ensures cards snap to proper position when scrolling
 const SNAP_INTERVAL = CARD_WIDTH + CARD_SPACING;

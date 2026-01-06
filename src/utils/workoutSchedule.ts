@@ -17,15 +17,16 @@ import {getCurrentDate} from '@/utils/dateUtils';
 
 /**
  * Weekly workout schedule mapping day of week to body part
- * Monday = 1, Tuesday = 2, Wednesday = 3, Thursday = 4, Saturday = 6
- * Friday (5) and Sunday (0) are rest days
+ * Monday = 1, Tuesday = 2, Wednesday = 3, Thursday = 4, Friday = 5, Saturday = 6
+ * Sunday (0) is a rest day
  */
 const WORKOUT_SCHEDULE: Record<number, BodyPart> = {
   1: 'Chest',          // Monday
   2: 'Arms',           // Tuesday
   3: 'Shoulders',      // Wednesday
-  4: 'Back & Tris',    // Thursday
-  6: 'Legs',           // Saturday
+  4: 'Back',           // Thursday (matches JSON)
+  5: 'Legs',           // Friday
+  6: 'Legs',           // Saturday (matches JSON - Legs day 2)
 };
 
 
@@ -42,12 +43,12 @@ export const getCurrentDayOfWeek = (): number => {
 };
 
 /**
- * Checks if current day is a rest day (Saturday or Sunday)
- * @returns true if today is Saturday (6) or Sunday (0)
+ * Checks if current day is a rest day (Sunday only)
+ * @returns true if today is Sunday (0)
  */
 export const isRestDay = (): boolean => {
   const day = getCurrentDayOfWeek();
-  return day === 0 || day === 6;
+  return day === 0;
 };
 
 // ============================================================================
@@ -64,8 +65,8 @@ export const isRestDay = (): boolean => {
 export const getBodyPartForDay = (dayOfWeek?: number): BodyPartOrRest => {
   const day = dayOfWeek ?? getCurrentDayOfWeek();
 
-  // Friday (5) and Sunday (0) are rest days
-  if (day === 5 || day === 0) {
+  // Sunday (0) is rest day
+  if (day === 0) {
     return 'Rest';
   }
 

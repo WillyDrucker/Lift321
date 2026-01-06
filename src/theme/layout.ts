@@ -186,7 +186,7 @@ export const layout = {
     borderRadius: 8, // Corner radius
     paddingLeft: 16, // Left inner padding
     paddingTop: 16, // Top inner padding
-    cardWidth: 328, // All cards same width
+    cardWidth: 300, // All cards same width
     cardSpacing: 8, // Gap between cards (8dp)
   },
 
@@ -259,6 +259,102 @@ export const layout = {
     widthPercentage: 80, // Percentage of screen width (10% padding on each side)
     heightPercentage: 70, // Percentage of available height
     opacity: 0.5, // Standard opacity for background images (50% for subtle effect)
+  },
+
+  // === BOTTOM SHEET ===
+  // Modal bottom sheet for dropdowns and selection menus
+  bottomSheet: {
+    maxHeightPercent: 75, // Maximum height as percentage of screen
+    handleHeight: 32, // Drag handle area height (touch-friendly grab zone)
+    handleWidth: 40, // Drag handle bar width
+    handleBarHeight: 4, // Drag handle bar thickness
+    borderRadius: 16, // Top corner radius
+    paddingHorizontal: 16, // Left/right content padding
+    paddingTop: 8, // Top padding (above handle)
+    paddingBottom: 8, // Bottom padding for scroll content
+    headerHeight: 48, // Title header height
+    swipeDismissThreshold: 0.3, // 30% of height to dismiss
+    swipeVelocityThreshold: 500, // Velocity threshold to dismiss (px/s)
+    gestureActivationThreshold: 10, // Pixels required to activate pan gesture
+    closeButtonSize: 28, // Close X button touch target
+    closeButtonOffset: 10, // Position from edge (16dp visual)
+    closeLineWidth: 20, // X icon line width
+    closeLineHeight: 2, // X icon line thickness
+    fallbackHeight: 300, // Fallback height before content measured
+    animationDelay: 10, // Brief delay for content measurement (ms)
+    shadowOffsetY: -4, // Shadow offset for elevation effect
+    shadowRadius: 8, // Shadow blur radius
+    elevation: 16, // Android elevation
+    handleOpacity: 0.5, // Drag handle bar opacity
+  },
+
+  // === CONTROL CARDS ===
+  // Unified height for weight, reps, exercise, and action cards
+  controlCard: {
+    height: 97, // Standard card height for visual consistency across workout controls
+    headerPaddingTop: 13, // Top padding for 16dp visual spacing to header text
+    headerPaddingBottom: 12, // Bottom padding for 16dp visual spacing from header to controls
+    gaugeHeight: 48, // Height of dial/gauge control area
+    buttonSize: 48, // +/- adjustment button dimensions
+  },
+
+  // === EXERCISE CARD ===
+  // Collapsible exercise display card with video tutorial
+  exerciseCard: {
+    headerPaddingTop: 13, // Top padding for 16dp visual spacing
+    exerciseNamePaddingHorizontal: 24, // Horizontal padding to avoid chevron overlap
+    exerciseNameMarginBottom: 2, // Spacing between exercise name and set info
+    exerciseNameFontSize: 32, // Exercise name text size
+    exerciseNameLineHeight: 31, // Tight line height for wrapped exercise names
+    setInfoFontSize: 16, // SET X OF Y text size
+    chevronTop: 6, // Chevron button position from top
+    chevronRight: 4, // Chevron button position from right
+    chevronSize: 20, // Chevron icon size
+  },
+
+  // === EXERCISE SELECTOR ===
+  // Bottom sheet exercise selection list styling
+  exerciseSelector: {
+    rowSpacing: 13, // Space between exercise rows (16dp visual from separator)
+    rowBottomPadding: 14, // Bottom padding for consistent row height
+    exerciseNameFontSize: 32, // Exercise name in selector
+    exerciseNameLineHeight: 32, // Line height matching font size
+    detailFontSize: 16, // Position/equipment detail text size
+    detailLineHeight: 16, // Detail line height
+    detailMarginBottom: 1, // Spacing between detail lines
+  },
+
+  // === VIDEO PLAYER ===
+  // YouTube Shorts player dimensions for exercise tutorials
+  videoPlayer: {
+    height: 220, // Video frame height
+    width: 124, // Video frame width (Shorts 9:16 aspect ratio)
+    fullWidth: 391, // Full player width before cropping
+    cropOffset: -134, // Left margin to crop black bars
+    borderRadius: 8, // Video container corner radius
+    bottomPadding: 8, // Padding below video in expanded card
+  },
+
+  // === WORKOUT TITLE BAR ===
+  // Title bar height for workout screens
+  workoutTitleBar: {
+    height: 48, // Title bar height below top nav
+  },
+
+  // === ACTION CARD ===
+  // LOG SET / REST TIMER action button styling
+  actionCard: {
+    titleFontSize: 32, // Main action text size
+    subtitleFontSize: 16, // Secondary instruction text size
+    restLabelFontSize: 12, // "RESTING..." label size
+    restValueFontSize: 36, // Timer countdown display size
+    restHintFontSize: 10, // "TAP TO SKIP" hint size
+    titleMarginBottom: 4, // Space between title and subtitle
+    restValueMarginBottom: 2, // Space below timer value
+    fillBarOpacity: 0.2, // Rest timer progress fill opacity
+    pulseDelay: 500, // Delay before subtitle pulse animation starts (ms)
+    pulseDuration: 2000, // Duration of one pulse cycle (ms)
+    timerAnimationDuration: 1000, // Timer progress animation duration (ms)
   },
 } as const;
 

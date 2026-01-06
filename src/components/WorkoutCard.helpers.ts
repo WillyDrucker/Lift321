@@ -13,7 +13,7 @@ import {theme} from '@/theme';
 
 // === TYPES ===
 
-export type BodyPart = 'Chest' | 'Arms' | 'Shoulders' | 'Back & Tris' | 'Legs';
+export type BodyPart = 'Chest' | 'Arms' | 'Shoulders' | 'Back' | 'Back & Tris' | 'Legs' | 'Abs' | 'Rest';
 export type CustomWorkout = 'Custom' | 'Work-As-You-Go' | 'SuperSet' | 'Partner Mode';
 export type WorkoutType = BodyPart | CustomWorkout;
 
@@ -24,7 +24,8 @@ export type WorkoutSuggester =
   | 'Partner (Willy D.)'
   | 'Custom Workout (Willy D.)';
 
-export type BodyPartOrRest = BodyPart | 'Rest';
+// BodyPartOrRest is now redundant since 'Rest' is included in BodyPart
+export type BodyPartOrRest = BodyPart;
 
 // === HELPER FUNCTIONS ===
 
@@ -32,7 +33,7 @@ export type BodyPartOrRest = BodyPart | 'Rest';
  * Helper to check if workout type is a body part
  */
 export const isBodyPart = (workoutType: WorkoutType): workoutType is BodyPart => {
-  return ['Chest', 'Arms', 'Shoulders', 'Back & Tris', 'Legs'].includes(workoutType);
+  return ['Chest', 'Arms', 'Shoulders', 'Back', 'Back & Tris', 'Legs', 'Abs', 'Rest'].includes(workoutType);
 };
 
 /**
@@ -100,10 +101,13 @@ export const getWorkoutImage = (workoutType: BodyPartOrRest | CustomWorkout): Im
       return require('@/assets/images/workouts/arms.png');
     case 'Shoulders':
       return require('@/assets/images/workouts/shoulders.png');
+    case 'Back':
     case 'Back & Tris':
       return require('@/assets/images/workouts/back.png');
     case 'Legs':
       return require('@/assets/images/workouts/legs.png');
+    case 'Abs':
+      return require('@/assets/images/workouts/chest.png'); // TODO: Add abs.png
 
     // Custom workouts
     case 'Custom':
@@ -114,5 +118,8 @@ export const getWorkoutImage = (workoutType: BodyPartOrRest | CustomWorkout): Im
       return require('@/assets/images/workouts/superset.png');
     case 'Partner Mode':
       return require('@/assets/images/workouts/partner-mode.png');
+
+    default:
+      return null;
   }
 };

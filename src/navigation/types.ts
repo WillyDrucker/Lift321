@@ -41,6 +41,9 @@ export type MainStackParamList = {
   SettingsScreen: undefined;
   HelpScreen: undefined;
   DevToolsScreen: undefined;
+  BodyPartSelector: {
+    suggester?: WorkoutSuggester;
+  };
   WorkoutOverview: {
     workoutType: WorkoutType;
     suggester?: WorkoutSuggester;

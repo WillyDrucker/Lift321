@@ -106,6 +106,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: theme.layout.topNav.paddingHorizontal,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.pureWhite,
   },
 
   leftButtonsContainer: {

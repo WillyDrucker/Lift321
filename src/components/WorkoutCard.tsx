@@ -43,12 +43,13 @@ export type WorkoutCardProps = {
   scrollX?: Animated.Value;
   cardIndex?: number;
   cardWidth?: number;
+  onPress?: () => void;          // Optional custom press handler
 };
 
 // === COMPONENT ===
 
 export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(
-  ({suggester, workoutType, animatedTop, isFirstCard = false, isLastCard = false, index = 0, scrollX, cardIndex = 0, cardWidth: propCardWidth}) => {
+  ({suggester, workoutType, animatedTop, isFirstCard = false, isLastCard = false, index = 0, scrollX, cardIndex = 0, cardWidth: propCardWidth, onPress}) => {
     // === HOOKS ===
     // Navigation hook for screen transitions
 
@@ -280,13 +281,16 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(
     };
 
     const handleWorkoutPress = () => {
-      navigation.navigate('WorkoutOverview', {
-        workoutType: navigationWorkoutType,
-        suggester: suggester,
-      });
+      if (onPress) {
+        onPress();
+      } else {
+        navigation.navigate('BodyPartSelector', {
+          suggester: suggester,
+        });
+      }
     };
 
-    // Spacing wrapper - handles margin between cards
+    // Spacing wrapper - handles gap between cards
     const spacingStyle = {
       marginRight: isLastCard ? 0 : theme.layout.recommendedWorkout.cardSpacing,
     };

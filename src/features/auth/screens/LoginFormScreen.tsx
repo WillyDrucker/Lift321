@@ -126,6 +126,8 @@ export const LoginFormScreen: React.FC<LoginFormScreenProps> = ({
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
+            returnKeyType="next"
+            blurOnSubmit={false}
           />
 
           {/* Password Input */}
@@ -133,6 +135,8 @@ export const LoginFormScreen: React.FC<LoginFormScreenProps> = ({
             value={password}
             onChangeText={setPassword}
             placeholder="Password"
+            returnKeyType="go"
+            onSubmitEditing={handleContinue}
           />
 
           {/* Forgot Password */}
