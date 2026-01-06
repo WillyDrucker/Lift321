@@ -17,15 +17,20 @@ export const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    padding: theme.spacing.s,
-    paddingBottom: 100,
+    paddingHorizontal: theme.spacing.s,
+    paddingTop: 8, // 8dp from top green line
+    paddingBottom: 8, // 8dp from bottom of end workout button
+  },
+  controlCardsRow: {
+    flexDirection: 'row',
+    gap: theme.spacing.s,
+    marginBottom: theme.spacing.s,
   },
   todaysWorkoutCard: {
     backgroundColor: theme.colors.backgroundPrimary,
     borderRadius: theme.spacing.s,
     paddingHorizontal: theme.spacing.s,
     paddingBottom: theme.spacing.s,
-    marginTop: theme.spacing.s,
     borderWidth: 1,
     borderColor: 'transparent',
   },
@@ -95,8 +100,8 @@ export const styles = StyleSheet.create({
     zIndex: 10,
   },
   finishButtonContainer: {
-    marginTop: theme.spacing.xl,
-    marginBottom: theme.spacing.xl,
+    marginTop: theme.spacing.s, // 8dp from above card
+    marginBottom: 0,
   },
   finishButtonText: {
     fontWeight: 'bold',

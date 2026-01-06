@@ -23,8 +23,9 @@ import {getExercisesForWorkout, type SessionType} from '@/services/exerciseServi
 import {WorkoutLayout} from '@/features/workout/components/WorkoutLayout';
 import {ExerciseSetRow} from '@/features/workout/components/ExerciseSetRow';
 import {WorkoutActionCard} from '@/features/workout/components/WorkoutActionCard';
-import {VideoCard} from '@/features/workout/components/VideoCard';
-import {WorkoutControlsCard} from '@/features/workout/components/WorkoutControlsCard';
+import {ExerciseCard} from '@/features/workout/components/ExerciseCard';
+import {WeightControlCard} from '@/features/workout/components/WeightControlCard';
+import {RepsControlCard} from '@/features/workout/components/RepsControlCard';
 import {ActionButton} from '@/components';
 import {PencilIcon} from '@/components/icons';
 import {useActiveWorkout} from '@/features/workout/context/ActiveWorkoutContext';
@@ -69,19 +70,21 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
-  // Fallback if context is empty (shouldn't happen in normal flow)
+  // Use config from context (pre-initialized before navigation)
+  // Falls back to route params only for edge cases (direct navigation, deep links)
   const workoutType = config?.workoutType || route.params.workoutType;
   const sessionType = config?.sessionType || route.params.sessionType;
 
-  // Initialize workout on mount
+  // Fallback initialization only if context wasn't pre-initialized
+  // This handles edge cases like deep linking or direct navigation
   useEffect(() => {
     if (!config) {
       startWorkout({
-        workoutType,
-        sessionType,
+        workoutType: route.params.workoutType,
+        sessionType: route.params.sessionType,
       });
     }
-  }, []); // Empty deps - only run on mount
+  }, [config, startWorkout, route.params.workoutType, route.params.sessionType]);
 
   // ==========================================================================
   // COMPUTED VALUES
@@ -138,13 +141,30 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
           if (isWorkoutComplete) return 'WORKOUT COMPLETE';
           // Fallback
           if (orderedSetKeys.length > 0) {
-              return orderedSetKeys[0].split('-').slice(0, -1).join('-'); 
+              return orderedSetKeys[0].split('-').slice(0, -1).join('-');
           }
           return 'WORKOUT';
       }
       const parts = activeSetKey.split('-');
       return parts.slice(0, -1).join('-');
   }, [activeSetKey, orderedSetKeys, isWorkoutComplete]);
+
+  // Derive current set number, total sets, and muscle group from active set key
+  const {currentSet, totalSets, currentMuscleGroup} = useMemo(() => {
+    if (!activeSetKey) {
+      return {currentSet: 1, totalSets: 1, currentMuscleGroup: 'Major1'};
+    }
+    const parts = activeSetKey.split('-');
+    const setNumber = parseInt(parts[parts.length - 1], 10) || 1;
+    const exerciseName = parts.slice(0, -1).join('-');
+
+    // Find the exercise to get total sets and muscle group
+    const exercise = workoutData.exercises.find(e => e.exercise_name === exerciseName);
+    const total = exercise?.adjustedSets || 1;
+    const muscleGroup = exercise?.muscle_group || 'Major1';
+
+    return {currentSet: setNumber, totalSets: total, currentMuscleGroup: muscleGroup};
+  }, [activeSetKey, workoutData.exercises]);
 
   // ==========================================================================
   // EVENT HANDLERS
@@ -250,18 +270,28 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
 
-          {/* 1. Video Card (Collapsible) */}
-          <VideoCard exerciseName={currentExerciseName} />
+          {/* 1. Exercise Card (Collapsible) */}
+          <ExerciseCard
+            exerciseName={currentExerciseName}
+            currentSet={currentSet}
+            totalSets={totalSets}
+            bodyPart={workoutType}
+            muscleGroup={currentMuscleGroup}
+          />
 
-          {/* 2. Combined Weight & Reps Control Card */}
-          <WorkoutControlsCard
+          {/* 2. Weight Control Card */}
+          <WeightControlCard
             initialWeight={currentGlobalWeight}
             onWeightChange={setGlobalWeight}
+          />
+
+          {/* 3. Reps Control Card */}
+          <RepsControlCard
             initialReps={currentGlobalReps}
             onRepsChange={setGlobalReps}
           />
 
-          {/* 3. Action Card (Log Set / Rest Timer / Finish) */}
+          {/* 4. Action Card (Log Set / Rest Timer / Finish) */}
           <WorkoutActionCard
             isResting={isResting}
             isComplete={isWorkoutComplete}
@@ -270,7 +300,7 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
             onFinish={handleFinishWorkout}
           />
 
-          {/* 4. Today's Workout (Exercise List) */}
+          {/* 5. Today's Workout (Exercise List) */}
           <View style={[styles.todaysWorkoutCard, isEditing && styles.cardEditing]}>
             <View style={styles.todaysWorkoutHeader}>
               <Text style={styles.todaysWorkoutText}>TODAY'S WORKOUT</Text>

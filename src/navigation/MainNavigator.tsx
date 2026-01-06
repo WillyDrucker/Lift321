@@ -16,6 +16,7 @@ import {ProfileScreen} from '@/features/main/screens/ProfileScreen';
 import {SettingsScreen} from '@/features/main/screens/SettingsScreen';
 import {HelpScreen} from '@/features/main/screens/HelpScreen';
 import {DevToolsScreen} from '@/features/main/screens/DevToolsScreen';
+import {BodyPartSelectorScreen} from '@/features/workout/screens/BodyPartSelectorScreen';
 import {WorkoutOverviewScreen} from '@/features/workout/screens/WorkoutOverviewScreen';
 import {ActiveWorkoutScreen} from '@/features/workout/screens/ActiveWorkoutScreen';
 import {ActiveWorkoutProvider} from '@/features/workout/context/ActiveWorkoutContext';
@@ -57,6 +58,7 @@ export const MainNavigator: React.FC<MainNavigatorProps> = () => {
         <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
         <Stack.Screen name="HelpScreen" component={HelpScreen} />
         <Stack.Screen name="DevToolsScreen" component={DevToolsScreen} />
+        <Stack.Screen name="BodyPartSelector" component={BodyPartSelectorScreen} />
         <Stack.Screen name="WorkoutOverview" component={WorkoutOverviewScreen} />
         <Stack.Screen name="ActiveWorkout" component={ActiveWorkoutScreen} />
       </Stack.Navigator>

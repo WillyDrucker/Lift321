@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
   // === WORKOUT TITLE BAR ===
   workoutTitleBar: {
     marginTop: theme.layout.topNav.topSpacing + theme.layout.topNav.height,
-    height: 66, // 66dp container (8dp + 50dp button + 8dp)
+    height: 48, // 48dp container (8dp + 32dp button + 8dp)
     backgroundColor: theme.colors.pureBlack,
     borderBottomWidth: theme.layout.border.thin,
     borderBottomColor: theme.colors.actionSuccess, // GREEN BORDER #1
@@ -202,13 +202,13 @@ const styles = StyleSheet.create({
   // === LET'S GO BUTTON ===
   letsGoButtonContainer: {
     width: 100,
-    height: 50,
+    height: 32,
   },
 
   letsGoButtonShadow: {
     position: 'absolute',
     width: 100,
-    height: 50,
+    height: 32,
     backgroundColor: theme.colors.shadowBlack,
     borderRadius: 8,
   },
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: 0,
     width: 100,
-    height: 50,
+    height: 32,
     backgroundColor: theme.colors.actionSuccess,
     borderRadius: 8,
     justifyContent: 'center',
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
   // === CONTENT AREA ===
   contentArea: {
     flex: 1,
-    paddingTop: theme.layout.topNav.topSpacing + theme.layout.topNav.height + 66 + theme.spacing.s, // Clear navigation area (138dp)
+    paddingTop: theme.layout.topNav.topSpacing + theme.layout.topNav.height + 48, // Clear navigation area (112dp)
     paddingBottom: theme.layout.bottomNav.height, // Clear bottom tab bar (accounts for safe area in BottomTabBar component)
   },
 });

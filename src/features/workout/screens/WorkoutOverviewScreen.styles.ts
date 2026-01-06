@@ -21,6 +21,7 @@ export const styles = StyleSheet.create({
 
   scrollContent: {
     flexGrow: 1,
+    paddingTop: 8, // 8dp from top green line
     paddingLeft: theme.spacing.s,
     paddingRight: theme.spacing.s,
   },

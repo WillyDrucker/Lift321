@@ -22,6 +22,7 @@ import {getExercisesForWorkout, type SessionType} from '@/services/exerciseServi
 import {getWorkoutDuration} from '@/utils/durationCalculator';
 import {WorkoutLayout} from '@/features/workout/components/WorkoutLayout';
 import {styles} from './WorkoutOverviewScreen.styles';
+import {useActiveWorkout} from '@/features/workout/context/ActiveWorkoutContext';
 
 // ============================================================================
 // TYPES
@@ -42,6 +43,7 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
   // ==========================================================================
 
   const {workoutType} = route.params;
+  const {startWorkout} = useActiveWorkout();
 
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
   const [selectedPlanFocus, setSelectedPlanFocus] = useState<'strength' | 'balanced' | 'growth'>('balanced');
@@ -287,6 +289,9 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
   // ==========================================================================
 
   const handleLetsGoPress = () => {
+    // Pre-initialize workout context BEFORE navigation for instant screen load
+    startWorkout({workoutType, sessionType});
+
     navigation.navigate('ActiveWorkout', {
       workoutType,
       sessionType,
@@ -316,7 +321,7 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
         style={styles.scrollView}
         contentContainerStyle={[
           styles.scrollContent,
-          {paddingBottom: 250} // Extra bottom padding ensures content clears navigation on all devices
+          {paddingBottom: 8} // 8dp from bottom tab bar
         ]}
         showsVerticalScrollIndicator={false}>
           {/* Workout Overview Plan Card */}

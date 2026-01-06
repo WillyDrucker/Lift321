@@ -14,6 +14,9 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
+  withRepeat,
+  withDelay,
+  interpolateColor,
 } from 'react-native-reanimated';
 import {theme} from '@/theme';
 
@@ -23,11 +26,11 @@ import {theme} from '@/theme';
 
 type WorkoutActionCardProps = {
   isResting: boolean;
-  isComplete?: boolean; // New prop
+  isComplete?: boolean;
   restDuration?: number;
   onLogSet: () => void;
   onEndRest: () => void;
-  onFinish?: () => void; // New prop
+  onFinish?: () => void;
 };
 
 // ============================================================================
@@ -46,44 +49,80 @@ export const WorkoutActionCard: React.FC<WorkoutActionCardProps> = ({
   const initialSeconds = restDuration * 60;
   const [secondsLeft, setSecondsLeft] = useState(initialSeconds);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const hasLoggedFirstSet = useRef(false);
 
   // Animated progress value (0 to 1)
   const progress = useSharedValue(0);
+
+  // Animated pulse value for subtitle (0 = black, 1 = blue)
+  const subtitlePulse = useSharedValue(0);
 
   // Animated style for fill bar
   const fillAnimatedStyle = useAnimatedStyle(() => ({
     width: `${progress.value * 100}%`,
   }));
 
+  // Animated style for pulsing subtitle (black to green pulse on first set)
+  const subtitleAnimatedStyle = useAnimatedStyle(() => ({
+    color: interpolateColor(
+      subtitlePulse.value,
+      [0, 1],
+      [theme.colors.pureBlack, theme.colors.actionSuccess]
+    ),
+  }));
+
+  // Track when first set is logged (entering rest mode means a set was logged)
+  useEffect(() => {
+    if (isResting) {
+      hasLoggedFirstSet.current = true;
+    }
+  }, [isResting]);
+
+  // Start pulsing animation only for first LOG SET to guide new users
+  useEffect(() => {
+    if (!isResting && !isComplete && !hasLoggedFirstSet.current) {
+      subtitlePulse.value = 0;
+      subtitlePulse.value = withDelay(
+        theme.layout.actionCard.pulseDelay,
+        withRepeat(
+          withTiming(1, {duration: theme.layout.actionCard.pulseDuration}),
+          -1,
+          true
+        )
+      );
+    } else {
+      subtitlePulse.value = withTiming(0, {duration: theme.layout.animation.duration});
+    }
+  }, [isResting, isComplete]);
+
   // Reset timer when entering rest mode
   useEffect(() => {
     if (isResting && !isComplete) {
       setSecondsLeft(initialSeconds);
-      progress.value = 0; // Reset to 0 at start
+      progress.value = 0;
 
       intervalRef.current = setInterval(() => {
         setSecondsLeft((prev) => {
           if (prev <= 1) {
             if (intervalRef.current) clearInterval(intervalRef.current);
-            progress.value = withTiming(1, {duration: 1000}); // Fill to 100%
+            progress.value = withTiming(1, {duration: theme.layout.actionCard.timerAnimationDuration});
             onEndRest();
             return 0;
           }
 
-          // Update progress smoothly
           const newSeconds = prev - 1;
           const elapsed = initialSeconds - newSeconds;
-          progress.value = withTiming(elapsed / initialSeconds, {duration: 1000});
+          progress.value = withTiming(elapsed / initialSeconds, {duration: theme.layout.actionCard.timerAnimationDuration});
 
           return newSeconds;
         });
-      }, 1000);
+      }, theme.layout.actionCard.timerAnimationDuration);
     } else {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
-      progress.value = 0; // Reset when not resting
+      progress.value = 0;
     }
 
     return () => {
@@ -123,7 +162,9 @@ export const WorkoutActionCard: React.FC<WorkoutActionCardProps> = ({
           activeOpacity={0.8}
         >
           <Text style={styles.logButtonTitle}>LOG SET</Text>
-          <Text style={styles.logButtonSubtitle}>TAP AFTER COMPLETING SET</Text>
+          <Animated.Text style={[styles.logButtonSubtitle, subtitleAnimatedStyle]}>
+            TAP AFTER COMPLETING SET
+          </Animated.Text>
         </TouchableOpacity>
       </View>
     );
@@ -159,80 +200,81 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: theme.spacing.s,
   },
-  // Log Set State
+  // === LOG SET STATE ===
   logButton: {
     backgroundColor: theme.colors.actionSuccess,
     borderRadius: theme.spacing.s,
     padding: theme.spacing.m,
     alignItems: 'center',
     justifyContent: 'center',
-    height: 80, // Reduced from 100
+    height: theme.layout.controlCard.height,
     shadowColor: theme.colors.shadowBlack,
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: {width: 0, height: theme.layout.border.medium},
     shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 4,
+    shadowRadius: theme.spacing.xs,
+    elevation: theme.spacing.xs,
   },
   logButtonTitle: {
-    fontSize: 20, // Reduced from 24
-    fontFamily: theme.typography.fontFamily.primary,
-    fontWeight: 'bold',
-    color: theme.colors.pureBlack, // Contrast on green
-    textTransform: 'uppercase',
-    marginBottom: 4,
-  },
-  logButtonSubtitle: {
-    fontSize: 12, // Reduced from 14
+    fontSize: theme.layout.actionCard.titleFontSize,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: 'bold',
     color: theme.colors.pureBlack,
-    opacity: 0.7,
+    textTransform: 'uppercase',
+    marginBottom: theme.layout.actionCard.titleMarginBottom,
+  },
+  logButtonSubtitle: {
+    fontSize: theme.layout.actionCard.subtitleFontSize,
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: 'bold',
+    color: theme.colors.pureBlack,
   },
 
-  // Rest State
+  // === REST STATE ===
   restButton: {
     backgroundColor: theme.colors.backgroundSecondary,
     borderRadius: theme.spacing.s,
     padding: theme.spacing.m,
     alignItems: 'center',
     justifyContent: 'center',
-    height: 100,
-    borderWidth: 2,
-    borderColor: theme.colors.actionWarning, // Orange/Yellow for rest/wait
-    overflow: 'hidden', // Clip fill to button bounds
-    position: 'relative', // Enable absolute positioning for fill
+    height: theme.layout.controlCard.height,
+    borderWidth: theme.layout.border.medium,
+    borderColor: theme.colors.actionWarning,
+    overflow: 'hidden',
+    position: 'relative',
   },
   fillBar: {
     position: 'absolute',
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: theme.colors.actionWarning, // Orange fill
-    opacity: 0.2, // Subtle, doesn't obscure text
-    borderRadius: theme.spacing.s - 2, // Match button radius minus border
+    backgroundColor: theme.colors.actionWarning,
+    opacity: theme.layout.actionCard.fillBarOpacity,
+    borderRadius: theme.spacing.s - theme.layout.border.medium,
   },
   restContent: {
     alignItems: 'center',
     justifyContent: 'center',
-    zIndex: 1, // Ensure text stays on top
+    zIndex: 1,
   },
   restLabel: {
-    fontSize: 12,
+    fontSize: theme.layout.actionCard.restLabelFontSize,
     color: theme.colors.textSecondary,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: 'bold',
-    marginBottom: 4,
+    marginBottom: theme.layout.actionCard.titleMarginBottom,
   },
   restValue: {
-    fontSize: 36,
+    fontSize: theme.layout.actionCard.restValueFontSize,
     color: theme.colors.pureWhite,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: 'bold',
-    marginBottom: 2,
+    marginBottom: theme.layout.actionCard.restValueMarginBottom,
   },
   restHint: {
-    fontSize: 10,
+    fontSize: theme.layout.actionCard.restHintFontSize,
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: 'bold',
     color: theme.colors.textSecondary,
-    opacity: 0.8,
+    opacity: theme.layout.interaction.pressedOpacity,
   },
 });

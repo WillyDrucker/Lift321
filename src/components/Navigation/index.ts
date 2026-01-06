@@ -18,3 +18,5 @@ export type {PlanProgressBarProps} from './PlanProgressBar';
 
 export {BottomTabBar} from './BottomTabBar';
 export type {TabItem} from './BottomTabBar';
+
+export {StandaloneBottomTabBar} from './StandaloneBottomTabBar';
