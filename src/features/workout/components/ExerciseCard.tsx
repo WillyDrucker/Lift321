@@ -180,6 +180,8 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
               </Text>
             </TouchableOpacity>
           </View>
+        </View>
+        <View style={styles.setInfoContainer}>
           <Text style={styles.setInfo}>
             <Text style={styles.setInfoLabel}>SET </Text>
             {currentSet}
@@ -293,7 +295,7 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   header: {
-    height: theme.layout.controlCard.height,
+    height: 96,
     position: 'relative',
     paddingTop: theme.layout.exerciseCard.headerPaddingTop,
     paddingHorizontal: theme.spacing.s,
@@ -302,6 +304,12 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
+  },
+  setInfoContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 6,
   },
   exerciseNameContainer: {
     paddingHorizontal: theme.layout.exerciseCard.exerciseNamePaddingHorizontal,
@@ -417,6 +425,7 @@ const styles = StyleSheet.create({
     fontSize: theme.layout.exerciseSelector.detailFontSize,
     lineHeight: theme.layout.exerciseSelector.detailLineHeight,
     fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: 'bold',
     color: theme.colors.textSecondary,
     textAlign: 'center',
     includeFontPadding: false,
@@ -426,6 +435,7 @@ const styles = StyleSheet.create({
     fontSize: theme.layout.exerciseSelector.detailFontSize,
     lineHeight: theme.layout.exerciseSelector.detailLineHeight,
     fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: 'bold',
     color: theme.colors.textSecondary,
     textAlign: 'center',
     includeFontPadding: false,
