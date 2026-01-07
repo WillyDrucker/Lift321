@@ -27,3 +27,9 @@ export type {
   SlideAnimationReturn,
   ScaleAnimationReturn,
 } from './useAnimation';
+
+export {useAutoRepeat} from './useAutoRepeat';
+export type {UseAutoRepeatReturn} from './useAutoRepeat';
+
+export {useDialControl} from './useDialControl';
+export type {UseDialControlConfig, UseDialControlReturn} from './useDialControl';

@@ -304,8 +304,8 @@ export const layout = {
     headerPaddingTop: 13, // Top padding for 16dp visual spacing
     exerciseNamePaddingHorizontal: 24, // Horizontal padding to avoid chevron overlap
     exerciseNameMarginBottom: 2, // Spacing between exercise name and set info
-    exerciseNameFontSize: 32, // Exercise name text size
-    exerciseNameLineHeight: 31, // Tight line height for wrapped exercise names
+    exerciseNameFontSize: 28, // Exercise name text size
+    exerciseNameLineHeight: 27, // Tight line height for wrapped exercise names
     setInfoFontSize: 16, // SET X OF Y text size
     chevronTop: 6, // Chevron button position from top
     chevronRight: 4, // Chevron button position from right
@@ -317,8 +317,8 @@ export const layout = {
   exerciseSelector: {
     rowSpacing: 13, // Space between exercise rows (16dp visual from separator)
     rowBottomPadding: 14, // Bottom padding for consistent row height
-    exerciseNameFontSize: 32, // Exercise name in selector
-    exerciseNameLineHeight: 32, // Line height matching font size
+    exerciseNameFontSize: 28, // Exercise name in selector (matches exercise card)
+    exerciseNameLineHeight: 28, // Line height matching font size
     detailFontSize: 16, // Position/equipment detail text size
     detailLineHeight: 16, // Detail line height
     detailMarginBottom: 1, // Spacing between detail lines
