@@ -74,19 +74,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
         resizeMode="cover"
       >
         <View style={styles.container}>
-          {/* Header with Logo and "Lift" text - 64dp from top */}
+          {/* Header with Logo */}
           <View style={styles.header}>
-            <Text style={styles.liftText}>LIFT</Text>
-            <View style={styles.logoWrapper}>
-              <View style={styles.logoShadowLayer3} />
-              <View style={styles.logoShadowLayer2} />
-              <View style={styles.logoShadowLayer1} />
-              <Image
-                source={require('@/assets/images/logo.png')}
-                style={styles.logo}
-                resizeMode="contain"
-              />
-            </View>
+            <Image
+              source={require('@/assets/images/logo.png')}
+              style={styles.logo}
+            />
           </View>
 
           {/* Center content - Brand messaging */}
@@ -156,61 +149,13 @@ const styles = StyleSheet.create({
   // === HEADER STYLES ===
 
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingLeft: theme.spacing.safeZoneHorizontal,
     marginTop: theme.spacing.safeZone,
-  },
-
-  liftText: {
-    fontSize: theme.typography.fontSize.xxxl,
-    fontFamily: theme.typography.fontFamily.brand,
-    color: theme.colors.textPrimary,
-    letterSpacing: theme.typography.letterSpacing.normal,
-    ...theme.textShadows.default,
-  },
-
-  logoWrapper: {
-    marginLeft: theme.spacing.s,
-    position: 'relative',
-    width: theme.layout.logo.size,
-    height: theme.layout.logo.size,
-  },
-
-  logoShadowLayer1: {
-    position: 'absolute',
-    top: theme.buttons.shadowLayers.layer1.top,
-    left: theme.buttons.shadowLayers.layer1.left,
-    width: theme.layout.logo.size,
-    height: theme.layout.logo.size,
-    backgroundColor: `rgba(0, 0, 0, ${theme.buttons.shadowLayers.layer1.opacity})`,
-    borderRadius: theme.layout.logo.borderRadius,
-  },
-
-  logoShadowLayer2: {
-    position: 'absolute',
-    top: theme.buttons.shadowLayers.layer2.top,
-    left: theme.buttons.shadowLayers.layer2.left,
-    width: theme.layout.logo.size,
-    height: theme.layout.logo.size,
-    backgroundColor: `rgba(0, 0, 0, ${theme.buttons.shadowLayers.layer2.opacity})`,
-    borderRadius: theme.layout.logo.borderRadius,
-  },
-
-  logoShadowLayer3: {
-    position: 'absolute',
-    top: theme.buttons.shadowLayers.layer3.top,
-    left: theme.buttons.shadowLayers.layer3.left,
-    width: theme.layout.logo.size,
-    height: theme.layout.logo.size,
-    backgroundColor: `rgba(0, 0, 0, ${theme.buttons.shadowLayers.layer3.opacity})`,
-    borderRadius: theme.layout.logo.borderRadius,
+    marginLeft: 32,
   },
 
   logo: {
-    width: theme.layout.logo.size,
-    height: theme.layout.logo.size,
-    position: 'relative',
+    width: 156,
+    height: 68,
   },
 
   // === CENTER CONTENT STYLES ===
@@ -220,6 +165,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'flex-start',
     paddingLeft: theme.spacing.safeZoneHorizontal,
+    marginTop: 50,
   },
 
   guaranteedText: {

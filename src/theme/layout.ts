@@ -200,8 +200,8 @@ export const layout = {
   // === PLAN CARDS ===
   // Training plan selection cards on PlansPage (smaller than workout cards)
   planCard: {
-    height: 128, // Compact card height (smaller than workout cards for denser plan browsing)
-    width: 330, // Same width as workout cards for consistent horizontal scrolling
+    height: 113, // 16:9 aspect ratio (200/113 ≈ 1.77)
+    width: 200,
   },
 
   // === DAY CALENDAR ADJUSTMENTS ===

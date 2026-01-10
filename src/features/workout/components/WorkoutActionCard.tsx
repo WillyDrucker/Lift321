@@ -95,6 +95,10 @@ export const WorkoutActionCard: React.FC<WorkoutActionCardProps> = ({
     }
   }, [isResting, isComplete]);
 
+  // Store onEndRest in a ref to avoid stale closures
+  const onEndRestRef = useRef(onEndRest);
+  onEndRestRef.current = onEndRest;
+
   // Reset timer when entering rest mode
   useEffect(() => {
     if (isResting && !isComplete) {
@@ -106,7 +110,8 @@ export const WorkoutActionCard: React.FC<WorkoutActionCardProps> = ({
           if (prev <= 1) {
             if (intervalRef.current) clearInterval(intervalRef.current);
             progress.value = withTiming(1, {duration: theme.layout.actionCard.timerAnimationDuration});
-            onEndRest();
+            // Defer callback to next tick to avoid setState-during-render
+            setTimeout(() => onEndRestRef.current(), 0);
             return 0;
           }
 
@@ -128,7 +133,7 @@ export const WorkoutActionCard: React.FC<WorkoutActionCardProps> = ({
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isResting, isComplete, initialSeconds, onEndRest]);
+  }, [isResting, isComplete, initialSeconds]);
 
   const formatTime = (totalSeconds: number) => {
     const m = Math.floor(totalSeconds / 60);

@@ -1,19 +1,17 @@
 // ==========================================================================
 // EXERCISE CARD COMPONENT
 //
-// Collapsible card displaying exercise info and tutorial video.
+// Displays current exercise info with equipment icon.
 // Allows selecting alternate exercises via bottom sheet.
-// Uses react-native-youtube-iframe for YouTube video playback.
 //
-// Dependencies: theme tokens, react-native-youtube-iframe, BottomSheet
+// Dependencies: theme tokens, BottomSheet
 // Used by: ActiveWorkoutScreen
 // ==========================================================================
 
-import React, {useState, useRef, useCallback, useMemo} from 'react';
-import {View, StyleSheet, Text, TouchableOpacity, Animated} from 'react-native';
-import YoutubePlayer from 'react-native-youtube-iframe';
+import React, {useState, useCallback, useMemo} from 'react';
+import {View, StyleSheet, Text, TouchableOpacity} from 'react-native';
 import {theme} from '@/theme';
-import {RightChevron} from '@/components/icons';
+import {BarbellIcon, DumbbellIcon, EZBarIcon, FixedBarbellIcon, FixedBarbellEZIcon, PinMachineIcon, CableMachineIcon, PlateLoadedIcon, SmithMachineIcon, ResistanceBandIcon, BodyweightIcon} from '@/components/icons';
 import {BottomSheet} from '@/components';
 import exercisesData from '@/data/exercises.json';
 
@@ -56,9 +54,9 @@ type ExerciseCardProps = {
   exerciseName?: string;
   currentSet?: number;
   totalSets?: number;
-  videoId?: string;
   bodyPart?: string;
   muscleGroup?: string;
+  day?: string;
 };
 
 // ============================================================================
@@ -69,81 +67,111 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
   exerciseName = 'EXERCISE',
   currentSet = 1,
   totalSets = 1,
-  videoId = 'qASbflixYF4',
   bodyPart = 'Chest',
   muscleGroup = 'Major1',
+  day = 'Monday',
 }) => {
-  const [expanded, setExpanded] = useState(false);
-  const [playing, setPlaying] = useState(false);
   const [exerciseSelectorVisible, setExerciseSelectorVisible] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState(exerciseName);
-  const [selectedColorCode, setSelectedColorCode] = useState<string>('cc1'); // Default green
-  const animatedValue = useRef(new Animated.Value(0)).current;
+  const [selectedColorCode, setSelectedColorCode] = useState<string>('cc1');
+  const [selectedEquipment, setSelectedEquipment] = useState({
+    equipmentUse: '',
+    equipmentWeight: '',
+    equipmentSetup: '',
+  });
 
   // Filter and sort exercises for the current body part and muscle group
   const alternateExercises = useMemo(() => {
-    const filtered = (exercisesData as Exercise[]).filter(
-      (ex) => ex.body_part === bodyPart && ex.muscle_group === muscleGroup
-    );
+    const filtered = (exercisesData as Exercise[]).filter((ex) => {
+      const matchesBodyPart = ex.body_part === bodyPart;
+      const matchesMuscleGroup = ex.muscle_group === muscleGroup;
+      const matchesDay = bodyPart === 'Legs' ? ex.day === day : true;
+      return matchesBodyPart && matchesMuscleGroup && matchesDay;
+    });
 
-    // Sort by program_order (order1, order2, etc.)
     const sorted = filtered.sort((a, b) => {
       const orderA = parseInt(a.program_order.replace('order', ''), 10);
       const orderB = parseInt(b.program_order.replace('order', ''), 10);
       return orderA - orderB;
     });
 
-    // Create unique entries with display info
-    // Each entry shows exercise name + position/equipment_use + equipment_setup
     return sorted.map((ex, index) => ({
       id: `${ex.exercise_name}-${ex.equipment_setup}-${index}`,
       name: ex.exercise_name,
       position: ex.position,
       equipmentUse: ex.equipment_use,
       equipmentSetup: ex.equipment_setup,
+      equipmentWeight: ex.equipment_weight,
       colorCode: ex.program_color_code,
       order: ex.program_order,
       isCurrentExercise: ex.exercise_name.toLowerCase() === selectedExercise.toLowerCase(),
     }));
-  }, [bodyPart, muscleGroup, selectedExercise]);
+  }, [day, bodyPart, muscleGroup, selectedExercise]);
 
-  // === ANIMATION INTERPOLATIONS ===
-  const chevronRotation = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['-90deg', '90deg'],
-  });
-
-  const contentHeight = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, theme.layout.videoPlayer.height + theme.layout.videoPlayer.bottomPadding],
-  });
-
-  const contentOpacity = animatedValue.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [0, 0, 1],
-  });
-
-  const toggleExpand = useCallback(() => {
-    const toValue = expanded ? 0 : 1;
-    setExpanded(!expanded);
-
-    // Pause video when collapsing
-    if (expanded) {
-      setPlaying(false);
+  // Initialize equipment info from the selected exercise
+  React.useEffect(() => {
+    const matchingExercise = alternateExercises.find(
+      ex => ex.name.toLowerCase() === selectedExercise.toLowerCase()
+    );
+    if (matchingExercise && !selectedEquipment.equipmentWeight) {
+      setSelectedEquipment({
+        equipmentUse: matchingExercise.equipmentUse,
+        equipmentWeight: matchingExercise.equipmentWeight,
+        equipmentSetup: matchingExercise.equipmentSetup,
+      });
     }
+  }, [alternateExercises, selectedExercise, selectedEquipment.equipmentWeight]);
 
-    Animated.timing(animatedValue, {
-      toValue,
-      duration: theme.layout.animation.duration,
-      useNativeDriver: false,
-    }).start();
-  }, [expanded, animatedValue]);
+  // Get the current equipment icon
+  const getEquipmentIcon = useCallback(() => {
+    const equipmentLower = selectedEquipment.equipmentUse.toLowerCase();
+    const weightLower = selectedEquipment.equipmentWeight.toLowerCase();
+    const setupLower = selectedEquipment.equipmentSetup.toLowerCase();
+    const exerciseNameLower = selectedExercise.toLowerCase();
+    const iconColor = COLOR_CODE_MAP[selectedColorCode] || theme.colors.actionSuccess;
 
-  const onStateChange = useCallback((state: string) => {
-    if (state === 'ended') {
-      setPlaying(false);
+    const isFreeWeight = weightLower === 'free weight';
+    const isPinLoaded = weightLower === 'pin-loaded';
+    const isPlateLoaded = weightLower === 'plate-loaded';
+    const isLinearWeight = weightLower === 'linear weight';
+    const isResistance = weightLower === 'resistance';
+    const isBodyweight = weightLower === 'bodyweight';
+
+    if (isFreeWeight && equipmentLower === 'barbell') {
+      return <BarbellIcon width={48} height={24} color={iconColor} />;
     }
-  }, []);
+    if (isFreeWeight && (equipmentLower === 'dumbbell' || equipmentLower === 'dumbbells')) {
+      return <DumbbellIcon width={48} height={24} color={iconColor} />;
+    }
+    if (isFreeWeight && equipmentLower === 'ez bar') {
+      return <EZBarIcon width={48} height={24} color={iconColor} />;
+    }
+    if (isFreeWeight && equipmentLower === 'fixed barbell' && exerciseNameLower === 'bicep curl') {
+      return <FixedBarbellEZIcon width={48} height={24} color={iconColor} />;
+    }
+    if (isFreeWeight && equipmentLower === 'fixed barbell') {
+      return <FixedBarbellIcon width={48} height={24} color={iconColor} />;
+    }
+    if (isPinLoaded && setupLower === 'cable machine') {
+      return <CableMachineIcon width={48} height={24} color={iconColor} />;
+    }
+    if (isPinLoaded) {
+      return <PinMachineIcon width={48} height={24} color={iconColor} />;
+    }
+    if (isPlateLoaded) {
+      return <PlateLoadedIcon width={48} height={24} color={iconColor} />;
+    }
+    if (isLinearWeight && setupLower.includes('smith machine')) {
+      return <SmithMachineIcon width={48} height={24} color={iconColor} />;
+    }
+    if (isResistance) {
+      return <ResistanceBandIcon width={48} height={24} color={iconColor} />;
+    }
+    if (isBodyweight) {
+      return <BodyweightIcon width={48} height={24} color={iconColor} />;
+    }
+    return null;
+  }, [selectedEquipment, selectedExercise, selectedColorCode]);
 
   const handleExerciseNamePress = useCallback(() => {
     setExerciseSelectorVisible(true);
@@ -156,84 +184,82 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
   const handleExerciseSelect = useCallback((exercise: {
     id: string;
     name: string;
-    equipment: string;
+    equipmentUse: string;
+    equipmentWeight: string;
+    equipmentSetup: string;
     colorCode: string;
     order: string;
     isCurrentExercise: boolean;
   }) => {
     setSelectedExercise(exercise.name);
     setSelectedColorCode(exercise.colorCode);
+    setSelectedEquipment({
+      equipmentUse: exercise.equipmentUse,
+      equipmentWeight: exercise.equipmentWeight,
+      equipmentSetup: exercise.equipmentSetup,
+    });
     setExerciseSelectorVisible(false);
   }, []);
+
+  const textColor = COLOR_CODE_MAP[selectedColorCode] || theme.colors.actionSuccess;
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerContent}>
-          <View style={styles.exerciseNameContainer}>
-            <TouchableOpacity
-              onPress={handleExerciseNamePress}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.exerciseName, {color: COLOR_CODE_MAP[selectedColorCode] || theme.colors.actionSuccess}]}>
-                {selectedExercise.toUpperCase()}
-              </Text>
-            </TouchableOpacity>
-          </View>
+          {/* Main info box with icon */}
+          <TouchableOpacity
+            onPress={handleExerciseNamePress}
+            activeOpacity={0.7}
+            style={styles.exerciseInfoBox}
+          >
+            {/* Exercise Name - Centered */}
+            <Text style={[styles.exerciseName, {color: textColor}]}>
+              {selectedExercise.toUpperCase()}
+            </Text>
+
+            {/* Details with Icon */}
+            <View style={styles.detailsWithIcon}>
+              {/* Equipment Icon - Centered on middle line */}
+              <View style={styles.iconAbsolute}>
+                {getEquipmentIcon()}
+              </View>
+
+              {/* Equipment Details - Centered */}
+              <View style={styles.detailsCentered}>
+                <Text style={[styles.exerciseDetailLine, {color: textColor}]}>
+                  {selectedEquipment.equipmentSetup.toUpperCase()}
+                </Text>
+                <Text style={[styles.exerciseDetailLine, {color: textColor}]}>
+                  {selectedEquipment.equipmentWeight.toUpperCase()}
+                </Text>
+                <Text style={[styles.exerciseDetailLineLast, {color: textColor}]}>
+                  {selectedEquipment.equipmentUse.toUpperCase()}
+                </Text>
+              </View>
+            </View>
+          </TouchableOpacity>
         </View>
         <View style={styles.setInfoContainer}>
           <Text style={styles.setInfo}>
-            <Text style={styles.setInfoLabel}>SET </Text>
+            <Text style={styles.setInfoLabel}>EXERCISE SET </Text>
             {currentSet}
             <Text style={styles.setInfoLabel}> OF </Text>
             {totalSets}
           </Text>
         </View>
-        <TouchableOpacity
-          style={styles.chevronTouchArea}
-          onPress={toggleExpand}
-          activeOpacity={0.7}
-          hitSlop={{top: theme.spacing.s, bottom: theme.spacing.s, left: theme.spacing.s, right: theme.spacing.s}}
-        >
-          <Animated.View style={[styles.chevronContainer, {transform: [{rotate: chevronRotation}]}]}>
-            <RightChevron size={theme.layout.exerciseCard.chevronSize} color={theme.colors.textSecondary} />
-          </Animated.View>
-        </TouchableOpacity>
       </View>
-
-      <Animated.View style={[styles.videoWrapper, {height: contentHeight, opacity: contentOpacity}]}>
-        <View style={styles.videoRow}>
-          {/* Left side - card space for future text content */}
-          <View style={styles.leftContent} />
-
-          {/* Right side - YouTube Shorts player */}
-          <View style={styles.videoContainer}>
-            <View style={styles.videoContent}>
-              <YoutubePlayer
-                height={theme.layout.videoPlayer.height}
-                width={theme.layout.videoPlayer.fullWidth}
-                play={playing}
-                videoId={videoId}
-                onChangeState={onStateChange}
-                webViewStyle={{opacity: 0.99}}
-              />
-            </View>
-          </View>
-        </View>
-      </Animated.View>
 
       {/* Exercise Selector Bottom Sheet */}
       <BottomSheet
         visible={exerciseSelectorVisible}
         onClose={handleExerciseSelectorClose}
-        topOffset={theme.layout.topNav.topSpacing + theme.layout.topNav.height + theme.layout.workoutTitleBar.height}
+        topOffset={theme.layout.topNav.topSpacing + theme.layout.topNav.height + theme.layout.workoutTitleBar.height + 32}
       >
-        {/* All exercises for this muscle group, ordered by program_order */}
         {alternateExercises.map((exercise, index) => {
           const isRedNote = exercise.colorCode === 'red';
-          const textColor = COLOR_CODE_MAP[exercise.colorCode] || theme.colors.textPrimary;
+          const rowTextColor = COLOR_CODE_MAP[exercise.colorCode] || theme.colors.textPrimary;
 
-          // Red items are non-selectable notes - only show exercise name
           if (isRedNote) {
             return (
               <View
@@ -245,14 +271,34 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
                   index === alternateExercises.length - 1 && styles.exerciseRowLast,
                 ]}
               >
-                <Text style={[styles.exerciseRowText, {color: textColor}]}>
+                <Text style={[styles.exerciseRowText, {color: rowTextColor}]}>
                   {exercise.name.toUpperCase()}
                 </Text>
               </View>
             );
           }
 
-          // Normal selectable exercise
+          const equipmentLower = exercise.equipmentUse.toLowerCase();
+          const weightLower = exercise.equipmentWeight?.toLowerCase() || '';
+          const setupLower = exercise.equipmentSetup?.toLowerCase() || '';
+
+          const isFreeWeight = weightLower === 'free weight';
+          const isPinLoaded = weightLower === 'pin-loaded';
+          const isPlateLoaded = weightLower === 'plate-loaded';
+          const isLinearWeight = weightLower === 'linear weight';
+          const isResistance = weightLower === 'resistance';
+          const isBodyweight = weightLower === 'bodyweight';
+
+          const isBarbell = isFreeWeight && equipmentLower === 'barbell';
+          const isDumbbell = isFreeWeight && (equipmentLower === 'dumbbell' || equipmentLower === 'dumbbells');
+          const isEZBar = isFreeWeight && equipmentLower === 'ez bar';
+          const exerciseNameLower = exercise.name.toLowerCase();
+          const isFixedBarbellEZ = isFreeWeight && equipmentLower === 'fixed barbell' && exerciseNameLower === 'bicep curl';
+          const isFixedBarbell = isFreeWeight && equipmentLower === 'fixed barbell' && !isFixedBarbellEZ;
+          const isCableMachine = isPinLoaded && setupLower === 'cable machine';
+          const isPinMachine = isPinLoaded && !isCableMachine;
+          const isSmithMachine = isLinearWeight && setupLower.includes('smith machine');
+
           return (
             <TouchableOpacity
               key={exercise.id}
@@ -264,15 +310,44 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
               onPress={() => handleExerciseSelect(exercise)}
               activeOpacity={0.7}
             >
-              <Text style={[styles.exerciseRowText, {color: textColor}]}>
-                {exercise.name.toUpperCase()}
+              <Text style={[styles.exerciseRowText, {color: rowTextColor}]}>
+                {(() => {
+                  const name = exercise.name.toUpperCase();
+                  const words = name.split(' ');
+                  if (words[0] === 'BANDED' && words.length >= 3) {
+                    return `BANDED\n${words.slice(1).join(' ')}`;
+                  }
+                  return name;
+                })()}
               </Text>
-              <Text style={[styles.exerciseRowPosition, {color: textColor}]}>
-                {exercise.position.toUpperCase()} - {exercise.equipmentUse.toUpperCase()}
-              </Text>
-              <Text style={[styles.exerciseRowEquipment, {color: textColor}]}>
-                {exercise.equipmentSetup.toUpperCase()}
-              </Text>
+
+              <View style={styles.exerciseRowDetailsWithIcon}>
+                <View style={styles.exerciseRowIconAbsolute}>
+                  {isBarbell && <BarbellIcon width={48} height={24} color={rowTextColor} />}
+                  {isDumbbell && <DumbbellIcon width={48} height={24} color={rowTextColor} />}
+                  {isEZBar && <EZBarIcon width={48} height={24} color={rowTextColor} />}
+                  {isFixedBarbell && <FixedBarbellIcon width={48} height={24} color={rowTextColor} />}
+                  {isFixedBarbellEZ && <FixedBarbellEZIcon width={48} height={24} color={rowTextColor} />}
+                  {isCableMachine && <CableMachineIcon width={48} height={24} color={rowTextColor} />}
+                  {isPinMachine && <PinMachineIcon width={48} height={24} color={rowTextColor} />}
+                  {isPlateLoaded && <PlateLoadedIcon width={48} height={24} color={rowTextColor} />}
+                  {isSmithMachine && <SmithMachineIcon width={48} height={24} color={rowTextColor} />}
+                  {isResistance && <ResistanceBandIcon width={48} height={24} color={rowTextColor} />}
+                  {isBodyweight && <BodyweightIcon width={48} height={24} color={rowTextColor} />}
+                </View>
+
+                <View style={styles.exerciseRowDetailsCentered}>
+                  <Text style={[styles.exerciseRowDetailLine, {color: rowTextColor}]}>
+                    {exercise.equipmentSetup.toUpperCase()}
+                  </Text>
+                  <Text style={[styles.exerciseRowDetailLine, {color: rowTextColor}]}>
+                    {exercise.equipmentWeight.toUpperCase()}
+                  </Text>
+                  <Text style={[styles.exerciseRowDetailLineLast, {color: rowTextColor}]}>
+                    {exercise.position.toUpperCase()}
+                  </Text>
+                </View>
+              </View>
             </TouchableOpacity>
           );
         })}
@@ -295,34 +370,66 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   header: {
-    height: 96,
-    position: 'relative',
-    paddingTop: theme.layout.exerciseCard.headerPaddingTop,
-    paddingHorizontal: theme.spacing.s,
+    padding: 8,
   },
   headerContent: {
-    flex: 1,
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
   },
   setInfoContainer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 6,
+    marginTop: 8,
   },
-  exerciseNameContainer: {
-    paddingHorizontal: theme.layout.exerciseCard.exerciseNamePaddingHorizontal,
-    marginBottom: theme.layout.exerciseCard.exerciseNameMarginBottom,
+  // === EXERCISE INFO BOX ===
+  exerciseInfoBox: {
+    backgroundColor: theme.colors.pureBlack,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    width: '100%',
   },
   exerciseName: {
-    fontSize: theme.layout.exerciseCard.exerciseNameFontSize,
-    lineHeight: theme.layout.exerciseCard.exerciseNameLineHeight,
+    fontSize: 32,
+    lineHeight: 32,
     includeFontPadding: false,
     color: theme.colors.actionSuccess,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: 'bold',
     textAlign: 'center',
+    marginBottom: theme.layout.exerciseSelector.detailMarginBottom,
+  },
+  detailsWithIcon: {
+    position: 'relative',
+    width: '100%',
+  },
+  iconAbsolute: {
+    position: 'absolute',
+    left: 0,
+    top: 18,
+    width: 48,
+    alignItems: 'center',
+  },
+  detailsCentered: {
+    alignItems: 'center',
+  },
+  exerciseDetailLine: {
+    fontSize: theme.layout.exerciseSelector.detailFontSize,
+    lineHeight: theme.layout.exerciseSelector.detailLineHeight,
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: 'bold',
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+    includeFontPadding: false,
+    marginBottom: 4,
+  },
+  exerciseDetailLineLast: {
+    fontSize: theme.layout.exerciseSelector.detailFontSize,
+    lineHeight: theme.layout.exerciseSelector.detailLineHeight,
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: 'bold',
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+    includeFontPadding: false,
+    marginBottom: 0,
   },
   setInfo: {
     fontSize: theme.layout.exerciseCard.setInfoFontSize,
@@ -336,70 +443,45 @@ const styles = StyleSheet.create({
   setInfoLabel: {
     color: theme.colors.backgroundTertiary,
   },
-  chevronTouchArea: {
-    position: 'absolute',
-    top: theme.layout.exerciseCard.chevronTop,
-    right: theme.layout.exerciseCard.chevronRight,
-  },
-  chevronContainer: {
-    // Container for animated rotation
-  },
-  videoWrapper: {
-    overflow: 'hidden',
-  },
-  videoRow: {
-    flexDirection: 'row',
-    flex: 1,
-    paddingRight: theme.spacing.s,
-    paddingBottom: theme.layout.videoPlayer.bottomPadding,
-  },
-  leftContent: {
-    flex: 1,
-  },
-  videoContainer: {
-    width: theme.layout.videoPlayer.width,
-    height: theme.layout.videoPlayer.height,
-    overflow: 'hidden',
-    borderRadius: theme.layout.videoPlayer.borderRadius,
-    backgroundColor: theme.colors.pureBlack,
-  },
-  videoContent: {
-    width: theme.layout.videoPlayer.fullWidth,
-    marginLeft: theme.layout.videoPlayer.cropOffset,
-  },
   // === EXERCISE SELECTOR STYLES ===
-  currentSelectionHeader: {
-    paddingVertical: theme.spacing.m,
-    alignItems: 'center',
-  },
-  currentSelectionLabel: {
-    fontSize: theme.typography.fontSize.s,
-    fontFamily: theme.typography.fontFamily.primary,
-    color: theme.colors.textSecondary,
-    marginBottom: theme.spacing.xs,
-  },
-  currentSelectionName: {
-    fontSize: theme.typography.fontSize.xl,
-    fontFamily: theme.typography.fontFamily.primary,
-    fontWeight: 'bold',
-    color: theme.colors.actionSuccess,
-  },
-  selectorDivider: {
-    height: theme.layout.border.thin,
-    backgroundColor: theme.colors.borderDefault,
-    marginVertical: theme.spacing.s,
-  },
-  alternatesLabel: {
-    fontSize: theme.typography.fontSize.s,
-    fontFamily: theme.typography.fontFamily.primary,
-    color: theme.colors.textSecondary,
-    marginBottom: theme.spacing.s,
-  },
   exerciseRow: {
-    alignItems: 'center',
     borderBottomWidth: theme.layout.border.thin,
     borderBottomColor: theme.colors.borderDefault,
     marginTop: 0,
+  },
+  exerciseRowDetailsWithIcon: {
+    position: 'relative',
+    width: '100%',
+  },
+  exerciseRowIconAbsolute: {
+    position: 'absolute',
+    left: 0,
+    top: 18,
+    width: 48,
+    alignItems: 'center',
+  },
+  exerciseRowDetailsCentered: {
+    alignItems: 'center',
+  },
+  exerciseRowDetailLine: {
+    fontSize: theme.layout.exerciseSelector.detailFontSize,
+    lineHeight: theme.layout.exerciseSelector.detailLineHeight,
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: 'bold',
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+    includeFontPadding: false,
+    marginBottom: 4,
+  },
+  exerciseRowDetailLineLast: {
+    fontSize: theme.layout.exerciseSelector.detailFontSize,
+    lineHeight: theme.layout.exerciseSelector.detailLineHeight,
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: 'bold',
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+    includeFontPadding: false,
+    marginBottom: theme.layout.exerciseSelector.rowBottomPadding,
   },
   exerciseRowNotFirst: {
     marginTop: theme.layout.exerciseSelector.rowSpacing,
@@ -408,7 +490,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
   },
   exerciseRowNote: {
-    // Non-selectable informational items (red color code)
     paddingBottom: theme.layout.exerciseSelector.rowBottomPadding,
   },
   exerciseRowText: {
@@ -420,32 +501,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     includeFontPadding: false,
     marginBottom: theme.layout.exerciseSelector.detailMarginBottom,
-  },
-  exerciseRowPosition: {
-    fontSize: theme.layout.exerciseSelector.detailFontSize,
-    lineHeight: theme.layout.exerciseSelector.detailLineHeight,
-    fontFamily: theme.typography.fontFamily.primary,
-    fontWeight: 'bold',
-    color: theme.colors.textSecondary,
-    textAlign: 'center',
-    includeFontPadding: false,
-    marginBottom: theme.layout.exerciseSelector.detailMarginBottom,
-  },
-  exerciseRowEquipment: {
-    fontSize: theme.layout.exerciseSelector.detailFontSize,
-    lineHeight: theme.layout.exerciseSelector.detailLineHeight,
-    fontFamily: theme.typography.fontFamily.primary,
-    fontWeight: 'bold',
-    color: theme.colors.textSecondary,
-    textAlign: 'center',
-    includeFontPadding: false,
-    marginBottom: theme.layout.exerciseSelector.rowBottomPadding,
-  },
-  currentIndicator: {
-    fontSize: theme.typography.fontSize.xs,
-    fontFamily: theme.typography.fontFamily.primary,
-    fontWeight: 'bold',
-    color: theme.colors.actionSuccess,
-    marginLeft: theme.spacing.s,
   },
 });

@@ -21,3 +21,7 @@ export {StatsIcon} from './StatsIcon';
 export {ProfileIcon} from './ProfileIcon';
 export {PencilIcon} from './PencilIcon';
 export {TrashIcon} from './TrashIcon';
+export {GearIcon} from './GearIcon';
+
+// Equipment Icons
+export * from './equipment';

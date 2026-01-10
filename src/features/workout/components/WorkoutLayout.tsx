@@ -23,8 +23,10 @@ import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {theme} from '@/theme';
 import {TopNavBar, Sidebar, BottomTabBar} from '@/components';
+import {GearIcon} from '@/components/icons';
 import type {WorkoutType} from '@/components/WorkoutCard';
 import type {MainStackParamList, TabParamList} from '@/navigation/types';
+import {getWorkoutDuration} from '@/utils/durationCalculator';
 
 // ============================================================================
 // TYPES
@@ -40,6 +42,8 @@ type WorkoutLayoutProps = {
   children: ReactNode;
   showLetsGoButton?: boolean;
   onLetsGoPress?: () => void;
+  currentSetIndex?: number;
+  totalSets?: number;
   sidebarVisible: boolean;
   onSidebarClose: () => void;
   onSidebarSelect: (option: 'profile' | 'settings' | 'help' | 'logout') => void;
@@ -63,6 +67,8 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
   children,
   showLetsGoButton = false,
   onLetsGoPress,
+  currentSetIndex = 0,
+  totalSets = 0,
   sidebarVisible,
   onSidebarClose,
   onSidebarSelect,
@@ -71,6 +77,11 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
   onGuidePress,
   navigation,
 }) => {
+  // Calculate workout status for settings bar
+  const currentSetDisplay = currentSetIndex + 1;
+  const remainingSets = totalSets - currentSetIndex;
+  const remainingMinutes = remainingSets > 0 ? getWorkoutDuration(remainingSets) : 0;
+  const showWorkoutStatus = totalSets > 0;
   return (
     <>
       <StatusBar
@@ -87,8 +98,11 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
             onBackPress={onBackPress}
           />
 
-          {/* Workout Title Bar with green border */}
-          <View style={styles.workoutTitleBar}>
+          {/* Workout Title Bar (body part name) */}
+          <View style={[
+            styles.workoutTitleBar,
+            !showWorkoutStatus && styles.workoutTitleBarWithGreenBorder,
+          ]}>
             <Text style={styles.workoutTitleText}>{workoutType}</Text>
 
             {/* Conditional Let's Go Button */}
@@ -110,10 +124,39 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
               </View>
             )}
           </View>
+
+          {/* Workout Settings Bar - only shown during active workout */}
+          {showWorkoutStatus && (
+            <View style={styles.workoutSettingsBar}>
+              {/* Gear Icon - Left aligned with hamburger menu */}
+              <View style={styles.gearIconContainer}>
+                <GearIcon width={24} height={24} color={theme.colors.textSecondary} />
+              </View>
+
+              {/* Right-aligned stats group */}
+              <View style={styles.statsGroup}>
+                {/* TO GO Label */}
+                <Text style={styles.statusLabel}>TO GO</Text>
+
+                {/* Separator */}
+                <View style={styles.verticalSeparator} />
+
+                {/* Remaining Stats */}
+                <Text style={styles.statusLabel}>SETS: </Text>
+                <Text style={styles.statusValue}>{remainingSets}</Text>
+                <Text style={styles.statsSpacer}>       </Text>
+                <Text style={styles.statusLabel}>MINS: </Text>
+                <Text style={styles.statusValue}>{remainingMinutes}</Text>
+              </View>
+            </View>
+          )}
         </View>
 
         {/* Dynamic Content Area - this is where transitions happen */}
-        <View style={styles.contentArea}>
+        <View style={[
+          styles.contentArea,
+          showWorkoutStatus && styles.contentAreaWithSettingsBar,
+        ]}>
           {children}
         </View>
 
@@ -177,13 +220,62 @@ const styles = StyleSheet.create({
     height: 48, // 48dp container (8dp + 32dp button + 8dp)
     backgroundColor: theme.colors.pureBlack,
     borderBottomWidth: theme.layout.border.thin,
-    borderBottomColor: theme.colors.actionSuccess, // GREEN BORDER #1
+    borderBottomColor: theme.colors.pureWhite, // White line when settings bar is shown
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingLeft: theme.spacing.s,
-    paddingRight: theme.spacing.s,
+    paddingHorizontal: theme.layout.topNav.paddingHorizontal, // Align with TopNavBar (16dp)
     zIndex: 1,
+  },
+  workoutTitleBarWithGreenBorder: {
+    borderBottomColor: theme.colors.actionSuccess, // Green line when no settings bar
+  },
+
+  // === WORKOUT SETTINGS BAR ===
+  workoutSettingsBar: {
+    height: 32,
+    backgroundColor: theme.colors.pureBlack,
+    borderBottomWidth: theme.layout.border.thin,
+    borderBottomColor: theme.colors.actionSuccess, // Green scroll bar
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: theme.layout.topNav.paddingHorizontal, // Align with TopNavBar (16dp)
+  },
+  statusLabel: {
+    fontSize: theme.layout.exerciseCard.setInfoFontSize,
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: 'bold',
+    color: theme.colors.backgroundTertiary,
+    includeFontPadding: false,
+  },
+  statusValue: {
+    fontSize: theme.layout.exerciseCard.setInfoFontSize,
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: 'bold',
+    color: theme.colors.actionSuccess,
+    includeFontPadding: false,
+  },
+  verticalSeparator: {
+    width: 1,
+    height: 20,
+    backgroundColor: theme.colors.pureWhite,
+    marginHorizontal: theme.spacing.s, // 8dp on each side
+  },
+  statsGroup: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  statsSpacer: {
+    fontSize: theme.layout.exerciseCard.setInfoFontSize,
+  },
+  gearIconContainer: {
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: theme.spacing.s, // Space before TO GO label
   },
 
   workoutTitleText: {
@@ -192,8 +284,6 @@ const styles = StyleSheet.create({
     color: theme.colors.actionSuccess,
     textTransform: 'uppercase',
     includeFontPadding: false,
-    transform: [{scaleX: 1.2}, {translateY: 2}], // Horizontal stretch with vertical adjustment
-    marginLeft: 11, // Left offset for visual alignment
     textShadowColor: theme.colors.shadowBlack,
     textShadowOffset: {width: 0, height: 2}, // Drop shadow
     textShadowRadius: 4, // Shadow blur
@@ -255,7 +345,10 @@ const styles = StyleSheet.create({
   // === CONTENT AREA ===
   contentArea: {
     flex: 1,
-    paddingTop: theme.layout.topNav.topSpacing + theme.layout.topNav.height + 48, // Clear navigation area (112dp)
+    paddingTop: theme.layout.topNav.topSpacing + theme.layout.topNav.height + 48, // Clear navigation area (TopNav + Title Bar)
     paddingBottom: theme.layout.bottomNav.height, // Clear bottom tab bar (accounts for safe area in BottomTabBar component)
+  },
+  contentAreaWithSettingsBar: {
+    paddingTop: theme.layout.topNav.topSpacing + theme.layout.topNav.height + 48 + 32, // Additional 32dp for Settings Bar
   },
 });

@@ -31,12 +31,12 @@ export const PlanCard: React.FC<PlanCardProps> = ({planName, imageSource, onPres
       activeOpacity={theme.layout.interaction.cardActiveOpacity}
       disabled={!onPress} // Non-functional for now
     >
-      {/* Background Image - Full 128dp height, centered */}
+      {/* Background Image - Stretched to fill 16:9 card */}
       {imageSource && (
         <Image
           source={imageSource}
           style={styles.backgroundImage}
-          resizeMode="cover"
+          resizeMode="stretch"
         />
       )}
 

@@ -74,6 +74,7 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
   // Falls back to route params only for edge cases (direct navigation, deep links)
   const workoutType = config?.workoutType || route.params.workoutType;
   const sessionType = config?.sessionType || route.params.sessionType;
+  const workoutDay = route.params.day || 'Monday';
 
   // Fallback initialization only if context wasn't pre-initialized
   // This handles edge cases like deep linking or direct navigation
@@ -165,6 +166,19 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
 
     return {currentSet: setNumber, totalSets: total, currentMuscleGroup: muscleGroup};
   }, [activeSetKey, workoutData.exercises]);
+
+  // Calculate global set index (0-based) and total sets for status bar
+  const {globalSetIndex, globalTotalSets} = useMemo(() => {
+    const total = orderedSetKeys.length;
+    if (!activeSetKey) {
+      return {globalSetIndex: 0, globalTotalSets: total};
+    }
+    const index = orderedSetKeys.indexOf(activeSetKey);
+    return {
+      globalSetIndex: index >= 0 ? index : 0,
+      globalTotalSets: total,
+    };
+  }, [activeSetKey, orderedSetKeys]);
 
   // ==========================================================================
   // EVENT HANDLERS
@@ -258,12 +272,15 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
     <WorkoutLayout
       workoutType={workoutType}
       showLetsGoButton={false}
+      currentSetIndex={globalSetIndex}
+      totalSets={globalTotalSets}
       sidebarVisible={sidebarVisible}
       onSidebarClose={() => setSidebarVisible(false)}
       onSidebarSelect={() => {}}
       onBackPress={handleBackPress}
       onMenuPress={handleMenuPress}
-      onGuidePress={handleGuidePress}>
+      onGuidePress={handleGuidePress}
+      navigation={navigation}>
       
       <ScrollView
         style={styles.scrollView}
@@ -277,6 +294,7 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
             totalSets={totalSets}
             bodyPart={workoutType}
             muscleGroup={currentMuscleGroup}
+            day={workoutDay}
           />
 
           {/* 2. Weight Control Card */}

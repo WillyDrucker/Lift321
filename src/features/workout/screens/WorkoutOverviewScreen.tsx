@@ -42,7 +42,7 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
   // STATE
   // ==========================================================================
 
-  const {workoutType} = route.params;
+  const {workoutType, day} = route.params;
   const {startWorkout} = useActiveWorkout();
 
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
@@ -301,6 +301,7 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
         current: 2,
         total: 15,
       },
+      day,
     });
   };
 

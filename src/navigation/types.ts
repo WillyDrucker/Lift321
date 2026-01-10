@@ -47,6 +47,7 @@ export type MainStackParamList = {
   WorkoutOverview: {
     workoutType: WorkoutType;
     suggester?: WorkoutSuggester;
+    day?: string;
   };
   ActiveWorkout: {
     workoutType: WorkoutType;
@@ -57,6 +58,7 @@ export type MainStackParamList = {
       current: number;
       total: number;
     };
+    day?: string;
   };
   WorkoutList: undefined;
   WorkoutSession: {workoutId: string};

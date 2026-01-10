@@ -76,6 +76,23 @@ const getBodyPartIndices = (): number[] => {
   );
 };
 
+// Day name mapping for exercise filtering
+const DAY_NAMES: Record<number, string> = {
+  0: 'Sunday',
+  1: 'Monday',
+  2: 'Tuesday',
+  3: 'Wednesday',
+  4: 'Thursday',
+  5: 'Friday',
+  6: 'Saturday',
+};
+
+// Get current day name
+const getTodaysDayName = (): string => {
+  const dayOfWeek = new Date().getDay();
+  return DAY_NAMES[dayOfWeek];
+};
+
 // Simulated "today's focus" - will come from user's plan
 const getTodaysFocus = (): BodyPart => {
   const dayOfWeek = new Date().getDay();
@@ -305,6 +322,7 @@ export const BodyPartSelectorScreen: React.FC<BodyPartSelectorProps> = ({
                   onPress={() => navigation.navigate('WorkoutOverview', {
                     workoutType: workout.bodyPart,
                     suggester: suggester,
+                    day: getTodaysDayName(),
                   })}
                 />
               ))}
