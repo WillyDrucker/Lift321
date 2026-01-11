@@ -133,20 +133,16 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
                 <GearIcon width={24} height={24} color={theme.colors.textSecondary} />
               </View>
 
-              {/* Right-aligned stats group */}
-              <View style={styles.statsGroup}>
-                {/* TO GO Label */}
-                <Text style={styles.statusLabel}>TO GO</Text>
+              {/* Centered SETS display */}
+              <View style={styles.statsGroupCentered}>
+                <Text style={styles.statusLabel}>SETS </Text>
+                <Text style={styles.statusValueLarge}>{remainingSets}</Text>
+              </View>
 
-                {/* Separator */}
-                <View style={styles.verticalSeparator} />
-
-                {/* Remaining Stats */}
-                <Text style={styles.statusLabel}>SETS: </Text>
-                <Text style={styles.statusValue}>{remainingSets}</Text>
-                <Text style={styles.statsSpacer}>       </Text>
-                <Text style={styles.statusLabel}>MINS: </Text>
-                <Text style={styles.statusValue}>{remainingMinutes}</Text>
+              {/* Right-aligned MINS */}
+              <View style={styles.statsGroupRight}>
+                <Text style={styles.statusLabel}>MINS </Text>
+                <Text style={styles.statusValueLarge}>{remainingMinutes}</Text>
               </View>
             </View>
           )}
@@ -233,7 +229,7 @@ const styles = StyleSheet.create({
 
   // === WORKOUT SETTINGS BAR ===
   workoutSettingsBar: {
-    height: 32,
+    height: theme.layout.workoutSettingsBar.height,
     backgroundColor: theme.colors.pureBlack,
     borderBottomWidth: theme.layout.border.thin,
     borderBottomColor: theme.colors.actionSuccess, // Green scroll bar
@@ -255,20 +251,23 @@ const styles = StyleSheet.create({
     color: theme.colors.actionSuccess,
     includeFontPadding: false,
   },
-  verticalSeparator: {
-    width: 1,
-    height: 20,
-    backgroundColor: theme.colors.pureWhite,
-    marginHorizontal: theme.spacing.s, // 8dp on each side
+  statusValueLarge: {
+    fontSize: 32,
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: 'bold',
+    color: theme.colors.actionSuccess,
+    includeFontPadding: false,
+    transform: [{translateY: -2.5}], // Center vertically (move up to compensate for font metrics)
   },
-  statsGroup: {
+  statsGroupCentered: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
   },
-  statsSpacer: {
-    fontSize: theme.layout.exerciseCard.setInfoFontSize,
+  statsGroupRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   gearIconContainer: {
     width: 24,
@@ -284,6 +283,7 @@ const styles = StyleSheet.create({
     color: theme.colors.actionSuccess,
     textTransform: 'uppercase',
     includeFontPadding: false,
+    transform: [{translateY: 2}], // Compensate for font metrics to visually center
     textShadowColor: theme.colors.shadowBlack,
     textShadowOffset: {width: 0, height: 2}, // Drop shadow
     textShadowRadius: 4, // Shadow blur
@@ -349,6 +349,6 @@ const styles = StyleSheet.create({
     paddingBottom: theme.layout.bottomNav.height, // Clear bottom tab bar (accounts for safe area in BottomTabBar component)
   },
   contentAreaWithSettingsBar: {
-    paddingTop: theme.layout.topNav.topSpacing + theme.layout.topNav.height + 48 + 32, // Additional 32dp for Settings Bar
+    paddingTop: theme.layout.activeWorkoutHeader.totalHeight, // Total header height during active workout
   },
 });

@@ -26,7 +26,7 @@ export const HamburgerIcon: React.FC<HamburgerIconProps> = ({
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
-        d="M3 12H21M3 6H21M3 18H21"
+        d="M0 12H24M0 6H24M0 18H24"
         stroke={color}
         strokeWidth={2}
         strokeLinecap="round"

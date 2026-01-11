@@ -341,6 +341,19 @@ export const layout = {
     height: 48, // Title bar height below top nav
   },
 
+  // === WORKOUT SETTINGS BAR ===
+  // Settings bar below title bar during active workout
+  workoutSettingsBar: {
+    height: 32, // Settings bar height
+  },
+
+  // === ACTIVE WORKOUT HEADER ===
+  // Combined height of all header elements during active workout
+  // topSpacing(32) + topNav(32) + titleBar(48) + settingsBar(32) = 144dp
+  activeWorkoutHeader: {
+    totalHeight: 144, // Total height from screen top to content area
+  },
+
   // === ACTION CARD ===
   // LOG SET / REST TIMER action button styling
   actionCard: {

@@ -26,6 +26,11 @@ export const styles = StyleSheet.create({
     gap: theme.spacing.s,
     marginBottom: theme.spacing.s,
   },
+  dialControlsRow: {
+    flexDirection: 'row',
+    gap: theme.spacing.s, // 8dp gap between cards
+    marginBottom: theme.spacing.s, // 8dp below the row
+  },
   todaysWorkoutCard: {
     backgroundColor: theme.colors.backgroundPrimary,
     borderRadius: theme.spacing.s,

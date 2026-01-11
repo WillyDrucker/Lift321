@@ -30,6 +30,8 @@ export type UseDialControlConfig = {
   flingSnapIncrement: number;
   flingVelocityThreshold: number;
   onChange: (value: number) => void;
+  hideButtons?: boolean;
+  compact?: boolean;
 };
 
 export type UseDialControlReturn = {
@@ -62,8 +64,28 @@ export type UseDialControlReturn = {
 // ============================================================================
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
-// Container padding (16) - left button (48) - right button (48) - margins (32)
-const GAUGE_WIDTH = SCREEN_WIDTH - 16 - 48 - 48 - 16 - 16;
+
+// Calculate gauge width based on layout mode
+const calculateGaugeWidth = (hideButtons: boolean, compact: boolean): number => {
+  if (compact && hideButtons) {
+    // Compact mode: 50% width cards with no buttons
+    // Screen padding: 8dp each side = 16dp
+    // Gap between cards: 8dp
+    // Each card: (SCREEN_WIDTH - 24) / 2
+    // Card padding: 8dp each side = 16dp
+    // Gauge takes full width of card content area
+    const cardWidth = (SCREEN_WIDTH - 24) / 2;
+    return cardWidth - 16;
+  } else if (hideButtons) {
+    // Full width card with no buttons
+    // Screen padding: 16dp, Card padding: 16dp
+    return SCREEN_WIDTH - 16 - 16;
+  } else {
+    // Original layout with buttons
+    // Container padding (16) - left button (48) - right button (48) - margins (32)
+    return SCREEN_WIDTH - 16 - 48 - 48 - 16 - 16;
+  }
+};
 
 // ============================================================================
 // HOOK
@@ -78,7 +100,12 @@ export const useDialControl = (config: UseDialControlConfig): UseDialControlRetu
     flingSnapIncrement,
     flingVelocityThreshold,
     onChange,
+    hideButtons = false,
+    compact = false,
   } = config;
+
+  // Calculate gauge width based on layout mode
+  const gaugeWidth = calculateGaugeWidth(hideButtons, compact);
 
   // === ANIMATION VALUES ===
   const dragOpacity = useRef(new Animated.Value(1)).current;
@@ -221,7 +248,7 @@ export const useDialControl = (config: UseDialControlConfig): UseDialControlRetu
     handleScroll,
     handleIncrement,
     handleDecrement,
-    gaugeWidth: GAUGE_WIDTH,
+    gaugeWidth,
     initialScrollOffset: initialValue * tickSpacing,
   };
 };

@@ -85,8 +85,8 @@ export const RepsControlCard: React.FC<RepsControlCardProps> = ({
       headerLabel="REPS"
       headerSuffix={headerSuffix}
       getValueColor={getRepsColor}
-      decrementLabel="-1"
-      incrementLabel="+1"
+      hideButtons={true}
+      compact={true}
     />
   );
 };

@@ -31,6 +31,8 @@ export const DialControlCard: React.FC<DialControlCardProps> = ({
   getValueColor,
   decrementLabel,
   incrementLabel,
+  hideButtons = false,
+  compact = false,
 }) => {
   // === HOOKS ===
   const {
@@ -56,6 +58,8 @@ export const DialControlCard: React.FC<DialControlCardProps> = ({
     flingSnapIncrement: config.flingSnapIncrement,
     flingVelocityThreshold: config.flingVelocityThreshold,
     onChange,
+    hideButtons,
+    compact,
   });
 
   const {startAutoRepeat, clearAllTimers} = useAutoRepeat();
@@ -112,7 +116,7 @@ export const DialControlCard: React.FC<DialControlCardProps> = ({
 
   // === RENDER ===
   return (
-    <View style={dialStyles.container}>
+    <View style={[dialStyles.container, compact && {flex: 1, marginBottom: 0}]}>
       {/* Header with label/value swap animation */}
       <View style={dialStyles.header}>
         <View style={dialStyles.headerRow}>
@@ -135,17 +139,19 @@ export const DialControlCard: React.FC<DialControlCardProps> = ({
 
       {/* Controls with integrated gauge */}
       <View style={dialStyles.controlsContainer}>
-        {/* Decrement Button */}
-        <Pressable
-          style={dialStyles.adjustButton}
-          onPressIn={handleDecrementPress}
-          onPressOut={clearAllTimers}
-        >
-          <Text style={dialStyles.adjustButtonText}>{decrementLabel}</Text>
-        </Pressable>
+        {/* Decrement Button - hidden if hideButtons */}
+        {!hideButtons && (
+          <Pressable
+            style={dialStyles.adjustButton}
+            onPressIn={handleDecrementPress}
+            onPressOut={clearAllTimers}
+          >
+            <Text style={dialStyles.adjustButtonText}>{decrementLabel}</Text>
+          </Pressable>
+        )}
 
         {/* Gauge Display */}
-        <View style={dialStyles.gaugeContainer}>
+        <View style={[dialStyles.gaugeContainer, hideButtons && {marginHorizontal: 0}]}>
           {/* Scrollable Tick Track */}
           <ScrollView
             ref={scrollViewRef}
@@ -196,14 +202,16 @@ export const DialControlCard: React.FC<DialControlCardProps> = ({
           </Animated.View>
         </View>
 
-        {/* Increment Button */}
-        <Pressable
-          style={dialStyles.adjustButton}
-          onPressIn={handleIncrementPress}
-          onPressOut={clearAllTimers}
-        >
-          <Text style={dialStyles.adjustButtonText}>{incrementLabel}</Text>
-        </Pressable>
+        {/* Increment Button - hidden if hideButtons */}
+        {!hideButtons && (
+          <Pressable
+            style={dialStyles.adjustButton}
+            onPressIn={handleIncrementPress}
+            onPressOut={clearAllTimers}
+          >
+            <Text style={dialStyles.adjustButtonText}>{incrementLabel}</Text>
+          </Pressable>
+        )}
       </View>
     </View>
   );

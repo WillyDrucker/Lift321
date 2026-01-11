@@ -52,8 +52,12 @@ export type DialControlCardProps = {
   getValueColor?: (value: number) => string;
 
   // Button labels
-  decrementLabel: string;           // "-1" or "-5"
-  incrementLabel: string;           // "+1" or "+5"
+  decrementLabel?: string;          // "-1" or "-5"
+  incrementLabel?: string;          // "+1" or "+5"
+
+  // Layout options
+  hideButtons?: boolean;            // Hide +/- buttons and expand dial to full width
+  compact?: boolean;                // 50% width mode
 };
 
 // ============================================================================

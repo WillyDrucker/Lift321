@@ -297,17 +297,17 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
             day={workoutDay}
           />
 
-          {/* 2. Weight Control Card */}
-          <WeightControlCard
-            initialWeight={currentGlobalWeight}
-            onWeightChange={setGlobalWeight}
-          />
-
-          {/* 3. Reps Control Card */}
-          <RepsControlCard
-            initialReps={currentGlobalReps}
-            onRepsChange={setGlobalReps}
-          />
+          {/* 2. Dial Controls Row - Reps (left) and Weight (right) */}
+          <View style={styles.dialControlsRow}>
+            <RepsControlCard
+              initialReps={currentGlobalReps}
+              onRepsChange={setGlobalReps}
+            />
+            <WeightControlCard
+              initialWeight={currentGlobalWeight}
+              onWeightChange={setGlobalWeight}
+            />
+          </View>
 
           {/* 4. Action Card (Log Set / Rest Timer / Finish) */}
           <WorkoutActionCard

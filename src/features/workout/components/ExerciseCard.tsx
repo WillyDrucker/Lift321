@@ -254,7 +254,8 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
       <BottomSheet
         visible={exerciseSelectorVisible}
         onClose={handleExerciseSelectorClose}
-        topOffset={theme.layout.topNav.topSpacing + theme.layout.topNav.height + theme.layout.workoutTitleBar.height + 32}
+        topOffset={64}
+        maxHeightPercent={95}
       >
         {alternateExercises.map((exercise, index) => {
           const isRedNote = exercise.colorCode === 'red';

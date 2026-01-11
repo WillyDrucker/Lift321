@@ -64,8 +64,8 @@ export const WeightControlCard: React.FC<WeightControlCardProps> = ({
       config={WEIGHT_CONFIG}
       headerLabel="WEIGHT"
       headerSuffix={headerSuffix}
-      decrementLabel="-5"
-      incrementLabel="+5"
+      hideButtons={true}
+      compact={true}
     />
   );
 };
