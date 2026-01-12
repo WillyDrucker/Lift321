@@ -79,6 +79,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
             <Image
               source={require('@/assets/images/logo.png')}
               style={styles.logo}
+              resizeMode="contain"
+              resizeMethod="resize"
             />
           </View>
 
@@ -154,8 +156,8 @@ const styles = StyleSheet.create({
   },
 
   logo: {
-    width: 156,
-    height: 68,
+    width: 100,
+    height: 52, // Matches source image 729:380 aspect ratio
   },
 
   // === CENTER CONTENT STYLES ===

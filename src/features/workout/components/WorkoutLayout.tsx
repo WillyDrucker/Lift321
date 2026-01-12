@@ -17,6 +17,7 @@ import {
   Text,
   View,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import type {CompositeNavigationProp} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -27,6 +28,9 @@ import {GearIcon} from '@/components/icons';
 import type {WorkoutType} from '@/components/WorkoutCard';
 import type {MainStackParamList, TabParamList} from '@/navigation/types';
 import {getWorkoutDuration} from '@/utils/durationCalculator';
+
+// Plan image
+const planImage = require('@/assets/images/plans/lift-3-2-1-plan.png');
 
 // ============================================================================
 // TYPES
@@ -104,6 +108,11 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
             !showWorkoutStatus && styles.workoutTitleBarWithGreenBorder,
           ]}>
             <Text style={styles.workoutTitleText}>{workoutType}</Text>
+
+            {/* Plan Image - shown during active workout */}
+            {showWorkoutStatus && (
+              <Image source={planImage} style={styles.planImage} resizeMode="contain" />
+            )}
 
             {/* Conditional Let's Go Button */}
             {showLetsGoButton && onLetsGoPress && (
@@ -287,6 +296,10 @@ const styles = StyleSheet.create({
     textShadowColor: theme.colors.shadowBlack,
     textShadowOffset: {width: 0, height: 2}, // Drop shadow
     textShadowRadius: 4, // Shadow blur
+  },
+  planImage: {
+    height: 32,
+    width: 96, // 3:1 aspect ratio (32 * 3 = 96)
   },
 
   // === LET'S GO BUTTON ===

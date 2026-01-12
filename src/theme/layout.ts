@@ -200,7 +200,7 @@ export const layout = {
   // === PLAN CARDS ===
   // Training plan selection cards on PlansPage (smaller than workout cards)
   planCard: {
-    height: 113, // 16:9 aspect ratio (200/113 ≈ 1.77)
+    height: 67, // 3:1 aspect ratio (200/67 ≈ 3)
     width: 200,
   },
 

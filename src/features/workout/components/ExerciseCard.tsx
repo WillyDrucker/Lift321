@@ -242,7 +242,7 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
         </View>
         <View style={styles.setInfoContainer}>
           <Text style={styles.setInfo}>
-            <Text style={styles.setInfoLabel}>EXERCISE SET </Text>
+            <Text style={styles.setInfoLabel}>CURRENT SET </Text>
             {currentSet}
             <Text style={styles.setInfoLabel}> OF </Text>
             {totalSets}
