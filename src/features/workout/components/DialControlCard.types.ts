@@ -21,10 +21,11 @@ export type DialConfig = {
 
   // Tick settings
   tickSpacing: number;      // Pixels between ticks
-  valuePerTick: number;     // Value each tick represents
+  valuePerTick: number;     // Value each tick represents (scroll precision)
 
   // Button behavior
-  buttonIncrement: number;  // +/- button change amount
+  buttonIncrement: number;  // Primary +/- button change amount
+  buttonIncrements?: number[];  // Optional: multiple button increments [small, large]
 
   // Fling behavior
   flingSnapIncrement: number;      // Snap to this increment on fling

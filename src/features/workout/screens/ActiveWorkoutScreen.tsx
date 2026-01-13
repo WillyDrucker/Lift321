@@ -24,8 +24,7 @@ import {WorkoutLayout} from '@/features/workout/components/WorkoutLayout';
 import {ExerciseSetRow} from '@/features/workout/components/ExerciseSetRow';
 import {WorkoutActionCard} from '@/features/workout/components/WorkoutActionCard';
 import {ExerciseCard} from '@/features/workout/components/ExerciseCard';
-import {WeightControlCard} from '@/features/workout/components/WeightControlCard';
-import {RepsControlCard} from '@/features/workout/components/RepsControlCard';
+import {ToggleableDialControlCard} from '@/features/workout/components/ToggleableDialControlCard';
 import {ActionButton} from '@/components';
 import {PencilIcon} from '@/components/icons';
 import {useActiveWorkout} from '@/features/workout/context/ActiveWorkoutContext';
@@ -297,17 +296,14 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
             day={workoutDay}
           />
 
-          {/* 2. Dial Controls Row - Reps (left) and Weight (right) */}
-          <View style={styles.dialControlsRow}>
-            <RepsControlCard
-              initialReps={currentGlobalReps}
-              onRepsChange={setGlobalReps}
-            />
-            <WeightControlCard
-              initialWeight={currentGlobalWeight}
-              onWeightChange={setGlobalWeight}
-            />
-          </View>
+          {/* 2. Toggleable Dial Control - Switch between Reps and Weight */}
+          <ToggleableDialControlCard
+            initialReps={currentGlobalReps}
+            initialWeight={currentGlobalWeight}
+            targetReps={10}
+            onRepsChange={setGlobalReps}
+            onWeightChange={setGlobalWeight}
+          />
 
           {/* 4. Action Card (Log Set / Rest Timer / Finish) */}
           <WorkoutActionCard

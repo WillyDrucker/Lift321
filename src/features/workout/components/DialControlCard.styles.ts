@@ -88,6 +88,10 @@ export const dialStyles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  buttonGroup: {
+    flexDirection: 'row',
+    gap: 4,
+  },
   adjustButton: {
     width: 48,
     height: 48,

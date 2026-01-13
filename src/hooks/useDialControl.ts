@@ -27,8 +27,8 @@ export type UseDialControlConfig = {
   maxValue: number;
   tickSpacing: number;
   valuePerTick: number;
-  flingSnapIncrement: number;
-  flingVelocityThreshold: number;
+  flingSnapIncrement?: number;  // No longer used - native snapping handles this
+  flingVelocityThreshold?: number;  // No longer used - native snapping handles this
   onChange: (value: number) => void;
   hideButtons?: boolean;
   compact?: boolean;
@@ -54,6 +54,9 @@ export type UseDialControlReturn = {
   handleIncrement: (amount: number, useAnimation?: boolean) => void;
   handleDecrement: (amount: number, useAnimation?: boolean) => void;
 
+  // Layout handlers
+  handleGaugeLayout: (event: any) => void;
+
   // Layout
   gaugeWidth: number;
   initialScrollOffset: number;
@@ -75,15 +78,15 @@ const calculateGaugeWidth = (hideButtons: boolean, compact: boolean): number => 
     // Card padding: 8dp each side = 16dp
     // Gauge takes full width of card content area
     const cardWidth = (SCREEN_WIDTH - 24) / 2;
-    return cardWidth - 16;
+    return Math.round(cardWidth - 16);
   } else if (hideButtons) {
     // Full width card with no buttons
     // Screen padding: 16dp, Card padding: 16dp
-    return SCREEN_WIDTH - 16 - 16;
+    return Math.round(SCREEN_WIDTH - 16 - 16);
   } else {
-    // Original layout with buttons
-    // Container padding (16) - left button (48) - right button (48) - margins (32)
-    return SCREEN_WIDTH - 16 - 48 - 48 - 16 - 16;
+    // Layout with buttons (1 on each side)
+    // Container padding (8dp each side = 16) - left button (48) - right button (48) - gauge margins (8dp each side = 16)
+    return Math.round(SCREEN_WIDTH - 16 - 48 - 48 - 16);
   }
 };
 
@@ -97,8 +100,6 @@ export const useDialControl = (config: UseDialControlConfig): UseDialControlRetu
     minValue,
     maxValue,
     tickSpacing,
-    flingSnapIncrement,
-    flingVelocityThreshold,
     onChange,
     hideButtons = false,
     compact = false,
@@ -117,12 +118,13 @@ export const useDialControl = (config: UseDialControlConfig): UseDialControlRetu
 
   // === STATE ===
   const [displayValue, setDisplayValue] = useState(initialValue);
+  const [actualGaugeWidth, setActualGaugeWidth] = useState(gaugeWidth);
   const currentValueRef = useRef(initialValue);
-  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollViewRef = useRef<any>(null);  // Works with both ScrollView and FlatList
   const isUserDragging = useRef(false);
   const isButtonUpdate = useRef(false);
   const lastScrollValue = useRef(initialValue);
-  const wasFling = useRef(false);
+  const buttonTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // === SYNC WITH EXTERNAL VALUE CHANGES ===
   useEffect(() => {
@@ -131,17 +133,27 @@ export const useDialControl = (config: UseDialControlConfig): UseDialControlRetu
       setDisplayValue(initialValue);
       if (initialValue !== lastScrollValue.current) {
         const scrollPosition = initialValue * tickSpacing;
-        scrollViewRef.current?.scrollTo({x: scrollPosition, animated: true});
+        // Use instant scroll (animated: false) for external value changes
+        // This prevents lag when switching modes or sets
+        scrollViewRef.current?.scrollToOffset({offset: scrollPosition, animated: false});
         lastScrollValue.current = initialValue;
       }
     }
   }, [initialValue, tickSpacing]);
 
+  // === CLEANUP ===
+  useEffect(() => {
+    return () => {
+      if (buttonTimeoutRef.current) {
+        clearTimeout(buttonTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // === SCROLL HANDLERS ===
   const handleScrollBeginDrag = useCallback(() => {
     isUserDragging.current = true;
     isButtonUpdate.current = false;
-    wasFling.current = false;
 
     Animated.timing(dragOpacity, {
       toValue: 0,
@@ -151,56 +163,45 @@ export const useDialControl = (config: UseDialControlConfig): UseDialControlRetu
   }, [dragOpacity]);
 
   const handleScrollEndDrag = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const scrollX = event.nativeEvent.contentOffset.x;
-    const velocity = Math.abs(event.nativeEvent.velocity?.x || 0);
-
-    if (velocity > flingVelocityThreshold) {
-      wasFling.current = true;
-      const currentValue = scrollX / tickSpacing;
-      const velocityX = event.nativeEvent.velocity?.x || 0;
-      const projectedValue = currentValue - (velocityX * 15);
-      const snappedValue = Math.round(projectedValue / flingSnapIncrement) * flingSnapIncrement;
-      const clampedValue = Math.max(minValue, Math.min(maxValue, snappedValue));
-
-      const scrollPosition = clampedValue * tickSpacing;
-      scrollViewRef.current?.scrollTo({x: scrollPosition, animated: true});
-      currentValueRef.current = clampedValue;
-      setDisplayValue(clampedValue);
-      lastScrollValue.current = clampedValue;
-      onChange(clampedValue);
-    } else {
-      const newValue = Math.round(scrollX / tickSpacing);
-      const clampedValue = Math.max(minValue, Math.min(maxValue, newValue));
-      currentValueRef.current = clampedValue;
-      setDisplayValue(clampedValue);
-      lastScrollValue.current = clampedValue;
-      onChange(clampedValue);
-    }
-  }, [flingVelocityThreshold, flingSnapIncrement, tickSpacing, minValue, maxValue, onChange]);
+    // Don't handle here - let momentum scroll handle it naturally
+    // This allows native snapping to work properly
+  }, []);
 
   const handleMomentumScrollEnd = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     isUserDragging.current = false;
+
+    // Skip handling if this is from a button press
+    if (isButtonUpdate.current) {
+      return;
+    }
+
+    const scrollX = event.nativeEvent.contentOffset.x;
+    const newValue = Math.round(scrollX / tickSpacing);
+    const clampedValue = Math.max(minValue, Math.min(maxValue, newValue));
+
+    // Ensure perfect alignment
+    const targetScrollPosition = clampedValue * tickSpacing;
+    const currentScrollPosition = scrollX;
+    const diff = Math.abs(targetScrollPosition - currentScrollPosition);
+
+    // If misaligned by more than 0.5px, snap to correct position
+    if (diff > 0.5) {
+      scrollViewRef.current?.scrollToOffset({
+        offset: targetScrollPosition,
+        animated: false,
+      });
+    }
+
+    currentValueRef.current = clampedValue;
+    setDisplayValue(clampedValue);
+    lastScrollValue.current = clampedValue;
+    onChange(clampedValue);
 
     Animated.timing(dragOpacity, {
       toValue: 1,
       duration: 200,
       useNativeDriver: true,
     }).start();
-
-    if (wasFling.current) {
-      wasFling.current = false;
-      return;
-    }
-
-    if (isButtonUpdate.current) return;
-
-    const scrollX = event.nativeEvent.contentOffset.x;
-    const newValue = Math.round(scrollX / tickSpacing);
-    const clampedValue = Math.max(minValue, Math.min(maxValue, newValue));
-    currentValueRef.current = clampedValue;
-    setDisplayValue(clampedValue);
-    lastScrollValue.current = clampedValue;
-    onChange(clampedValue);
   }, [dragOpacity, tickSpacing, minValue, maxValue, onChange]);
 
   const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -211,29 +212,57 @@ export const useDialControl = (config: UseDialControlConfig): UseDialControlRetu
     setDisplayValue(clampedValue);
   }, [tickSpacing, minValue, maxValue]);
 
+  // === LAYOUT HANDLER ===
+  const handleGaugeLayout = useCallback((event: any) => {
+    const { width } = event.nativeEvent.layout;
+    setActualGaugeWidth(Math.round(width));
+  }, []);
+
   // === BUTTON HANDLERS ===
   const handleIncrement = useCallback((amount: number, useAnimation: boolean = true) => {
+    // Clear any existing timeout
+    if (buttonTimeoutRef.current) {
+      clearTimeout(buttonTimeoutRef.current);
+    }
+
     const current = currentValueRef.current;
     const newValue = Math.min(current + amount, maxValue);
     currentValueRef.current = newValue;
     setDisplayValue(newValue);
     isButtonUpdate.current = true;
     lastScrollValue.current = newValue;
-    const scrollPosition = newValue * tickSpacing;
-    scrollViewRef.current?.scrollTo({x: scrollPosition, animated: useAnimation});
+    const scrollPosition = Math.round(newValue * tickSpacing);
+    scrollViewRef.current?.scrollToOffset({offset: scrollPosition, animated: useAnimation});
     onChange(newValue);
+
+    // Reset button update flag after animation completes
+    buttonTimeoutRef.current = setTimeout(() => {
+      isButtonUpdate.current = false;
+      buttonTimeoutRef.current = null;
+    }, 350);
   }, [maxValue, tickSpacing, onChange]);
 
   const handleDecrement = useCallback((amount: number, useAnimation: boolean = true) => {
+    // Clear any existing timeout
+    if (buttonTimeoutRef.current) {
+      clearTimeout(buttonTimeoutRef.current);
+    }
+
     const current = currentValueRef.current;
     const newValue = Math.max(current - amount, minValue);
     currentValueRef.current = newValue;
     setDisplayValue(newValue);
     isButtonUpdate.current = true;
     lastScrollValue.current = newValue;
-    const scrollPosition = newValue * tickSpacing;
-    scrollViewRef.current?.scrollTo({x: scrollPosition, animated: useAnimation});
+    const scrollPosition = Math.round(newValue * tickSpacing);
+    scrollViewRef.current?.scrollToOffset({offset: scrollPosition, animated: useAnimation});
     onChange(newValue);
+
+    // Reset button update flag after animation completes
+    buttonTimeoutRef.current = setTimeout(() => {
+      isButtonUpdate.current = false;
+      buttonTimeoutRef.current = null;
+    }, 350);
   }, [minValue, tickSpacing, onChange]);
 
   return {
@@ -248,7 +277,8 @@ export const useDialControl = (config: UseDialControlConfig): UseDialControlRetu
     handleScroll,
     handleIncrement,
     handleDecrement,
-    gaugeWidth,
-    initialScrollOffset: initialValue * tickSpacing,
+    handleGaugeLayout,
+    gaugeWidth: actualGaugeWidth,
+    initialScrollOffset: Math.round(initialValue * tickSpacing),
   };
 };

@@ -9,8 +9,8 @@
 // Used by: RepsControlCard, WeightControlCard
 // ==========================================================================
 
-import React, {useMemo} from 'react';
-import {View, Text, Pressable, ScrollView, Animated} from 'react-native';
+import React, {useMemo, memo, useCallback} from 'react';
+import {View, Text, Pressable, FlatList, Animated} from 'react-native';
 import {theme} from '@/theme';
 import {useDialControl} from '@/hooks/useDialControl';
 import {useAutoRepeat} from '@/hooks/useAutoRepeat';
@@ -18,10 +18,42 @@ import {dialStyles, DIAL_DIMENSIONS, GAUGE_HEIGHT} from './DialControlCard.style
 import type {DialControlCardProps} from './DialControlCard.types';
 
 // ============================================================================
+// TICK ITEM COMPONENT
+// ============================================================================
+
+type TickItemProps = {
+  index: number;
+  tickSpacing: number;
+  valuePerTick: number;
+};
+
+const TickItem = memo<TickItemProps>(({ index, tickSpacing, valuePerTick }) => {
+  const tickValue = index * valuePerTick;
+  const isMajor = tickValue % 10 === 0;
+  const isMedium = tickValue % 5 === 0 && !isMajor;
+
+  return (
+    <View style={[dialStyles.tickContainer, { width: tickSpacing }]}>
+      <View
+        style={[
+          dialStyles.tick,
+          isMajor ? dialStyles.majorTick : isMedium ? dialStyles.mediumTick : dialStyles.minorTick,
+        ]}
+      />
+      {isMajor && (
+        <Text style={dialStyles.tickLabel}>{tickValue}</Text>
+      )}
+    </View>
+  );
+});
+
+TickItem.displayName = 'TickItem';
+
+// ============================================================================
 // COMPONENT
 // ============================================================================
 
-export const DialControlCard: React.FC<DialControlCardProps> = ({
+const DialControlCardComponent: React.FC<DialControlCardProps> = ({
   value,
   onChange,
   config,
@@ -47,6 +79,7 @@ export const DialControlCard: React.FC<DialControlCardProps> = ({
     handleScroll,
     handleIncrement,
     handleDecrement,
+    handleGaugeLayout,
     gaugeWidth,
     initialScrollOffset,
   } = useDialControl({
@@ -68,51 +101,52 @@ export const DialControlCard: React.FC<DialControlCardProps> = ({
   const displayText = formatValue ? formatValue(displayValue) : displayValue.toString();
   const valueColor = getValueColor ? getValueColor(displayValue) : theme.colors.pureWhite;
 
-  // === RENDER TICKS ===
-  const ticks = useMemo(() => {
-    const tickElements: JSX.Element[] = [];
+  // === TICK DATA ===
+  const tickData = useMemo(() => {
     const maxTicks = config.maxValue / config.valuePerTick;
-
-    for (let tickIndex = 0; tickIndex <= maxTicks; tickIndex++) {
-      const tickValue = tickIndex * config.valuePerTick;
-      const isMajor = tickValue % 10 === 0;
-      const isMedium = tickValue % 5 === 0 && !isMajor;
-
-      tickElements.push(
-        <View
-          key={tickIndex}
-          style={dialStyles.tickContainer}
-          renderToHardwareTextureAndroid={true}
-        >
-          <View
-            style={[
-              dialStyles.tick,
-              isMajor ? dialStyles.majorTick : isMedium ? dialStyles.mediumTick : dialStyles.minorTick,
-            ]}
-          />
-          {isMajor && (
-            <Text style={dialStyles.tickLabel}>{tickValue}</Text>
-          )}
-        </View>
-      );
-    }
-    return tickElements;
+    return Array.from({ length: maxTicks + 1 }, (_, i) => i);
   }, [config.maxValue, config.valuePerTick]);
 
-  // === BUTTON HANDLERS ===
-  const handleDecrementPress = () => {
-    startAutoRepeat(
-      () => handleDecrement(config.buttonIncrement, true),
-      () => handleDecrement(config.buttonIncrement, false)
-    );
-  };
+  // === FLATLIST CALLBACKS ===
+  const renderTick = useCallback(
+    ({ item: index }: { item: number }) => (
+      <TickItem
+        index={index}
+        tickSpacing={config.tickSpacing}
+        valuePerTick={config.valuePerTick}
+      />
+    ),
+    [config.tickSpacing, config.valuePerTick]
+  );
 
-  const handleIncrementPress = () => {
+  const keyExtractor = useCallback((item: number) => `tick-${item}`, []);
+
+  const getItemLayout = useCallback(
+    (_: any, index: number) => ({
+      length: config.tickSpacing,
+      offset: config.tickSpacing * index,
+      index,
+    }),
+    [config.tickSpacing]
+  );
+
+  // === BUTTON HANDLERS ===
+  const createDecrementHandler = useCallback((amount: number) => () => {
     startAutoRepeat(
-      () => handleIncrement(config.buttonIncrement, true),
-      () => handleIncrement(config.buttonIncrement, false)
+      () => handleDecrement(amount, true),
+      () => handleDecrement(amount, false)
     );
-  };
+  }, [startAutoRepeat, handleDecrement]);
+
+  const createIncrementHandler = useCallback((amount: number) => () => {
+    startAutoRepeat(
+      () => handleIncrement(amount, true),
+      () => handleIncrement(amount, false)
+    );
+  }, [startAutoRepeat, handleIncrement]);
+
+  // Determine button increments to display
+  const buttonIncrements = config.buttonIncrements || [config.buttonIncrement];
 
   // === RENDER ===
   return (
@@ -139,44 +173,55 @@ export const DialControlCard: React.FC<DialControlCardProps> = ({
 
       {/* Controls with integrated gauge */}
       <View style={dialStyles.controlsContainer}>
-        {/* Decrement Button - hidden if hideButtons */}
+        {/* Decrement Buttons - hidden if hideButtons */}
         {!hideButtons && (
-          <Pressable
-            style={dialStyles.adjustButton}
-            onPressIn={handleDecrementPress}
-            onPressOut={clearAllTimers}
-          >
-            <Text style={dialStyles.adjustButtonText}>{decrementLabel}</Text>
-          </Pressable>
+          <View style={dialStyles.buttonGroup}>
+            {buttonIncrements.slice().reverse().map((increment) => (
+              <Pressable
+                key={`dec-${increment}`}
+                style={dialStyles.adjustButton}
+                onPressIn={createDecrementHandler(increment)}
+                onPressOut={clearAllTimers}
+              >
+                <Text style={dialStyles.adjustButtonText}>-{increment}</Text>
+              </Pressable>
+            ))}
+          </View>
         )}
 
         {/* Gauge Display */}
-        <View style={[dialStyles.gaugeContainer, hideButtons && {marginHorizontal: 0}]}>
+        <View
+          style={[dialStyles.gaugeContainer, hideButtons && {marginHorizontal: 0}]}
+          onLayout={handleGaugeLayout}
+        >
           {/* Scrollable Tick Track */}
-          <ScrollView
-            ref={scrollViewRef}
+          <FlatList
+            ref={scrollViewRef as any}
             horizontal
+            data={tickData}
+            renderItem={renderTick}
+            keyExtractor={keyExtractor}
+            getItemLayout={getItemLayout}
+            initialNumToRender={20}
+            maxToRenderPerBatch={10}
+            windowSize={5}
+            removeClippedSubviews={true}
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={[
-              dialStyles.dialTrack,
-              {paddingHorizontal: gaugeWidth / 2 - DIAL_DIMENSIONS.tickSpacing / 2},
-            ]}
+            contentContainerStyle={{
+              paddingHorizontal: Math.round((gaugeWidth / 2) - (config.tickSpacing / 2)),
+            }}
             snapToInterval={config.tickSpacing}
             snapToAlignment="start"
-            decelerationRate={0.992}
-            disableIntervalMomentum={true}
-            nestedScrollEnabled={true}
+            decelerationRate={0.99}
+            disableIntervalMomentum={false}
             directionalLockEnabled={true}
-            removeClippedSubviews={true}
             onScroll={handleScroll}
             scrollEventThrottle={16}
             onScrollBeginDrag={handleScrollBeginDrag}
             onScrollEndDrag={handleScrollEndDrag}
             onMomentumScrollEnd={handleMomentumScrollEnd}
             contentOffset={{x: initialScrollOffset, y: 0}}
-          >
-            {ticks}
-          </ScrollView>
+          />
 
           {/* Label background near major ticks */}
           {[0, 1, 9].includes(displayValue % 10) && (
@@ -202,20 +247,29 @@ export const DialControlCard: React.FC<DialControlCardProps> = ({
           </Animated.View>
         </View>
 
-        {/* Increment Button - hidden if hideButtons */}
+        {/* Increment Buttons - hidden if hideButtons */}
         {!hideButtons && (
-          <Pressable
-            style={dialStyles.adjustButton}
-            onPressIn={handleIncrementPress}
-            onPressOut={clearAllTimers}
-          >
-            <Text style={dialStyles.adjustButtonText}>{incrementLabel}</Text>
-          </Pressable>
+          <View style={dialStyles.buttonGroup}>
+            {buttonIncrements.map((increment) => (
+              <Pressable
+                key={`inc-${increment}`}
+                style={dialStyles.adjustButton}
+                onPressIn={createIncrementHandler(increment)}
+                onPressOut={clearAllTimers}
+              >
+                <Text style={dialStyles.adjustButtonText}>+{increment}</Text>
+              </Pressable>
+            ))}
+          </View>
         )}
       </View>
     </View>
   );
 };
+
+// Memoize to prevent re-renders when props haven't changed
+// This is critical for performance since the component renders 100+ tick marks
+export const DialControlCard = memo(DialControlCardComponent);
 
 // ============================================================================
 // EXPORTS

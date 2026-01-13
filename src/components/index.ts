@@ -31,6 +31,7 @@ export {PlanCardsScroller} from './PlanCardsScroller';
 export {ActivityFeedCard} from './ActivityFeedCard';
 export {Sidebar} from './Sidebar';
 export {BottomSheet} from './BottomSheet';
+export {SegmentedControl} from './SegmentedControl';
 
 // === LAYOUT ===
 export {DefaultScreenLayout} from './Layout/DefaultScreenLayout';
