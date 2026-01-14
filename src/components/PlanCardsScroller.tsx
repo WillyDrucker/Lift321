@@ -9,56 +9,40 @@
 // ==========================================================================
 
 import React, {useRef} from 'react';
-import {ScrollView, StyleSheet, View, ImageSourcePropType, useWindowDimensions} from 'react-native';
+import {ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native';
 import {theme} from '@/theme';
 import {PlanCard} from '@/components';
+import {usePlan, type PlanData} from '@/features/plans/context/PlanContext';
 
 // === TYPES ===
 
 export type PlanCardsScrollerProps = {
-  plans: string[]; // Array of plan names
+  plans?: PlanData[]; // Optional plans array (overrides context if provided)
+  selectable?: boolean; // Whether plans can be selected (default: true)
   cardHeight?: number; // Optional card height (default: 128)
 };
 
 // === CONSTANTS ===
 
 // Consistent card dimensions and spacing for smooth scrolling with snapToOffsets
-const CARD_WIDTH = theme.layout.planCard.width; // 330dp
-const CARD_HEIGHT = theme.layout.planCard.height; // 128dp (smaller than workout cards for denser browsing)
+const CARD_WIDTH = theme.layout.planCard.width; // 200dp
+const CARD_IMAGE_HEIGHT = Math.round(CARD_WIDTH / 3); // 67dp (3:1 aspect ratio from width)
+const CARD_TEXT_HEIGHT = 24; // Plan name text height (16dp font + 4dp margin + buffer)
+const CARD_HEIGHT = CARD_IMAGE_HEIGHT + CARD_TEXT_HEIGHT; // Total card height with text above (~91dp)
 const CARD_SPACING = theme.layout.recommendedWorkout.cardSpacing; // 8dp
 const LEFT_MARGIN = theme.layout.recommendedWorkout.leftMargin; // 8dp
-
-// === HELPERS ===
-
-/**
- * Maps plan names to their corresponding image assets
- * Returns default image if plan not found in mapping
- */
-const getPlanImage = (planName: string): ImageSourcePropType | undefined => {
-  // Fallback image for plans that don't have custom images yet
-  const fallbackImage = require('@/assets/images/plans/lift-3-2-1-plan.png');
-
-  const imageMap: Record<string, ImageSourcePropType> = {
-    'Lift 3-2-1': require('@/assets/images/plans/lift-3-2-1-plan.png'),
-    'Lift 3-2-GLP-1': fallbackImage,
-    'Beginner 3-2-1': fallbackImage,
-    'Advanced 3-2-1': fallbackImage,
-    'Expert 3-2-1': fallbackImage,
-    'Strength 3-2-1': fallbackImage,
-    'Growth 3-2-1': fallbackImage,
-    'Zero-to-SuperHero': fallbackImage,
-    'Athlete': fallbackImage,
-    'Weight Loss': fallbackImage,
-    'Lean': fallbackImage,
-  };
-
-  return imageMap[planName];
-};
 
 // === COMPONENT ===
 
 export const PlanCardsScroller: React.FC<PlanCardsScrollerProps> = React.memo(
-  ({plans, cardHeight = CARD_HEIGHT}) => {
+  ({plans, selectable = true, cardHeight = CARD_HEIGHT}) => {
+    // === CONTEXT ===
+
+    const {lift321Plans, selectedPlan, selectPlan} = usePlan();
+
+    // Use provided plans or default to lift321 plans from context
+    const displayPlans = plans ?? lift321Plans;
+
     // === REFS ===
 
     const scrollViewRef = useRef<ScrollView>(null);
@@ -73,9 +57,9 @@ export const PlanCardsScroller: React.FC<PlanCardsScrollerProps> = React.memo(
     // Card 1: offset 0 (starts at 8dp from left)
     // Card 2+: offset ensures previous card shows 8dp peek on left
     // Last card: offset ensures 8dp margin on right
-    const snapOffsets = plans.map((_, index) => {
+    const snapOffsets = displayPlans.map((_, index) => {
       if (index === 0) return 0; // First card at left margin
-      if (index === plans.length - 1) {
+      if (index === displayPlans.length - 1) {
         // Last card: right edge at screen width - right padding
         const cardStartPosition =
           LEFT_MARGIN + index * (CARD_WIDTH + CARD_SPACING);
@@ -103,16 +87,18 @@ export const PlanCardsScroller: React.FC<PlanCardsScrollerProps> = React.memo(
           nestedScrollEnabled={true}
           directionalLockEnabled={true}
           pagingEnabled={false}>
-          {plans.map((planName, index) => (
+          {displayPlans.map((plan, index) => (
             <View
-              key={`${planName}-${index}`}
+              key={plan.id}
               style={[
                 styles.cardWrapper,
                 index > 0 && {marginLeft: CARD_SPACING},
               ]}>
               <PlanCard
-                planName={planName}
-                imageSource={getPlanImage(planName)}
+                planName={plan.name}
+                imageSource={plan.image}
+                isSelected={selectable && selectedPlan.id === plan.id}
+                onPress={selectable ? () => selectPlan(plan.id) : undefined}
               />
             </View>
           ))}

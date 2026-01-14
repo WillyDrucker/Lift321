@@ -56,7 +56,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: theme.spacing.s,
     borderWidth: theme.layout.border.thin,
-    borderColor: theme.colors.actionSuccess,
+    borderColor: 'transparent', // Removed green border - can restore with theme.colors.actionSuccess
   },
 
   workoutPlanNameText: {
@@ -179,7 +179,12 @@ export const styles = StyleSheet.create({
   },
 
   workoutSessionDurationValue: {
+    fontSize: theme.typography.fontSize.xl,
+    lineHeight: theme.typography.fontSize.xl,
+    fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.textPrimary,
+    textTransform: 'uppercase',
   },
 
   workoutSessionTypesContainer: {

@@ -4,8 +4,8 @@
 // Type definitions for the generic dial control component.
 // Enables configuration of value ranges, increments, and display.
 //
-// Dependencies: React, React Native
-// Used by: DialControlCard, RepsControlCard, WeightControlCard
+// Dependencies: React
+// Used by: DialControlCard, ToggleableDialControlCard
 // ==========================================================================
 
 import type {ReactNode} from 'react';
@@ -40,25 +40,25 @@ export type DialControlCardProps = {
   // Value control
   value: number;
   onChange: (value: number) => void;
+  onDisplayValueChange?: (value: number) => void;  // Real-time value during dragging
 
   // Dial configuration
   config: DialConfig;
 
-  // Header customization
-  headerLabel: string;              // "REPS" or "WEIGHT"
-  headerSuffix?: ReactNode;         // "(TARGET: X)" or "(LBS)"
+  // Top element (e.g., SegmentedControl for mode switching)
+  topElement?: ReactNode;
 
   // Display customization
   formatValue?: (value: number) => string;
   getValueColor?: (value: number) => string;
 
-  // Button labels
-  decrementLabel?: string;          // "-1" or "-5"
-  incrementLabel?: string;          // "+1" or "+5"
-
   // Layout options
   hideButtons?: boolean;            // Hide +/- buttons and expand dial to full width
   compact?: boolean;                // 50% width mode
+
+  // Error state
+  hasError?: boolean;               // Triggers error flash animation on dial
+  onErrorAnimationComplete?: () => void;  // Called when flash animation ends
 };
 
 // ============================================================================

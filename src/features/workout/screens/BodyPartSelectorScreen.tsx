@@ -5,7 +5,7 @@
 // Cards are grouped by body part (Chest → Arms → Shoulders → Back → Legs → Abs).
 // Top tabs sync with scroll position and allow quick navigation.
 //
-// Dependencies: theme tokens, navigation types, shared components
+// Dependencies: theme tokens, navigation types, AppLayout
 // Used by: Navigation stack (from WorkoutCard press on HomePage)
 // ==========================================================================
 
@@ -16,21 +16,12 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  SafeAreaView,
-  StatusBar,
   Animated,
   Dimensions,
 } from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {theme} from '@/theme';
 import type {MainStackScreenProps} from '@/navigation/types';
-import {
-  TopNavBar,
-  WeekCalendar,
-  PlanProgressBar,
-  Sidebar,
-  StandaloneBottomTabBar,
-} from '@/components';
+import {AppLayout, StandaloneBottomTabBar} from '@/components';
 import {WorkoutCard} from '@/components/WorkoutCard';
 
 // ============================================================================
@@ -54,29 +45,25 @@ type BodyPartWorkout = {
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const BODY_PARTS: BodyPart[] = ['Chest', 'Arms', 'Shoulders', 'Back', 'Legs', 'Abs'];
 
-// One workout card per body part
 const BODY_PART_WORKOUTS: BodyPartWorkout[] = [
-  {bodyPart: 'Chest', title: 'Chest'},
-  {bodyPart: 'Arms', title: 'Arms'},
-  {bodyPart: 'Shoulders', title: 'Shoulders'},
-  {bodyPart: 'Back', title: 'Back'},
-  {bodyPart: 'Legs', title: 'Legs'},
-  {bodyPart: 'Abs', title: 'Abs'},
+  {bodyPart: 'Chest', title: 'Chest 3-2-1'},
+  {bodyPart: 'Arms', title: 'Arms 3-2-1'},
+  {bodyPart: 'Shoulders', title: 'Shoulders 3-2-1'},
+  {bodyPart: 'Back', title: 'Back 3-2-1'},
+  {bodyPart: 'Legs', title: 'Legs 3-2-1'},
+  {bodyPart: 'Abs', title: 'Abs 3-2-1'},
 ];
 
-// Card dimensions from theme
 const CARD_WIDTH = theme.layout.recommendedWorkout.cardWidth;
 const CARD_SPACING = theme.layout.recommendedWorkout.cardSpacing;
-const CARD_MARGIN = theme.layout.recommendedWorkout.leftMargin + 4; // Visual margin + offset
+const CARD_MARGIN = theme.layout.recommendedWorkout.leftMargin + 4;
 
-// Calculate which body part index each card belongs to
 const getBodyPartIndices = (): number[] => {
   return BODY_PART_WORKOUTS.map(workout =>
     BODY_PARTS.indexOf(workout.bodyPart)
   );
 };
 
-// Day name mapping for exercise filtering
 const DAY_NAMES: Record<number, string> = {
   0: 'Sunday',
   1: 'Monday',
@@ -87,23 +74,21 @@ const DAY_NAMES: Record<number, string> = {
   6: 'Saturday',
 };
 
-// Get current day name
 const getTodaysDayName = (): string => {
   const dayOfWeek = new Date().getDay();
   return DAY_NAMES[dayOfWeek];
 };
 
-// Simulated "today's focus" - will come from user's plan
 const getTodaysFocus = (): BodyPart => {
   const dayOfWeek = new Date().getDay();
   const focusMap: Record<number, BodyPart> = {
-    0: 'Chest',     // Sunday (Rest day - default to Chest)
-    1: 'Chest',     // Monday
-    2: 'Arms',      // Tuesday
-    3: 'Shoulders', // Wednesday
-    4: 'Back',      // Thursday
-    5: 'Legs',      // Friday
-    6: 'Legs',      // Saturday (matches JSON - Legs day 2)
+    0: 'Chest',
+    1: 'Chest',
+    2: 'Arms',
+    3: 'Shoulders',
+    4: 'Back',
+    5: 'Legs',
+    6: 'Legs',
   };
   return focusMap[dayOfWeek];
 };
@@ -120,7 +105,6 @@ export const BodyPartSelectorScreen: React.FC<BodyPartSelectorProps> = ({
   // STATE
   // ==========================================================================
 
-  const insets = useSafeAreaInsets();
   const scrollViewRef = useRef<ScrollView>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
 
@@ -128,33 +112,20 @@ export const BodyPartSelectorScreen: React.FC<BodyPartSelectorProps> = ({
   const todaysFocus = getTodaysFocus();
   const [selectedBodyPart, setSelectedBodyPart] = useState<BodyPart>(todaysFocus);
   const [selectedDay, setSelectedDay] = useState<string>('');
-  const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
 
-  // Plan progress data (static for now - will come from context)
-  const planName = 'Lift 3-2-1';
   const totalWorkouts = 36;
   const completedWorkouts = 3;
 
-  // Body part indices for each card
   const bodyPartIndices = useMemo(() => getBodyPartIndices(), []);
-
-  // Calculate snap interval
   const SNAP_INTERVAL = CARD_WIDTH + CARD_SPACING;
-
-  // Calculate dynamic bottom padding for bottom tab bar
-  const dynamicBottomTabHeight = insets.bottom > theme.layout.bottomNav.gestureNavThreshold
-    ? theme.layout.bottomNav.height + theme.layout.bottomNav.buttonNavExtraHeight
-    : theme.layout.bottomNav.height;
 
   // ==========================================================================
   // EFFECTS
   // ==========================================================================
 
-  // Auto-scroll to today's focus on mount
   useEffect(() => {
     const firstCardIndex = BODY_PART_WORKOUTS.findIndex(w => w.bodyPart === todaysFocus);
     if (firstCardIndex !== -1 && scrollViewRef.current) {
-      // Small delay to ensure scroll view is ready
       setTimeout(() => {
         const scrollPosition = firstCardIndex * SNAP_INTERVAL;
         scrollViewRef.current?.scrollTo({x: scrollPosition, animated: false});
@@ -169,7 +140,6 @@ export const BodyPartSelectorScreen: React.FC<BodyPartSelectorProps> = ({
   const handleBodyPartSelect = useCallback((bodyPart: BodyPart) => {
     setSelectedBodyPart(bodyPart);
 
-    // Find first card index for this body part
     const firstCardIndex = BODY_PART_WORKOUTS.findIndex(w => w.bodyPart === bodyPart);
     if (firstCardIndex !== -1 && scrollViewRef.current) {
       const scrollPosition = firstCardIndex * SNAP_INTERVAL;
@@ -181,7 +151,6 @@ export const BodyPartSelectorScreen: React.FC<BodyPartSelectorProps> = ({
     const offsetX = event.nativeEvent.contentOffset.x;
     const cardIndex = Math.round(offsetX / SNAP_INTERVAL);
 
-    // Clamp to valid range
     const clampedIndex = Math.max(0, Math.min(cardIndex, BODY_PART_WORKOUTS.length - 1));
     const currentBodyPart = BODY_PART_WORKOUTS[clampedIndex]?.bodyPart;
 
@@ -198,38 +167,9 @@ export const BodyPartSelectorScreen: React.FC<BodyPartSelectorProps> = ({
     setSelectedDay(date);
   }, []);
 
-  const handleGuidePress = useCallback(() => {
-    navigation.navigate('HelpScreen');
+  const handleNavigate = useCallback((screen: string) => {
+    navigation.navigate(screen as any);
   }, [navigation]);
-
-  const handleMenuPress = useCallback(() => {
-    setSidebarVisible(true);
-  }, []);
-
-  const handleSidebarClose = useCallback(() => {
-    setSidebarVisible(false);
-  }, []);
-
-  const handleSidebarSelect = useCallback(
-    async (option: 'profile' | 'settings' | 'help' | 'logout' | 'devtools') => {
-      setSidebarVisible(false);
-      switch (option) {
-        case 'profile':
-          navigation.navigate('ProfileScreen');
-          break;
-        case 'settings':
-          navigation.navigate('SettingsScreen');
-          break;
-        case 'help':
-          navigation.navigate('HelpScreen');
-          break;
-        case 'devtools':
-          navigation.navigate('DevToolsScreen');
-          break;
-      }
-    },
-    [navigation],
-  );
 
   // ==========================================================================
   // RENDER
@@ -237,19 +177,17 @@ export const BodyPartSelectorScreen: React.FC<BodyPartSelectorProps> = ({
 
   return (
     <>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor={theme.colors.backgroundPrimary}
-        translucent={false}
-      />
-      <SafeAreaView style={styles.container}>
-        {/* Scrollable Content Area */}
+      <AppLayout
+        showBackButton={true}
+        onBackPress={handleBack}
+        selectedDay={selectedDay}
+        onDayPress={handleDayPress}
+        completedWorkouts={completedWorkouts}
+        totalWorkouts={totalWorkouts}
+        onNavigate={handleNavigate}
+      >
         <ScrollView
           style={styles.scrollView}
-          contentContainerStyle={[
-            styles.scrollContent,
-            {paddingBottom: dynamicBottomTabHeight + theme.spacing.lg}
-          ]}
           showsVerticalScrollIndicator={false}
         >
           {/* Body Part Tabs */}
@@ -313,6 +251,7 @@ export const BodyPartSelectorScreen: React.FC<BodyPartSelectorProps> = ({
                 <WorkoutCard
                   key={`${workout.bodyPart}-${workout.title}-${index}`}
                   workoutType={workout.bodyPart}
+                  title={workout.title}
                   isFirstCard={index === 0}
                   isLastCard={index === BODY_PART_WORKOUTS.length - 1}
                   index={index}
@@ -329,42 +268,10 @@ export const BodyPartSelectorScreen: React.FC<BodyPartSelectorProps> = ({
             </Animated.ScrollView>
           </View>
         </ScrollView>
+      </AppLayout>
 
-        {/* Fixed Top Navigation (renders above ScrollView) */}
-        <View style={styles.topBarsContainer}>
-          <TopNavBar
-            onGuidePress={handleGuidePress}
-            onMenuPress={handleMenuPress}
-            onBackPress={handleBack}
-          />
-
-          {/* Divider Bar */}
-          <View style={styles.divider} />
-
-          {/* Week Calendar */}
-          <WeekCalendar
-            selectedDay={selectedDay}
-            onDayPress={handleDayPress}
-          />
-
-          {/* Plan Progress */}
-          <PlanProgressBar
-            planName={planName}
-            completedWorkouts={completedWorkouts}
-            totalWorkouts={totalWorkouts}
-          />
-        </View>
-
-        {/* Sidebar */}
-        <Sidebar
-          visible={sidebarVisible}
-          onClose={handleSidebarClose}
-          onSelect={handleSidebarSelect}
-        />
-
-        {/* Bottom Tab Bar */}
-        <StandaloneBottomTabBar activeTab="home" />
-      </SafeAreaView>
+      {/* Bottom Tab Bar (standalone for stack screens) */}
+      <StandaloneBottomTabBar activeTab="home" />
     </>
   );
 };
@@ -374,31 +281,11 @@ export const BodyPartSelectorScreen: React.FC<BodyPartSelectorProps> = ({
 // ============================================================================
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.pureBlack,
-  },
   scrollView: {
     flex: 1,
   },
-  scrollContent: {
-    paddingTop: 140, // Space for fixed top bars
-  },
-  topBarsContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: theme.colors.pureBlack,
-    zIndex: 10,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: theme.colors.borderPrimary,
-    marginHorizontal: theme.spacing.lg,
-  },
   tabsSection: {
-    paddingTop: theme.spacing.md,
+    paddingTop: 0,
     paddingBottom: theme.spacing.sm,
     paddingHorizontal: theme.spacing.s,
   },
@@ -411,9 +298,7 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.xs,
     paddingHorizontal: theme.spacing.xs,
   },
-  tabSelected: {
-    // Selected state handled by text color
-  },
+  tabSelected: {},
   tabText: {
     fontSize: theme.typography.fontSize.xs,
     fontFamily: theme.typography.fontFamily.primary,
@@ -429,7 +314,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
   },
   sectionHeader: {
-    paddingHorizontal: theme.spacing.lg,
+    paddingLeft: theme.spacing.s,
+    paddingRight: theme.spacing.lg,
     paddingTop: theme.spacing.md,
     paddingBottom: theme.spacing.sm,
   },

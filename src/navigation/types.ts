@@ -39,6 +39,7 @@ export type MainStackParamList = {
   Tabs: NavigatorScreenParams<TabParamList>;
   ProfileScreen: undefined;
   SettingsScreen: undefined;
+  ToolsScreen: undefined;
   HelpScreen: undefined;
   DevToolsScreen: undefined;
   BodyPartSelector: {

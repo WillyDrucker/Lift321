@@ -19,10 +19,12 @@ import {
 import {theme} from '@/theme';
 import type {RootStackScreenProps} from '@/navigation/types';
 import {getExercisesForWorkout, type SessionType} from '@/services/exerciseService';
-import {getWorkoutDuration} from '@/utils/durationCalculator';
+import {calculateWorkoutDuration} from '@/utils/durationCalculator';
+import {getPlanFocusConfig} from '@/utils/planFocusCalculator';
 import {WorkoutLayout} from '@/features/workout/components/WorkoutLayout';
 import {styles} from './WorkoutOverviewScreen.styles';
 import {useActiveWorkout} from '@/features/workout/context/ActiveWorkoutContext';
+import {usePlan} from '@/features/plans/context/PlanContext';
 
 // ============================================================================
 // TYPES
@@ -44,6 +46,7 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
 
   const {workoutType, day} = route.params;
   const {startWorkout} = useActiveWorkout();
+  const {selectedPlan} = usePlan();
 
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
   const [selectedPlanFocus, setSelectedPlanFocus] = useState<'strength' | 'balanced' | 'growth'>('balanced');
@@ -66,10 +69,18 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
     return getExercisesForWorkout(workoutType, sessionType);
   }, [workoutType, sessionType]);
 
-  // Calculate workout duration dynamically
+  // Calculate plan focus config (target reps and rest time)
+  const planFocusConfig = useMemo(() => {
+    return getPlanFocusConfig(10, selectedPlanFocus); // Default 10 reps
+  }, [selectedPlanFocus]);
+
+  // Calculate workout duration dynamically based on plan focus rest time
   const workoutDuration = useMemo(() => {
-    return getWorkoutDuration(workoutData.totalSets);
-  }, [workoutData.totalSets]);
+    return calculateWorkoutDuration({
+      totalSets: workoutData.totalSets,
+      restMinutesPerSet: planFocusConfig.restMinutes,
+    }).totalMinutes;
+  }, [workoutData.totalSets, planFocusConfig.restMinutes]);
 
   // Calculate dynamic vertical line height for exercise tree
   const verticalLineHeight = useMemo(() => {
@@ -227,10 +238,6 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
     setSidebarVisible(true);
   };
 
-  const handleGuidePress = () => {
-    navigation.navigate('HelpScreen');
-  };
-
   const handleSidebarSelect = async (
     option: 'profile' | 'settings' | 'help' | 'logout',
   ) => {
@@ -290,7 +297,7 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
 
   const handleLetsGoPress = () => {
     // Pre-initialize workout context BEFORE navigation for instant screen load
-    startWorkout({workoutType, sessionType});
+    startWorkout({workoutType, sessionType, planFocus: selectedPlanFocus});
 
     navigation.navigate('ActiveWorkout', {
       workoutType,
@@ -315,7 +322,6 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
       onSidebarSelect={handleSidebarSelect}
       onBackPress={handleBackPress}
       onMenuPress={handleMenuPress}
-      onGuidePress={handleGuidePress}
       navigation={navigation}>
       {/* Scrollable Content Area */}
       <ScrollView
@@ -336,7 +342,14 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
               onPress={() => console.log('Plan selector pressed')}
               activeOpacity={1}>
               <Text style={styles.workoutPlanNameText}>
-                <Text style={styles.workoutPlanNameItalic}>LIFT</Text> 3-2-1
+                {selectedPlan.displayPrefix ? (
+                  <>
+                    <Text style={styles.workoutPlanNameItalic}>{selectedPlan.displayPrefix}</Text>
+                    {' '}{selectedPlan.displaySuffix}
+                  </>
+                ) : (
+                  selectedPlan.displaySuffix
+                )}
               </Text>
             </TouchableOpacity>
 
@@ -391,17 +404,15 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
             {/* Current Session Text */}
             <Text style={styles.workoutSessionCurrentText}>CURRENT SESSION</Text>
 
-            {/* Duration Selector */}
+            {/* Duration Display */}
             <View style={styles.workoutSessionDurationSelector}>
-              <Text style={styles.workoutSessionDurationLabel}>
-                DURATION: <Text style={[
-                  styles.workoutSessionDurationValue,
-                  selectedSession === 'standard' && {color: theme.colors.sessionStandard},
-                  selectedSession === 'express' && {color: theme.colors.sessionExpress},
-                  selectedSession === 'maintenance' && {color: theme.colors.sessionMaintenance},
-                ]}>
-                  {workoutDuration} MINUTES
-                </Text>
+              <Text style={[
+                styles.workoutSessionDurationValue,
+                selectedSession === 'standard' && {color: theme.colors.sessionStandard},
+                selectedSession === 'express' && {color: theme.colors.sessionExpress},
+                selectedSession === 'maintenance' && {color: theme.colors.sessionMaintenance},
+              ]}>
+                {workoutDuration} MINUTES
               </Text>
             </View>
 

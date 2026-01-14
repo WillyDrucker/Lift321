@@ -48,8 +48,9 @@ export const WelcomeBox: React.FC<WelcomeBoxProps> = ({
         },
       ]}
       {...panHandlers}>
-      {/* Swipe Indicator */}
+      {/* Drag Handle - centered at top */}
       <View style={styles.swipeIndicator} />
+      {/* Welcome Text */}
       <Text style={styles.welcomeText}>
         Welcome, {userName}.{' '}
         <Text style={styles.welcomeSubText}>{message}</Text>
@@ -70,13 +71,14 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.backgroundPrimary,
     borderTopLeftRadius: theme.layout.welcomeBox.borderRadius,
     borderBottomLeftRadius: theme.layout.welcomeBox.borderRadius,
-    paddingLeft: theme.layout.welcomeBox.paddingLeft,
+    paddingLeft: 8, // Space for drag handle
     paddingRight: theme.layout.welcomeBox.paddingRight,
-    paddingTop: theme.layout.welcomeBox.paddingTop,
-    paddingBottom: theme.layout.welcomeBox.paddingBottom,
-    justifyContent: 'flex-start',
+    paddingVertical: 6, // Compact vertical padding
+    flexDirection: 'row',
+    alignItems: 'center', // Center items vertically
   },
   welcomeText: {
+    flex: 1, // Take remaining space after drag handle
     fontSize: theme.typography.fontSize.m,
     fontFamily: theme.typography.fontFamily.primary,
     color: theme.colors.pureWhite,
@@ -87,11 +89,9 @@ const styles = StyleSheet.create({
     color: theme.colors.navInactive,
   },
   swipeIndicator: {
-    position: 'absolute',
-    left: theme.spacing.s,
-    top: theme.spacing.xs,
-    width: theme.layout.welcomeBox.swipeIndicatorWidth,
-    height: theme.layout.welcomeBox.swipeIndicatorHeight,
+    width: 4, // Vertical bar width
+    height: 24, // Compact height for welcome box
+    marginRight: 16, // 16dp space between handle and text
     backgroundColor: theme.colors.navInactive,
     borderRadius: theme.layout.welcomeBox.swipeIndicatorBorderRadius,
     opacity: theme.layout.welcomeBox.swipeIndicatorOpacity,

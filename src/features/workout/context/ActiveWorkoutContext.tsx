@@ -13,6 +13,12 @@ import type {WorkoutType} from '@/components/WorkoutCard';
 import type {SessionType} from '@/services/exerciseService';
 import {getExercisesForWorkout} from '@/services/exerciseService';
 import type {SetData} from '@/features/workout/components/ExerciseSetRow';
+import {
+  type PlanFocus,
+  getPlanFocusConfig,
+  DEFAULT_REST_MINUTES,
+  DEFAULT_TARGET_REPS,
+} from '@/utils/planFocusCalculator';
 
 // ============================================================================
 // TYPES
@@ -21,6 +27,7 @@ import type {SetData} from '@/features/workout/components/ExerciseSetRow';
 type ActiveWorkoutConfig = {
   workoutType: WorkoutType;
   sessionType: SessionType;
+  planFocus: PlanFocus;
 };
 
 type ActiveWorkoutContextType = {
@@ -33,7 +40,13 @@ type ActiveWorkoutContextType = {
   currentGlobalReps: number;
   isResting: boolean;
   isWorkoutComplete: boolean;
-  
+  hasWeightError: boolean;
+  hasRepsError: boolean;
+
+  // Computed from planFocus
+  targetReps: number;
+  restMinutes: number;
+
   // Actions
   startWorkout: (config: ActiveWorkoutConfig) => void;
   endWorkout: () => void;
@@ -44,6 +57,8 @@ type ActiveWorkoutContextType = {
   setGlobalReps: (reps: number) => void;
   deleteSet: (key: string) => void;
   selectSet: (key: string) => void;
+  clearWeightError: () => void;
+  clearRepsError: () => void;
 };
 
 // ============================================================================
@@ -73,8 +88,22 @@ export const ActiveWorkoutProvider: React.FC<{children: ReactNode}> = ({children
   const [currentGlobalReps, setCurrentGlobalReps] = useState<number>(10);
   const [isResting, setIsResting] = useState<boolean>(false);
   const [isWorkoutComplete, setIsWorkoutComplete] = useState<boolean>(false);
+  const [hasWeightError, setHasWeightError] = useState<boolean>(false);
+  const [hasRepsError, setHasRepsError] = useState<boolean>(false);
 
   const isActive = !!config;
+
+  // === COMPUTED VALUES (from planFocus) ===
+
+  const planFocusConfig = useMemo(() => {
+    if (!config) {
+      return { targetReps: DEFAULT_TARGET_REPS, restMinutes: DEFAULT_REST_MINUTES };
+    }
+    return getPlanFocusConfig(DEFAULT_TARGET_REPS, config.planFocus);
+  }, [config]);
+
+  const targetReps = planFocusConfig.targetReps;
+  const restMinutes = planFocusConfig.restMinutes;
 
   // === HELPERS ===
   
@@ -99,7 +128,16 @@ export const ActiveWorkoutProvider: React.FC<{children: ReactNode}> = ({children
     setWorkoutState({});
     setIsResting(false);
     setIsWorkoutComplete(false);
-    
+    setHasWeightError(false);
+    setHasRepsError(false);
+
+    // Reset weight to 0 (forces user to set before logging)
+    setCurrentGlobalWeight(0);
+
+    // Initialize reps to target based on plan focus
+    const focusConfig = getPlanFocusConfig(DEFAULT_TARGET_REPS, newConfig.planFocus);
+    setCurrentGlobalReps(focusConfig.targetReps);
+
     // Initialize active set
     const keys = getOrderedKeys(newConfig);
     if (keys.length > 0) {
@@ -113,6 +151,8 @@ export const ActiveWorkoutProvider: React.FC<{children: ReactNode}> = ({children
     setActiveSetKey(null);
     setIsResting(false);
     setIsWorkoutComplete(false);
+    setHasWeightError(false);
+    setHasRepsError(false);
   }, []);
 
   const updateSet = useCallback((key: string, newData: SetData) => {
@@ -147,6 +187,21 @@ export const ActiveWorkoutProvider: React.FC<{children: ReactNode}> = ({children
   }, [config, activeSetKey, getOrderedKeys]);
 
   const logSet = useCallback(() => {
+      // Validate weight and reps are not 0
+      let hasError = false;
+
+      if (currentGlobalWeight === 0) {
+          setHasWeightError(true);
+          hasError = true;
+      }
+
+      if (currentGlobalReps === 0) {
+          setHasRepsError(true);
+          hasError = true;
+      }
+
+      if (hasError) return;
+
       if (activeSetKey) {
           updateSet(activeSetKey, {
               weight: currentGlobalWeight.toString(),
@@ -155,6 +210,14 @@ export const ActiveWorkoutProvider: React.FC<{children: ReactNode}> = ({children
           });
       }
   }, [activeSetKey, currentGlobalWeight, currentGlobalReps, updateSet]);
+
+  const clearWeightError = useCallback(() => {
+      setHasWeightError(false);
+  }, []);
+
+  const clearRepsError = useCallback(() => {
+      setHasRepsError(false);
+  }, []);
 
   const endRest = useCallback(() => {
       setIsResting(false);
@@ -226,7 +289,7 @@ export const ActiveWorkoutProvider: React.FC<{children: ReactNode}> = ({children
   }, [activeSetKey, workoutState]);
 
   // === VALUE ===
-  
+
   const value = useMemo(() => ({
     isActive,
     config,
@@ -236,6 +299,10 @@ export const ActiveWorkoutProvider: React.FC<{children: ReactNode}> = ({children
     currentGlobalReps,
     isResting,
     isWorkoutComplete,
+    hasWeightError,
+    hasRepsError,
+    targetReps,
+    restMinutes,
     startWorkout,
     endWorkout,
     updateSet,
@@ -245,10 +312,12 @@ export const ActiveWorkoutProvider: React.FC<{children: ReactNode}> = ({children
     setGlobalReps,
     deleteSet,
     selectSet,
+    clearWeightError,
+    clearRepsError,
   }), [
-    isActive, config, workoutState, activeSetKey, currentGlobalWeight, currentGlobalReps, 
-    isResting, isWorkoutComplete, startWorkout, endWorkout, updateSet, logSet, endRest, 
-    setGlobalWeight, setGlobalReps, deleteSet, selectSet
+    isActive, config, workoutState, activeSetKey, currentGlobalWeight, currentGlobalReps,
+    isResting, isWorkoutComplete, hasWeightError, hasRepsError, targetReps, restMinutes, startWorkout, endWorkout,
+    updateSet, logSet, endRest, setGlobalWeight, setGlobalReps, deleteSet, selectSet, clearWeightError, clearRepsError
   ]);
 
   return (

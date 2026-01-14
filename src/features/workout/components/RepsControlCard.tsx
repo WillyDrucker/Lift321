@@ -22,6 +22,8 @@ type RepsControlCardProps = {
   initialReps?: number;
   targetReps?: number;
   onRepsChange: (reps: number) => void;
+  hasError?: boolean;
+  onErrorAnimationComplete?: () => void;
 };
 
 // ============================================================================
@@ -54,6 +56,8 @@ export const RepsControlCard: React.FC<RepsControlCardProps> = ({
   initialReps = 10,
   targetReps = 10,
   onRepsChange,
+  hasError = false,
+  onErrorAnimationComplete,
 }) => {
   // Color based on distance from target
   const getRepsColor = useCallback((reps: number) => {
@@ -87,6 +91,8 @@ export const RepsControlCard: React.FC<RepsControlCardProps> = ({
       getValueColor={getRepsColor}
       hideButtons={true}
       compact={true}
+      hasError={hasError}
+      onErrorAnimationComplete={onErrorAnimationComplete}
     />
   );
 };

@@ -15,11 +15,13 @@ import {TabNavigator} from './TabNavigator';
 import {ProfileScreen} from '@/features/main/screens/ProfileScreen';
 import {SettingsScreen} from '@/features/main/screens/SettingsScreen';
 import {HelpScreen} from '@/features/main/screens/HelpScreen';
+import {ToolsScreen} from '@/features/main/screens/ToolsScreen';
 import {DevToolsScreen} from '@/features/main/screens/DevToolsScreen';
 import {BodyPartSelectorScreen} from '@/features/workout/screens/BodyPartSelectorScreen';
 import {WorkoutOverviewScreen} from '@/features/workout/screens/WorkoutOverviewScreen';
 import {ActiveWorkoutScreen} from '@/features/workout/screens/ActiveWorkoutScreen';
 import {ActiveWorkoutProvider} from '@/features/workout/context/ActiveWorkoutContext';
+import {PlanProvider} from '@/features/plans/context/PlanContext';
 import type {MainStackParamList} from './types';
 
 // === TYPES ===
@@ -42,8 +44,9 @@ const Stack = createNativeStackNavigator<MainStackParamList>();
  */
 export const MainNavigator: React.FC<MainNavigatorProps> = () => {
   return (
-    <ActiveWorkoutProvider>
-      <Stack.Navigator
+    <PlanProvider>
+      <ActiveWorkoutProvider>
+        <Stack.Navigator
         initialRouteName="Tabs"
         screenOptions={{
           headerShown: false,
@@ -56,12 +59,14 @@ export const MainNavigator: React.FC<MainNavigatorProps> = () => {
         {/* Modal/Overlay screens - pushed on top of tabs */}
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
         <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
+        <Stack.Screen name="ToolsScreen" component={ToolsScreen} />
         <Stack.Screen name="HelpScreen" component={HelpScreen} />
         <Stack.Screen name="DevToolsScreen" component={DevToolsScreen} />
         <Stack.Screen name="BodyPartSelector" component={BodyPartSelectorScreen} />
         <Stack.Screen name="WorkoutOverview" component={WorkoutOverviewScreen} />
         <Stack.Screen name="ActiveWorkout" component={ActiveWorkoutScreen} />
-      </Stack.Navigator>
-    </ActiveWorkoutProvider>
+        </Stack.Navigator>
+      </ActiveWorkoutProvider>
+    </PlanProvider>
   );
 };

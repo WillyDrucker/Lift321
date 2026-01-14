@@ -42,46 +42,6 @@ export const dialStyles = StyleSheet.create({
     marginBottom: theme.spacing.s,
   },
 
-  // === HEADER ===
-  header: {
-    marginBottom: 12,
-    alignItems: 'center',
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  headerSwapContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 16,
-    color: theme.colors.backgroundTertiary,
-    fontFamily: theme.typography.fontFamily.primary,
-    fontWeight: 'bold',
-    includeFontPadding: false,
-  },
-  headerValue: {
-    fontSize: 32,
-    lineHeight: 32,
-    color: theme.colors.pureWhite,
-    fontFamily: theme.typography.fontFamily.primary,
-    fontWeight: 'bold',
-    includeFontPadding: false,
-    position: 'absolute',
-    textShadowColor: theme.colors.pureBlack,
-    textShadowOffset: {width: 0, height: 0},
-    textShadowRadius: 8,
-  },
-  headerStatic: {
-    fontSize: 16,
-    color: theme.colors.backgroundTertiary,
-    fontFamily: theme.typography.fontFamily.primary,
-    fontWeight: 'bold',
-    includeFontPadding: false,
-  },
-
   // === CONTROLS ===
   controlsContainer: {
     flexDirection: 'row',
@@ -118,6 +78,16 @@ export const dialStyles = StyleSheet.create({
     overflow: 'hidden',
     position: 'relative',
     justifyContent: 'center',
+  },
+  errorOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: theme.colors.actionDanger,
+    borderRadius: 8,
+    zIndex: 10,
   },
   dialTrack: {
     flexDirection: 'row',

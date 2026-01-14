@@ -2,20 +2,33 @@
 // DIAL CONTROL CARD COMPONENT
 //
 // Generic dial control for adjusting numeric values.
-// Features scrollable dial gauge with tick marks, +/- buttons with
-// auto-repeat, and animated header transitions.
+// Features scrollable dial gauge with tick marks and +/- buttons with
+// auto-repeat. Supports optional topElement for custom headers.
 //
 // Dependencies: theme tokens, useDialControl, useAutoRepeat
-// Used by: RepsControlCard, WeightControlCard
+// Used by: ToggleableDialControlCard
 // ==========================================================================
 
-import React, {useMemo, memo, useCallback} from 'react';
+import React, {useMemo, memo, useCallback, useEffect} from 'react';
 import {View, Text, Pressable, FlatList, Animated} from 'react-native';
+import ReAnimated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSequence,
+  withTiming,
+  runOnJS,
+} from 'react-native-reanimated';
 import {theme} from '@/theme';
 import {useDialControl} from '@/hooks/useDialControl';
 import {useAutoRepeat} from '@/hooks/useAutoRepeat';
 import {dialStyles, DIAL_DIMENSIONS, GAUGE_HEIGHT} from './DialControlCard.styles';
 import type {DialControlCardProps} from './DialControlCard.types';
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const ERROR_FLASH_DURATION = 200; // 200ms per flash transition
 
 // ============================================================================
 // TICK ITEM COMPONENT
@@ -56,23 +69,47 @@ TickItem.displayName = 'TickItem';
 const DialControlCardComponent: React.FC<DialControlCardProps> = ({
   value,
   onChange,
+  onDisplayValueChange,
   config,
-  headerLabel,
-  headerSuffix,
+  topElement,
   formatValue,
   getValueColor,
-  decrementLabel,
-  incrementLabel,
   hideButtons = false,
   compact = false,
+  hasError = false,
+  onErrorAnimationComplete,
 }) => {
+  // === ERROR ANIMATION ===
+  const errorFlash = useSharedValue(0);
+
+  useEffect(() => {
+    if (hasError && onErrorAnimationComplete) {
+      // Start immediately at 1 (red), then flash off/on/off/on/off
+      errorFlash.value = 1;
+      errorFlash.value = withSequence(
+        // Already at 1, go to 0
+        withTiming(0, {duration: ERROR_FLASH_DURATION}),
+        // Flash 2
+        withTiming(1, {duration: ERROR_FLASH_DURATION}),
+        withTiming(0, {duration: ERROR_FLASH_DURATION}),
+        // Flash 3
+        withTiming(1, {duration: ERROR_FLASH_DURATION}),
+        withTiming(0, {duration: ERROR_FLASH_DURATION}, () => {
+          runOnJS(onErrorAnimationComplete)();
+        }),
+      );
+    }
+  }, [hasError, onErrorAnimationComplete]);
+
+  const errorOverlayStyle = useAnimatedStyle(() => ({
+    opacity: errorFlash.value * 0.6,
+  }));
+
   // === HOOKS ===
   const {
     displayValue,
     scrollViewRef,
     dragOpacity,
-    headerLabelOpacity,
-    headerValueOpacity,
     handleScrollBeginDrag,
     handleScrollEndDrag,
     handleMomentumScrollEnd,
@@ -96,6 +133,13 @@ const DialControlCardComponent: React.FC<DialControlCardProps> = ({
   });
 
   const {startAutoRepeat, clearAllTimers} = useAutoRepeat();
+
+  // === REAL-TIME VALUE CALLBACK ===
+  useEffect(() => {
+    if (onDisplayValueChange) {
+      onDisplayValueChange(displayValue);
+    }
+  }, [displayValue, onDisplayValueChange]);
 
   // === COMPUTED VALUES ===
   const displayText = formatValue ? formatValue(displayValue) : displayValue.toString();
@@ -151,25 +195,12 @@ const DialControlCardComponent: React.FC<DialControlCardProps> = ({
   // === RENDER ===
   return (
     <View style={[dialStyles.container, compact && {flex: 1, marginBottom: 0}]}>
-      {/* Header with label/value swap animation */}
-      <View style={dialStyles.header}>
-        <View style={dialStyles.headerRow}>
-          <View style={dialStyles.headerSwapContainer}>
-            <Animated.Text style={[dialStyles.title, {opacity: headerLabelOpacity}]}>
-              {headerLabel}
-            </Animated.Text>
-            <Animated.Text
-              style={[
-                dialStyles.headerValue,
-                {color: valueColor, opacity: headerValueOpacity},
-              ]}
-            >
-              {displayText}
-            </Animated.Text>
-          </View>
-          {headerSuffix}
+      {/* Optional Top Element (e.g., SegmentedControl) */}
+      {topElement && (
+        <View style={{marginTop: -4, marginBottom: 16}}>
+          {topElement}
         </View>
-      </View>
+      )}
 
       {/* Controls with integrated gauge */}
       <View style={dialStyles.controlsContainer}>
@@ -194,6 +225,12 @@ const DialControlCardComponent: React.FC<DialControlCardProps> = ({
           style={[dialStyles.gaugeContainer, hideButtons && {marginHorizontal: 0}]}
           onLayout={handleGaugeLayout}
         >
+          {/* Error Flash Overlay */}
+          <ReAnimated.View
+            style={[dialStyles.errorOverlay, errorOverlayStyle]}
+            pointerEvents="none"
+          />
+
           {/* Scrollable Tick Track */}
           <FlatList
             ref={scrollViewRef as any}

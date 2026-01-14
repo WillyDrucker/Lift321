@@ -10,6 +10,7 @@
 
 import React from 'react';
 import {Pressable, StyleSheet, Text, View} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {theme} from '@/theme';
 import {useWeekCalendar} from '@/hooks';
 
@@ -24,10 +25,11 @@ export type WeekCalendarProps = {
 
 export const WeekCalendar: React.FC<WeekCalendarProps> = React.memo(
   ({selectedDay, onDayPress}) => {
+    const insets = useSafeAreaInsets();
     const {weekDays, todayString} = useWeekCalendar();
 
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, {top: insets.top + theme.layout.topNav.height}]}>
         {weekDays.map((day, index) => {
           const isToday = day.date === todayString;
           return (
@@ -58,11 +60,11 @@ WeekCalendar.displayName = 'WeekCalendar';
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    top: theme.layout.weekCalendar.topPosition,
+    // top is set dynamically via insets.top + nav height
     left: 0,
     right: 0,
     height: theme.layout.weekCalendar.height,
-    backgroundColor: theme.colors.pureBlack, // Pure black background (global standard)
+    backgroundColor: theme.colors.pureBlack,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',

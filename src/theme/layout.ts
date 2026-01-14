@@ -73,7 +73,7 @@ export const layout = {
   bottomNav: {
     height: 68, // Bottom navigation bar height (base height for gesture nav)
     iconSize: 24, // Navigation icon size
-    iconTopSpacing: 6, // Icon position from top of bar
+    iconTopSpacing: 5, // Icon position from top of bar
     paddingHorizontal: 16, // Left/right padding inside nav bar
     paddingBottom: 8, // Bottom padding for spacing above system nav area
     // Dynamic height calculation thresholds
@@ -124,10 +124,10 @@ export const layout = {
   // Minimal top navigation for HomePage and main screens
   topNav: {
     topSpacing: 32, // Distance from screen top (stays below status bar)
-    height: 32, // Navigation bar height (minimalist for maximum scrollable space)
+    height: 27, // Navigation bar height (4dp top + 18dp hamburger visual + 5dp bottom)
     paddingHorizontal: 16, // Left/right padding for icon spacing
-    searchIconSize: 20, // Search icon size (minimalist)
-    menuIconSize: 28, // Hamburger menu icon size (minimalist)
+    searchIconSize: 18, // Info/help icon size
+    menuIconSize: 24, // Hamburger menu icon size
     backIconSize: 28, // Back button icon size (minimalist, globally consistent)
     borderWidth: 0, // No border
   },
@@ -349,9 +349,9 @@ export const layout = {
 
   // === ACTIVE WORKOUT HEADER ===
   // Combined height of all header elements during active workout
-  // topSpacing(32) + topNav(32) + titleBar(48) + settingsBar(32) = 144dp
+  // topSpacing(dynamic) + topNav(24) + titleBar(40) + settingsBar(31) = ~95dp + insets.top
   activeWorkoutHeader: {
-    totalHeight: 144, // Total height from screen top to content area
+    totalHeight: 127, // Total height from screen top to content area (assumes ~32dp inset)
   },
 
   // === ACTION CARD ===

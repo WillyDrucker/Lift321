@@ -19,6 +19,7 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import type {CompositeNavigationProp} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
@@ -27,10 +28,8 @@ import {TopNavBar, Sidebar, BottomTabBar} from '@/components';
 import {GearIcon} from '@/components/icons';
 import type {WorkoutType} from '@/components/WorkoutCard';
 import type {MainStackParamList, TabParamList} from '@/navigation/types';
-import {getWorkoutDuration} from '@/utils/durationCalculator';
-
-// Plan image
-const planImage = require('@/assets/images/plans/lift-3-2-1-plan.png');
+import {calculateWorkoutDuration} from '@/utils/durationCalculator';
+import {usePlan} from '@/features/plans/context/PlanContext';
 
 // ============================================================================
 // TYPES
@@ -48,12 +47,12 @@ type WorkoutLayoutProps = {
   onLetsGoPress?: () => void;
   currentSetIndex?: number;
   totalSets?: number;
+  restMinutesPerSet?: number; // Dynamic rest time based on plan focus
   sidebarVisible: boolean;
   onSidebarClose: () => void;
   onSidebarSelect: (option: 'profile' | 'settings' | 'help' | 'logout') => void;
   onBackPress: () => void;
   onMenuPress: () => void;
-  onGuidePress: () => void;
   navigation: WorkoutLayoutNavigation;
 };
 
@@ -73,18 +72,26 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
   onLetsGoPress,
   currentSetIndex = 0,
   totalSets = 0,
+  restMinutesPerSet = 5,
   sidebarVisible,
   onSidebarClose,
   onSidebarSelect,
   onBackPress,
   onMenuPress,
-  onGuidePress,
   navigation,
 }) => {
+  // Get safe area insets for dynamic positioning
+  const insets = useSafeAreaInsets();
+
+  // Get selected plan from context
+  const {selectedPlan} = usePlan();
+
   // Calculate workout status for settings bar
   const currentSetDisplay = currentSetIndex + 1;
   const remainingSets = totalSets - currentSetIndex;
-  const remainingMinutes = remainingSets > 0 ? getWorkoutDuration(remainingSets) : 0;
+  const remainingMinutes = remainingSets > 0
+    ? calculateWorkoutDuration({totalSets: remainingSets, restMinutesPerSet}).totalMinutes
+    : 0;
   const showWorkoutStatus = totalSets > 0;
   return (
     <>
@@ -97,21 +104,17 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
         {/* Fixed Navigation Area */}
         <View style={styles.navigationArea}>
           <TopNavBar
-            onGuidePress={onGuidePress}
             onMenuPress={onMenuPress}
             onBackPress={onBackPress}
           />
 
           {/* Workout Title Bar (body part name) */}
-          <View style={[
-            styles.workoutTitleBar,
-            !showWorkoutStatus && styles.workoutTitleBarWithGreenBorder,
-          ]}>
+          <View style={[styles.workoutTitleBar, {marginTop: insets.top + theme.layout.topNav.height}]}>
             <Text style={styles.workoutTitleText}>{workoutType}</Text>
 
             {/* Plan Image - shown during active workout */}
             {showWorkoutStatus && (
-              <Image source={planImage} style={styles.planImage} resizeMode="contain" />
+              <Image source={selectedPlan.image} style={styles.planImage} resizeMode="contain" />
             )}
 
             {/* Conditional Let's Go Button */}
@@ -133,6 +136,9 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
               </View>
             )}
           </View>
+
+          {/* Green accent line - only shown when no settings bar */}
+          {!showWorkoutStatus && <View style={styles.greenAccentLine} />}
 
           {/* Workout Settings Bar - only shown during active workout */}
           {showWorkoutStatus && (
@@ -160,7 +166,8 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
         {/* Dynamic Content Area - this is where transitions happen */}
         <View style={[
           styles.contentArea,
-          showWorkoutStatus && styles.contentAreaWithSettingsBar,
+          {paddingTop: insets.top + theme.layout.topNav.height + 41}, // nav + title bar(40) + green line(1)
+          showWorkoutStatus && {paddingTop: insets.top + theme.layout.topNav.height + 40 + 31}, // nav + title bar + settings bar
         ]}>
           {children}
         </View>
@@ -221,24 +228,23 @@ const styles = StyleSheet.create({
 
   // === WORKOUT TITLE BAR ===
   workoutTitleBar: {
-    marginTop: theme.layout.topNav.topSpacing + theme.layout.topNav.height,
-    height: 48, // 48dp container (8dp + 32dp button + 8dp)
+    // marginTop is set dynamically via insets.top + nav height
+    height: 40, // 40dp container (4dp + 32dp image + 4dp)
     backgroundColor: theme.colors.pureBlack,
-    borderBottomWidth: theme.layout.border.thin,
-    borderBottomColor: theme.colors.pureWhite, // White line when settings bar is shown
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: theme.layout.topNav.paddingHorizontal, // Align with TopNavBar (16dp)
     zIndex: 1,
   },
-  workoutTitleBarWithGreenBorder: {
-    borderBottomColor: theme.colors.actionSuccess, // Green line when no settings bar
+  greenAccentLine: {
+    height: 1, // 1dp green line when no settings bar
+    backgroundColor: theme.colors.actionSuccess,
   },
 
   // === WORKOUT SETTINGS BAR ===
   workoutSettingsBar: {
-    height: theme.layout.workoutSettingsBar.height,
+    height: 31, // 4dp gap from text to green line
     backgroundColor: theme.colors.pureBlack,
     borderBottomWidth: theme.layout.border.thin,
     borderBottomColor: theme.colors.actionSuccess, // Green scroll bar
@@ -266,17 +272,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: theme.colors.actionSuccess,
     includeFontPadding: false,
-    transform: [{translateY: -2.5}], // Center vertically (move up to compensate for font metrics)
   },
   statsGroupCentered: {
     flex: 1,
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'center',
+    marginTop: -4, // Move up to 0dp from top
   },
   statsGroupRight: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    marginTop: -4, // Move up to 0dp from top
   },
   gearIconContainer: {
     width: 24,
@@ -298,8 +305,9 @@ const styles = StyleSheet.create({
     textShadowRadius: 4, // Shadow blur
   },
   planImage: {
-    height: 32,
-    width: 96, // 3:1 aspect ratio (32 * 3 = 96)
+    height: 36, // 0dp from top, 4dp from bottom in 40dp title bar
+    width: 108, // 3:1 aspect ratio (36 * 3 = 108)
+    alignSelf: 'flex-start', // Position at top of title bar
   },
 
   // === LET'S GO BUTTON ===
@@ -358,10 +366,7 @@ const styles = StyleSheet.create({
   // === CONTENT AREA ===
   contentArea: {
     flex: 1,
-    paddingTop: theme.layout.topNav.topSpacing + theme.layout.topNav.height + 48, // Clear navigation area (TopNav + Title Bar)
+    // paddingTop is set dynamically via insets
     paddingBottom: theme.layout.bottomNav.height, // Clear bottom tab bar (accounts for safe area in BottomTabBar component)
-  },
-  contentAreaWithSettingsBar: {
-    paddingTop: theme.layout.activeWorkoutHeader.totalHeight, // Total header height during active workout
   },
 });

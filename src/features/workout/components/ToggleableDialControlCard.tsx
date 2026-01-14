@@ -4,16 +4,16 @@
 // Single full-width dial control that toggles between reps and weight modes.
 // Preserves both values independently and provides mode-specific configuration.
 //
-// Dependencies: DialControlCard, SegmentedControl, theme tokens
+// Dependencies: DialControlCard, theme tokens
 // Used by: ActiveWorkoutScreen
 // ==========================================================================
 
-import React, {useState, useCallback, useEffect, useMemo} from 'react';
+import React, {useState, useCallback, useEffect, useMemo, useRef} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {theme} from '@/theme';
 import {DialControlCard} from './DialControlCard';
-import type {DialConfig} from './DialControlCard.types';
 import {SegmentedControl} from '@/components';
+import type {DialConfig} from './DialControlCard.types';
 
 // ============================================================================
 // TYPES
@@ -27,6 +27,11 @@ type ToggleableDialControlCardProps = {
   targetReps?: number;
   onRepsChange: (reps: number) => void;
   onWeightChange: (weight: number) => void;
+  // Error handling props
+  hasRepsError?: boolean;
+  hasWeightError?: boolean;
+  onRepsErrorAnimationComplete?: () => void;
+  onWeightErrorAnimationComplete?: () => void;
 };
 
 // ============================================================================
@@ -55,8 +60,6 @@ const WEIGHT_CONFIG: DialConfig = {
   flingVelocityThreshold: 0.5,
 };
 
-// Removed static SEGMENTED_OPTIONS - now created dynamically with values
-
 // ============================================================================
 // COMPONENT
 // ============================================================================
@@ -67,6 +70,10 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
   targetReps = 10,
   onRepsChange,
   onWeightChange,
+  hasRepsError = false,
+  hasWeightError = false,
+  onRepsErrorAnimationComplete,
+  onWeightErrorAnimationComplete,
 }) => {
   // ==========================================================================
   // STATE
@@ -75,6 +82,12 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
   const [mode, setMode] = useState<DialMode>('reps');
   const [localReps, setLocalReps] = useState(initialReps);
   const [localWeight, setLocalWeight] = useState(initialWeight);
+  const [displayReps, setDisplayReps] = useState(initialReps); // Real-time value during dragging
+  const [displayWeight, setDisplayWeight] = useState(initialWeight); // Real-time value during dragging
+
+  // Ref to track current mode for callbacks (avoids stale closure issues)
+  const modeRef = useRef<DialMode>(mode);
+  modeRef.current = mode;
 
   // ==========================================================================
   // EFFECTS - SYNC EXTERNAL CHANGES
@@ -82,10 +95,12 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
 
   useEffect(() => {
     setLocalReps(initialReps);
+    setDisplayReps(initialReps);
   }, [initialReps]);
 
   useEffect(() => {
     setLocalWeight(initialWeight);
+    setDisplayWeight(initialWeight);
   }, [initialWeight]);
 
   // ==========================================================================
@@ -94,17 +109,25 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
 
   const handleRepsChange = useCallback((reps: number) => {
     setLocalReps(reps);
+    setDisplayReps(reps);
     onRepsChange(reps);
   }, [onRepsChange]);
 
   const handleWeightChange = useCallback((weight: number) => {
     setLocalWeight(weight);
+    setDisplayWeight(weight);
     onWeightChange(weight);
   }, [onWeightChange]);
 
-  const handleModeSelect = useCallback((index: number) => {
-    setMode(index === 0 ? 'reps' : 'weight');
+  const handleDisplayValueChange = useCallback((value: number) => {
+    // Use ref to get current mode (avoids stale closure during mode transitions)
+    if (modeRef.current === 'reps') {
+      setDisplayReps(value);
+    } else {
+      setDisplayWeight(value);
+    }
   }, []);
+
 
   // ==========================================================================
   // COLOR FEEDBACK (REPS ONLY)
@@ -135,34 +158,13 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
     [mode, handleRepsChange, handleWeightChange]
   );
 
-  const headerLabel = mode === 'reps' ? 'REPS' : 'WEIGHT';
   const getValueColor = mode === 'reps' ? getRepsColor : undefined;
 
-  const headerSuffix = useMemo(() =>
-    mode === 'reps' ? (
-      <Text style={styles.suffixText}>
-        {' '}(TARGET: <Text style={styles.targetValue}>{targetReps}</Text>)
-      </Text>
-    ) : (
-      <Text style={styles.suffixText}>{' '}(LBS)</Text>
-    ),
-    [mode, targetReps]
-  );
-
-  // Dynamic segmented control options with current values and colors
-  const segmentedOptions = useMemo(() => {
-    const repsColor = getRepsColor(localReps);
-    const weightColor = theme.colors.actionSuccess; // Green for weight
-
-    return [
-      <Text key="reps" style={styles.segmentOption}>
-        REPS: <Text style={[styles.segmentValue, {color: repsColor}]}>{localReps}</Text>
-      </Text>,
-      <Text key="weight" style={styles.segmentOption}>
-        WEIGHT: <Text style={[styles.segmentValue, {color: weightColor}]}>{localWeight}</Text>
-      </Text>,
-    ];
-  }, [localReps, localWeight, getRepsColor]);
+  // Error handling based on current mode
+  const hasError = mode === 'reps' ? hasRepsError : hasWeightError;
+  const onErrorAnimationComplete = mode === 'reps'
+    ? onRepsErrorAnimationComplete
+    : onWeightErrorAnimationComplete;
 
   // ==========================================================================
   // RENDER
@@ -170,20 +172,36 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
 
   return (
     <View style={styles.container}>
-      <SegmentedControl
-        options={segmentedOptions}
-        selectedIndex={mode === 'reps' ? 0 : 1}
-        onSelect={handleModeSelect}
-      />
       <DialControlCard
+        key={mode}
         value={activeValue}
         onChange={handleChange}
+        onDisplayValueChange={handleDisplayValueChange}
         config={activeConfig}
-        headerLabel={headerLabel}
-        headerSuffix={headerSuffix}
+        topElement={
+          <SegmentedControl
+            options={[
+              <View key="reps" style={styles.repsOption}>
+                <Text style={[styles.repsText, mode === 'reps' && styles.repsTextActive]}>REPS</Text>
+                <Text style={[styles.repsValue, {color: getRepsColor(displayReps)}]}>{displayReps}</Text>
+              </View>,
+              <View key="weight" style={styles.weightOption}>
+                <View style={styles.weightLabelStack}>
+                  <Text style={[styles.weightText, mode === 'weight' && styles.weightTextActive]}>WEIGHT</Text>
+                  <Text style={[styles.lbsText, mode === 'weight' && styles.lbsTextActive]}>(LBS)</Text>
+                </View>
+                <Text style={styles.weightValue}>{displayWeight}</Text>
+              </View>
+            ]}
+            selectedIndex={mode === 'reps' ? 0 : 1}
+            onSelect={(index) => setMode(index === 0 ? 'reps' : 'weight')}
+          />
+        }
         getValueColor={getValueColor}
         hideButtons={false}
         compact={false}
+        hasError={hasError}
+        onErrorAnimationComplete={onErrorAnimationComplete}
       />
     </View>
   );
@@ -195,25 +213,66 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
 
 const styles = StyleSheet.create({
   container: {
-    // No margin needed - SegmentedControl and DialControlCard have their own margins
+    // No margin needed - buttons and DialControlCard have their own margins
   },
-  suffixText: {
-    fontSize: 16,
-    color: theme.colors.backgroundTertiary,
-    fontFamily: theme.typography.fontFamily.primary,
-    fontWeight: theme.typography.fontWeight.bold,
+  repsOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
-  targetValue: {
-    color: theme.colors.actionSuccess,
-  },
-  segmentOption: {
+  repsText: {
     fontSize: theme.typography.fontSize.m,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.textSecondary,
     textTransform: 'uppercase',
   },
-  segmentValue: {
-    // Color will be set dynamically
+  repsTextActive: {
+    color: theme.colors.textPrimary,
+  },
+  repsValue: {
+    fontSize: 32,
+    lineHeight: 32,
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: theme.typography.fontWeight.bold,
+    includeFontPadding: false,
+    // Color is set dynamically based on getRepsColor
+  },
+  weightOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  weightLabelStack: {
+    alignItems: 'center',
+  },
+  weightText: {
+    fontSize: theme.typography.fontSize.m,
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.textSecondary,
+    textTransform: 'uppercase',
+  },
+  weightTextActive: {
+    color: theme.colors.textPrimary,
+  },
+  weightValue: {
+    fontSize: 32,
+    lineHeight: 32,
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.pureWhite,
+    includeFontPadding: false,
+  },
+  lbsText: {
+    fontSize: theme.typography.fontSize.m,
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.textSecondary,
+    textTransform: 'uppercase',
+    marginTop: -4,
+  },
+  lbsTextActive: {
+    color: theme.colors.textPrimary,
   },
 });

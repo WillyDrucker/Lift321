@@ -10,13 +10,13 @@
 
 import React from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {theme} from '@/theme';
-import {InfoIcon, HamburgerIcon, LeftChevron} from '@/components/icons';
+import {HamburgerRegularThin, LeftChevron} from '@/components/icons';
 
 // === TYPES ===
 
 export type TopNavBarProps = {
-  onGuidePress: () => void; // Opens help/guide screen
   onMenuPress: () => void;
   onBackPress?: () => void; // Optional back button
 };
@@ -24,13 +24,15 @@ export type TopNavBarProps = {
 // === COMPONENT ===
 
 export const TopNavBar: React.FC<TopNavBarProps> = React.memo(
-  ({onGuidePress, onMenuPress, onBackPress}) => {
+  ({onMenuPress, onBackPress}) => {
+    const insets = useSafeAreaInsets();
+
     return (
       <>
-        {/* Status bar background extension */}
-        <View style={styles.statusBarBackground} />
+        {/* Status bar background extension - dynamic height based on device */}
+        <View style={[styles.statusBarBackground, {height: insets.top}]} />
 
-        <View style={styles.container}>
+        <View style={[styles.container, {top: insets.top}]}>
           {/* Left side buttons */}
           <View style={styles.leftButtonsContainer}>
             {/* Hamburger Menu - Left aligned */}
@@ -40,7 +42,7 @@ export const TopNavBar: React.FC<TopNavBarProps> = React.memo(
                 styles.menuButton,
                 pressed && styles.pressed,
               ]}>
-              <HamburgerIcon
+              <HamburgerRegularThin
                 size={theme.layout.topNav.menuIconSize}
                 color={theme.colors.textPrimary}
               />
@@ -61,19 +63,6 @@ export const TopNavBar: React.FC<TopNavBarProps> = React.memo(
               </Pressable>
             )}
           </View>
-
-          {/* Guide/Help Icon - Right aligned */}
-          <Pressable
-            onPress={onGuidePress}
-            style={({pressed}) => [
-              styles.guideButton,
-              pressed && styles.pressed,
-            ]}>
-            <InfoIcon
-              size={theme.layout.topNav.searchIconSize}
-              color={theme.colors.textPrimary}
-            />
-          </Pressable>
         </View>
       </>
     );
@@ -91,28 +80,27 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: theme.layout.topNav.topSpacing,
-    backgroundColor: theme.colors.pureBlack, // Pure black background (global standard)
+    // height is set dynamically via insets.top
+    backgroundColor: theme.colors.pureBlack,
   },
 
   container: {
     position: 'absolute',
-    top: theme.layout.topNav.topSpacing,
+    // top is set dynamically via insets.top
     left: 0,
     right: 0,
     height: theme.layout.topNav.height,
-    backgroundColor: theme.colors.pureBlack, // Pure black background (global standard)
+    backgroundColor: theme.colors.pureBlack,
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
     paddingHorizontal: theme.layout.topNav.paddingHorizontal,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.pureWhite,
+    paddingTop: 1, // 1dp + 3dp SVG dead space = 4dp visual for hamburger
   },
 
   leftButtonsContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: theme.spacing.m, // Standard gap between navigation icons
   },
 
@@ -121,10 +109,6 @@ const styles = StyleSheet.create({
   },
 
   backButton: {
-    padding: 0,
-  },
-
-  guideButton: {
     padding: 0,
   },
 

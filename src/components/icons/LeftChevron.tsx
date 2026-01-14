@@ -10,7 +10,7 @@
 // ==========================================================================
 
 import React from 'react';
-import Svg, {Path} from 'react-native-svg';
+import Svg, {Path, G} from 'react-native-svg';
 
 // === TYPES ===
 
@@ -27,13 +27,15 @@ export const LeftChevron: React.FC<LeftChevronProps> = ({
 }) => {
   return (
     <Svg width={size} height={size} viewBox="0 0 32 32" fill="none">
-      <Path
-        d="M20 24L12 16L20 8"
-        stroke={color}
-        strokeWidth={3}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <G transform="translate(0, -2)">
+        <Path
+          d="M20 24L12 16L20 8"
+          stroke={color}
+          strokeWidth={3}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </G>
     </Svg>
   );
 };

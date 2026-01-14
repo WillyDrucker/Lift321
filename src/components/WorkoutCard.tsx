@@ -36,6 +36,7 @@ export type {BodyPart, CustomWorkout, WorkoutType, WorkoutSuggester};
 export type WorkoutCardProps = {
   suggester?: WorkoutSuggester;  // NEW: Suggester-based mode
   workoutType?: WorkoutType;     // LEGACY: Keep for backward compat
+  title?: string;                // Optional custom title override
   animatedTop?: Animated.Value;
   isFirstCard?: boolean;
   isLastCard?: boolean;
@@ -49,7 +50,7 @@ export type WorkoutCardProps = {
 // === COMPONENT ===
 
 export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(
-  ({suggester, workoutType, animatedTop, isFirstCard = false, isLastCard = false, index = 0, scrollX, cardIndex = 0, cardWidth: propCardWidth, onPress}) => {
+  ({suggester, workoutType, title: customTitle, animatedTop, isFirstCard = false, isLastCard = false, index = 0, scrollX, cardIndex = 0, cardWidth: propCardWidth, onPress}) => {
     // === HOOKS ===
     // Navigation hook for screen transitions
 
@@ -78,7 +79,8 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(
       : (workoutType as BodyPart) || 'Chest'; // Default fallback
 
     // Card title - displayed in header area
-    const workoutTitle = (() => {
+    // Use custom title if provided, otherwise generate from suggester/workoutType
+    const workoutTitle = customTitle ?? (() => {
       switch (suggester) {
         case '3-2-1 A.I. Trainer':
           return getWorkoutTitle(bodyPart); // Day-based rotation

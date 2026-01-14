@@ -13,8 +13,12 @@ import {theme} from '@/theme';
 
 export const styles = StyleSheet.create({
   container: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: 1000,
+    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
 
   overlay: {
@@ -31,6 +35,24 @@ export const styles = StyleSheet.create({
     ...theme.viewShadows.large,
   },
 
+  dragHandleArea: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: 32, // 32dp draggable space on the right
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10, // Ensure it's above sidebar content
+  },
+
+  dragHandleBar: {
+    width: 4, // Vertical bar width
+    height: 48, // Vertical bar height
+    backgroundColor: theme.colors.textSecondary,
+    borderRadius: 2,
+  },
+
   header: {
     paddingTop: theme.layout.sidebar.headerPaddingTop,
     paddingBottom: theme.layout.sidebar.headerPaddingBottom,
@@ -39,8 +61,8 @@ export const styles = StyleSheet.create({
   },
 
   logo: {
-    width: theme.layout.logo.size,
-    height: theme.layout.logo.size,
+    width: 100,
+    height: 52, // Matches LoginScreen logo (729:380 aspect ratio)
     marginBottom: theme.layout.sidebar.logoMarginBottom,
   },
 
@@ -54,7 +76,14 @@ export const styles = StyleSheet.create({
 
   menuItem: {
     paddingVertical: theme.layout.sidebar.itemPaddingVertical,
-    paddingHorizontal: theme.layout.sidebar.itemPaddingHorizontal,
+    paddingLeft: theme.layout.sidebar.itemPaddingHorizontal,
+    paddingRight: theme.layout.sidebar.itemPaddingHorizontal + 32, // Account for drag handle area
+  },
+
+  menuItemWithIcon: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16, // 16dp between icon and text
   },
 
   menuItemPressed: {
@@ -70,14 +99,16 @@ export const styles = StyleSheet.create({
   divider: {
     height: theme.layout.border.thin,
     backgroundColor: theme.colors.borderDefault,
-    marginHorizontal: theme.spacing.m,
+    marginLeft: theme.spacing.m,
+    marginRight: theme.spacing.m + 32, // Account for drag handle area
   },
 
   footer: {
     flex: 1,
     justifyContent: 'flex-end',
     paddingBottom: theme.spacing.l,
-    paddingHorizontal: theme.layout.sidebar.itemPaddingHorizontal,
+    paddingLeft: theme.layout.sidebar.itemPaddingHorizontal,
+    paddingRight: theme.layout.sidebar.itemPaddingHorizontal + 32, // Account for drag handle area
   },
 
   versionContainer: {

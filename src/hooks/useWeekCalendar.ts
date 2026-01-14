@@ -24,18 +24,27 @@ export type DayData = {
 export const useWeekCalendar = () => {
   // Track override changes to trigger recalculation
   const [overrideDay, setOverrideDay] = useState(getOverrideDayCache());
+  // Track actual date to refresh when day changes (midnight rollover or app resume)
+  const [currentDateString, setCurrentDateString] = useState(() => formatDateShort(new Date()));
 
-  // Poll for override changes (simple approach for immediate updates)
+  // Poll for override changes and actual date changes
   useEffect(() => {
     const interval = setInterval(() => {
+      // Check for override changes
       const currentOverride = getOverrideDayCache();
       if (currentOverride !== overrideDay) {
         setOverrideDay(currentOverride);
       }
-    }, 100); // Check every 100ms
+
+      // Check for actual date changes (midnight rollover or device date change)
+      const actualDateString = formatDateShort(new Date());
+      if (actualDateString !== currentDateString) {
+        setCurrentDateString(actualDateString);
+      }
+    }, 1000); // Check every second
 
     return () => clearInterval(interval);
-  }, [overrideDay]);
+  }, [overrideDay, currentDateString]);
 
   const weekDays = useMemo(() => {
     const weekDates = getWeekDates(); // Now uses getCurrentDate() internally
@@ -45,11 +54,11 @@ export const useWeekCalendar = () => {
       date: formatDateShort(date),
       fullDate: date,
     }));
-  }, [overrideDay]); // Recalculate when override changes
+  }, [overrideDay, currentDateString]); // Recalculate when override or actual date changes
 
   const todayString = useMemo(() => {
     return formatDateShort(getCurrentDate()); // Use override-aware date
-  }, [overrideDay]); // Recalculate when override changes
+  }, [overrideDay, currentDateString]); // Recalculate when override or actual date changes
 
   return {
     weekDays,

@@ -15,6 +15,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {
   Image,
+  Modal,
   Pressable,
   StyleSheet,
   Text,
@@ -29,17 +30,18 @@ import Animated, {
   interpolate,
   Extrapolation,
 } from 'react-native-reanimated';
-import {Gesture, GestureDetector} from 'react-native-gesture-handler';
+import {Gesture, GestureDetector, GestureHandlerRootView} from 'react-native-gesture-handler';
 import {theme} from '@/theme';
 import {authService, isGuestMode} from '@/services';
 import {styles} from './Sidebar.styles';
+import {InfoIcon} from '@/components/icons';
 
 // Import app version from package.json
 const packageJson = require('../../package.json');
 
 // === TYPES ===
 
-type MenuOption = 'profile' | 'settings' | 'help' | 'logout' | 'devtools';
+type MenuOption = 'profile' | 'settings' | 'tools' | 'help' | 'logout' | 'devtools';
 
 type SidebarProps = {
   visible: boolean;
@@ -202,20 +204,32 @@ const SidebarComponent: React.FC<SidebarProps> = ({
   }
 
   return (
-    <View style={styles.container}>
-      {/* Backdrop overlay - tap to close */}
-      <Pressable style={StyleSheet.absoluteFill} onPress={handleOverlayPress}>
-        <Animated.View style={[styles.overlay, overlayAnimatedStyle]} />
-      </Pressable>
+    <Modal
+      visible={shouldRender}
+      transparent={true}
+      animationType="none"
+      statusBarTranslucent={true}
+      onRequestClose={onClose}>
+      <GestureHandlerRootView style={styles.container}>
+        {/* Backdrop overlay - tap to close */}
+        <Pressable style={StyleSheet.absoluteFill} onPress={handleOverlayPress}>
+          <Animated.View style={[styles.overlay, overlayAnimatedStyle]} />
+        </Pressable>
 
-      {/* Sidebar drawer with gesture handling */}
-      <GestureDetector gesture={panGesture}>
+        {/* Sidebar drawer */}
         <Animated.View
           style={[
             styles.sidebar,
             {width: sidebarWidth},
             sidebarAnimatedStyle,
           ]}>
+          {/* Drag Handle - Right edge with gesture zone for swipe-to-close */}
+          <GestureDetector gesture={panGesture}>
+            <Animated.View style={styles.dragHandleArea}>
+              <View style={styles.dragHandleBar} />
+            </Animated.View>
+          </GestureDetector>
+
           {/* Header Section */}
           <View style={styles.header}>
             {/* Logo */}
@@ -249,7 +263,16 @@ const SidebarComponent: React.FC<SidebarProps> = ({
 
           <Pressable
             style={({pressed}) => [styles.menuItem, pressed && styles.menuItemPressed]}
+            onPress={() => handleSelect('tools')}>
+            <Text style={styles.menuText}>Tools</Text>
+          </Pressable>
+
+          <View style={styles.divider} />
+
+          <Pressable
+            style={({pressed}) => [styles.menuItem, styles.menuItemWithIcon, pressed && styles.menuItemPressed]}
             onPress={() => handleSelect('help')}>
+            <InfoIcon size={18} color={theme.colors.textPrimary} />
             <Text style={styles.menuText}>Help</Text>
           </Pressable>
 
@@ -270,8 +293,8 @@ const SidebarComponent: React.FC<SidebarProps> = ({
             </Pressable>
           </View>
         </Animated.View>
-      </GestureDetector>
-    </View>
+      </GestureHandlerRootView>
+    </Modal>
   );
 };
 

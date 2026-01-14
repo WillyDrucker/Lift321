@@ -48,7 +48,7 @@ const SegmentedControlComponent: React.FC<SegmentedControlProps> = ({
               index === options.length - 1 && styles.segmentLast,
             ]}
             onPress={() => onSelect(index)}
-            activeOpacity={0.7}
+            activeOpacity={1}
           >
             {isString ? (
               <Text
@@ -78,9 +78,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: theme.colors.backgroundPrimary,
     borderRadius: theme.spacing.s,
-    borderWidth: 1,
-    borderColor: theme.colors.borderDefault,
-    overflow: 'hidden',
     marginBottom: theme.spacing.s,
   },
   segment: {
@@ -88,21 +85,22 @@ const styles = StyleSheet.create({
     height: 44,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'transparent',
-    borderRightWidth: 1,
-    borderRightColor: theme.colors.borderDefault,
+    backgroundColor: theme.colors.backgroundSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.borderDefault,
   },
   segmentFirst: {
     borderTopLeftRadius: theme.spacing.s,
     borderBottomLeftRadius: theme.spacing.s,
   },
   segmentLast: {
-    borderRightWidth: 0,
     borderTopRightRadius: theme.spacing.s,
     borderBottomRightRadius: theme.spacing.s,
   },
   segmentActive: {
-    backgroundColor: theme.colors.backgroundSecondary,
+    backgroundColor: theme.colors.backgroundTertiary,
+    borderWidth: 1,
+    borderColor: theme.colors.actionSuccess,
   },
   segmentText: {
     fontSize: theme.typography.fontSize.m,

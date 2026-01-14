@@ -3,19 +3,21 @@
 //
 // Displays current training plan name and completion progress.
 // Shows horizontal progress bar with percentage fill.
+// Uses global plan context for selected plan name.
 //
-// Dependencies: theme tokens
-// Used by: HomePage
+// Dependencies: theme tokens, PlanContext
+// Used by: HomePage, PlansPage
 // ==========================================================================
 
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {theme} from '@/theme';
+import {usePlan} from '@/features/plans/context/PlanContext';
 
 // === TYPES ===
 
 export type PlanProgressBarProps = {
-  planName: string;
   completedWorkouts: number;
   totalWorkouts: number;
 };
@@ -23,13 +25,25 @@ export type PlanProgressBarProps = {
 // === COMPONENT ===
 
 export const PlanProgressBar: React.FC<PlanProgressBarProps> = React.memo(
-  ({planName, completedWorkouts, totalWorkouts}) => {
+  ({completedWorkouts, totalWorkouts}) => {
+    const insets = useSafeAreaInsets();
+    const {selectedPlan} = usePlan();
     const progressPercentage = (completedWorkouts / totalWorkouts) * 100;
 
+    // Position: insets.top + nav height + calendar height - overlap adjustment
+    const topPosition = insets.top + theme.layout.topNav.height + theme.layout.weekCalendar.height - 4;
+
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, {top: topPosition}]}>
         <Text style={styles.planName}>
-          <Text style={styles.planNameItalic}>LIFT</Text> 3-2-1
+          {selectedPlan.displayPrefix ? (
+            <>
+              <Text style={styles.planNameItalic}>{selectedPlan.displayPrefix}</Text>
+              {' '}{selectedPlan.displaySuffix}
+            </>
+          ) : (
+            selectedPlan.displaySuffix
+          )}
         </Text>
         <View style={styles.progressBarContainer}>
           <View style={styles.progressBarBackground}>
@@ -54,7 +68,7 @@ PlanProgressBar.displayName = 'PlanProgressBar';
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    top: theme.layout.planProgress.topPosition,
+    // top is set dynamically via insets + nav + calendar heights
     left: 0,
     right: 0,
     height: theme.layout.planProgress.height,
@@ -73,6 +87,7 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.navActive,
     textTransform: 'uppercase', // All caps text
+    flexShrink: 0, // Prevent text from shrinking - auto-expands based on content
   },
 
   planNameItalic: {

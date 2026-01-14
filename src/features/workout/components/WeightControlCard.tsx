@@ -21,6 +21,8 @@ import type {DialConfig} from './DialControlCard.types';
 type WeightControlCardProps = {
   initialWeight?: number;
   onWeightChange: (weight: number) => void;
+  hasError?: boolean;
+  onErrorAnimationComplete?: () => void;
 };
 
 // ============================================================================
@@ -42,8 +44,10 @@ const WEIGHT_CONFIG: DialConfig = {
 // ============================================================================
 
 export const WeightControlCard: React.FC<WeightControlCardProps> = ({
-  initialWeight = 135,
+  initialWeight = 0,
   onWeightChange,
+  hasError = false,
+  onErrorAnimationComplete,
 }) => {
   // Header suffix showing unit
   const headerSuffix = (
@@ -66,6 +70,8 @@ export const WeightControlCard: React.FC<WeightControlCardProps> = ({
       headerSuffix={headerSuffix}
       hideButtons={true}
       compact={true}
+      hasError={hasError}
+      onErrorAnimationComplete={onErrorAnimationComplete}
     />
   );
 };

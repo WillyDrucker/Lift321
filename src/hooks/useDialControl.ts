@@ -41,8 +41,6 @@ export type UseDialControlReturn = {
 
   // Animation values
   dragOpacity: Animated.Value;
-  headerLabelOpacity: Animated.Value;
-  headerValueOpacity: Animated.AnimatedInterpolation<number>;
 
   // Scroll handlers
   handleScrollBeginDrag: () => void;
@@ -110,11 +108,6 @@ export const useDialControl = (config: UseDialControlConfig): UseDialControlRetu
 
   // === ANIMATION VALUES ===
   const dragOpacity = useRef(new Animated.Value(1)).current;
-  const headerLabelOpacity = dragOpacity;
-  const headerValueOpacity = dragOpacity.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 0],
-  });
 
   // === STATE ===
   const [displayValue, setDisplayValue] = useState(initialValue);
@@ -269,8 +262,6 @@ export const useDialControl = (config: UseDialControlConfig): UseDialControlRetu
     displayValue,
     scrollViewRef,
     dragOpacity,
-    headerLabelOpacity,
-    headerValueOpacity,
     handleScrollBeginDrag,
     handleScrollEndDrag,
     handleMomentumScrollEnd,

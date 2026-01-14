@@ -34,6 +34,7 @@ export {BottomSheet} from './BottomSheet';
 export {SegmentedControl} from './SegmentedControl';
 
 // === LAYOUT ===
+export {AppLayout} from './AppLayout';
 export {DefaultScreenLayout} from './Layout/DefaultScreenLayout';
 
 // === ERROR HANDLING ===

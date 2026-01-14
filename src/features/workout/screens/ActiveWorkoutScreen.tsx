@@ -55,6 +55,10 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
     currentGlobalReps,
     isResting,
     isWorkoutComplete,
+    hasWeightError,
+    hasRepsError,
+    targetReps,
+    restMinutes,
     startWorkout,
     updateSet,
     logSet,
@@ -64,6 +68,8 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
     deleteSet,
     selectSet,
     endWorkout,
+    clearWeightError,
+    clearRepsError,
   } = useActiveWorkout();
 
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
@@ -82,9 +88,10 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
       startWorkout({
         workoutType: route.params.workoutType,
         sessionType: route.params.sessionType,
+        planFocus: route.params.planFocus || 'balanced',
       });
     }
-  }, [config, startWorkout, route.params.workoutType, route.params.sessionType]);
+  }, [config, startWorkout, route.params.workoutType, route.params.sessionType, route.params.planFocus]);
 
   // ==========================================================================
   // COMPUTED VALUES
@@ -109,9 +116,9 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
 
   const verticalLineHeight = useMemo(() => {
     const START_OFFSET = 25;
-    const SET_HEIGHT = 50; 
-    const SET_MARGIN = 5; 
-    const GROUP_SPACER = 32; 
+    const SET_HEIGHT = 50;
+    const SET_MARGIN = 5;
+    const GROUP_SPACER = 32;
 
     let totalHeight = START_OFFSET;
     let exerciseCount = 0;
@@ -185,8 +192,7 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
 
   const handleBackPress = () => navigation.goBack();
   const handleMenuPress = () => setSidebarVisible(true);
-  const handleGuidePress = () => navigation.navigate('HelpScreen');
-  
+
   const handleFinishWorkout = useCallback(() => {
     console.log('Workout Finished!', workoutState);
     endWorkout(); // Clears context
@@ -217,7 +223,7 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
     for (let setNumber = 1; setNumber <= totalSets; setNumber++) {
       const key = `${exerciseName}-${setNumber}`;
       const isActive = key === activeSetKey;
-      
+
       sets.push(
         <View key={key} style={[styles.setWrapper, isActive && styles.activeSetWrapper]}>
             {isActive && !isEditing && <View style={styles.activeIndicator} />}
@@ -273,14 +279,14 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
       showLetsGoButton={false}
       currentSetIndex={globalSetIndex}
       totalSets={globalTotalSets}
+      restMinutesPerSet={restMinutes}
       sidebarVisible={sidebarVisible}
       onSidebarClose={() => setSidebarVisible(false)}
       onSidebarSelect={() => {}}
       onBackPress={handleBackPress}
       onMenuPress={handleMenuPress}
-      onGuidePress={handleGuidePress}
       navigation={navigation}>
-      
+
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -300,15 +306,20 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
           <ToggleableDialControlCard
             initialReps={currentGlobalReps}
             initialWeight={currentGlobalWeight}
-            targetReps={10}
+            targetReps={targetReps}
             onRepsChange={setGlobalReps}
             onWeightChange={setGlobalWeight}
+            hasRepsError={hasRepsError}
+            hasWeightError={hasWeightError}
+            onRepsErrorAnimationComplete={clearRepsError}
+            onWeightErrorAnimationComplete={clearWeightError}
           />
 
           {/* 4. Action Card (Log Set / Rest Timer / Finish) */}
           <WorkoutActionCard
             isResting={isResting}
             isComplete={isWorkoutComplete}
+            restDuration={restMinutes}
             onLogSet={logSet}
             onEndRest={endRest}
             onFinish={handleFinishWorkout}
@@ -319,15 +330,15 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
             <View style={styles.todaysWorkoutHeader}>
               <Text style={styles.todaysWorkoutText}>TODAY'S WORKOUT</Text>
               <View style={styles.titleConnector} />
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={() => setIsEditing(!isEditing)}
                 style={styles.editButton}
                 hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
               >
-                <PencilIcon 
-                    width={28} 
-                    height={28} 
-                    color={isEditing ? theme.colors.actionWarning : theme.colors.textSecondary} 
+                <PencilIcon
+                    width={28}
+                    height={28}
+                    color={isEditing ? theme.colors.actionWarning : theme.colors.textSecondary}
                 />
               </TouchableOpacity>
             </View>
