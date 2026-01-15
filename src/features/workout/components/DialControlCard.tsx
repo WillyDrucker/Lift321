@@ -84,15 +84,12 @@ const DialControlCardComponent: React.FC<DialControlCardProps> = ({
 
   useEffect(() => {
     if (hasError && onErrorAnimationComplete) {
-      // Start immediately at 1 (red), then flash off/on/off/on/off
-      errorFlash.value = 1;
+      // 3 flashes: on-off-on-off-on-off (start visible, end hidden)
       errorFlash.value = withSequence(
-        // Already at 1, go to 0
+        withTiming(1, {duration: 0}), // Start immediately visible
         withTiming(0, {duration: ERROR_FLASH_DURATION}),
-        // Flash 2
         withTiming(1, {duration: ERROR_FLASH_DURATION}),
         withTiming(0, {duration: ERROR_FLASH_DURATION}),
-        // Flash 3
         withTiming(1, {duration: ERROR_FLASH_DURATION}),
         withTiming(0, {duration: ERROR_FLASH_DURATION}, () => {
           runOnJS(onErrorAnimationComplete)();

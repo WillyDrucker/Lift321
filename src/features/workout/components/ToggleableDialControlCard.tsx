@@ -89,6 +89,27 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
   const modeRef = useRef<DialMode>(mode);
   modeRef.current = mode;
 
+  // Track "acknowledged" errors - errors that existed while in a different mode
+  // This prevents carryover: if error was seen in wrong mode, don't flash when switching
+  const acknowledgedRepsError = useRef(false);
+  const acknowledgedWeightError = useRef(false);
+
+  // Synchronous error acknowledgment (runs during render, not in effect)
+  // If error exists but mode doesn't match, acknowledge it (mark as "seen in wrong mode")
+  if (hasRepsError && mode !== 'reps') {
+    acknowledgedRepsError.current = true;
+  }
+  if (hasWeightError && mode !== 'weight') {
+    acknowledgedWeightError.current = true;
+  }
+  // Clear acknowledgment when error is cleared (allows re-triggering)
+  if (!hasRepsError) {
+    acknowledgedRepsError.current = false;
+  }
+  if (!hasWeightError) {
+    acknowledgedWeightError.current = false;
+  }
+
   // ==========================================================================
   // EFFECTS - SYNC EXTERNAL CHANGES
   // ==========================================================================
@@ -128,6 +149,25 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
     }
   }, []);
 
+  // Handle button error animation completion - clear the error in context
+  const handleButtonErrorComplete = useCallback((index: number) => {
+    if (index === 0 && onRepsErrorAnimationComplete) {
+      onRepsErrorAnimationComplete();
+    } else if (index === 1 && onWeightErrorAnimationComplete) {
+      onWeightErrorAnimationComplete();
+    }
+  }, [onRepsErrorAnimationComplete, onWeightErrorAnimationComplete]);
+
+  // Handle dial error animation completion - acknowledge the error to prevent re-flash
+  const handleDialErrorComplete = useCallback(() => {
+    // Mark as acknowledged so it won't flash again until cleared and re-triggered
+    if (modeRef.current === 'reps') {
+      acknowledgedRepsError.current = true;
+    } else {
+      acknowledgedWeightError.current = true;
+    }
+  }, []);
+
 
   // ==========================================================================
   // COLOR FEEDBACK (REPS ONLY)
@@ -160,11 +200,11 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
 
   const getValueColor = mode === 'reps' ? getRepsColor : undefined;
 
-  // Error handling based on current mode
-  const hasError = mode === 'reps' ? hasRepsError : hasWeightError;
-  const onErrorAnimationComplete = mode === 'reps'
-    ? onRepsErrorAnimationComplete
-    : onWeightErrorAnimationComplete;
+  // Dial error: show only if error exists for current mode AND wasn't acknowledged
+  // Acknowledged = error existed while in wrong mode (carryover prevention)
+  const showDialError =
+    (mode === 'reps' && hasRepsError && !acknowledgedRepsError.current) ||
+    (mode === 'weight' && hasWeightError && !acknowledgedWeightError.current);
 
   // ==========================================================================
   // RENDER
@@ -195,13 +235,15 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
             ]}
             selectedIndex={mode === 'reps' ? 0 : 1}
             onSelect={(index) => setMode(index === 0 ? 'reps' : 'weight')}
+            errorStates={[hasRepsError, hasWeightError]}
+            onErrorAnimationComplete={handleButtonErrorComplete}
           />
         }
         getValueColor={getValueColor}
         hideButtons={false}
         compact={false}
-        hasError={hasError}
-        onErrorAnimationComplete={onErrorAnimationComplete}
+        hasError={showDialError}
+        onErrorAnimationComplete={handleDialErrorComplete}
       />
     </View>
   );

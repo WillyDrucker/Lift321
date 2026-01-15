@@ -25,7 +25,6 @@ import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {theme} from '@/theme';
 import {TopNavBar, Sidebar, BottomTabBar} from '@/components';
-import {GearIcon} from '@/components/icons';
 import type {WorkoutType} from '@/components/WorkoutCard';
 import type {MainStackParamList, TabParamList} from '@/navigation/types';
 import {calculateWorkoutDuration} from '@/utils/durationCalculator';
@@ -106,6 +105,7 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
           <TopNavBar
             onMenuPress={onMenuPress}
             onBackPress={onBackPress}
+            onGearPress={showWorkoutStatus ? () => {} : undefined}
           />
 
           {/* Workout Title Bar (body part name) */}
@@ -143,11 +143,6 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
           {/* Workout Settings Bar - only shown during active workout */}
           {showWorkoutStatus && (
             <View style={styles.workoutSettingsBar}>
-              {/* Gear Icon - Left aligned with hamburger menu */}
-              <View style={styles.gearIconContainer}>
-                <GearIcon width={24} height={24} color={theme.colors.textSecondary} />
-              </View>
-
               {/* Centered SETS display */}
               <View style={styles.statsGroupCentered}>
                 <Text style={styles.statusLabel}>SETS </Text>
@@ -284,13 +279,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginTop: -4, // Move up to 0dp from top
-  },
-  gearIconContainer: {
-    width: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: theme.spacing.s, // Space before TO GO label
   },
 
   workoutTitleText: {

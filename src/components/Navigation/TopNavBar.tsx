@@ -12,19 +12,20 @@ import React from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {theme} from '@/theme';
-import {HamburgerRegularThin, LeftChevron} from '@/components/icons';
+import {HamburgerRegularThin, LeftChevron, GearIcon} from '@/components/icons';
 
 // === TYPES ===
 
 export type TopNavBarProps = {
   onMenuPress: () => void;
   onBackPress?: () => void; // Optional back button
+  onGearPress?: () => void; // Optional gear icon on right side
 };
 
 // === COMPONENT ===
 
 export const TopNavBar: React.FC<TopNavBarProps> = React.memo(
-  ({onMenuPress, onBackPress}) => {
+  ({onMenuPress, onBackPress, onGearPress}) => {
     const insets = useSafeAreaInsets();
 
     return (
@@ -63,6 +64,22 @@ export const TopNavBar: React.FC<TopNavBarProps> = React.memo(
               </Pressable>
             )}
           </View>
+
+          {/* Right side - Gear Icon (optional) */}
+          {onGearPress && (
+            <Pressable
+              onPress={onGearPress}
+              style={({pressed}) => [
+                styles.gearButton,
+                pressed && styles.pressed,
+              ]}>
+              <GearIcon
+                width={theme.layout.topNav.menuIconSize}
+                height={theme.layout.topNav.menuIconSize}
+                color={theme.colors.textSecondary}
+              />
+            </Pressable>
+          )}
         </View>
       </>
     );
@@ -109,6 +126,10 @@ const styles = StyleSheet.create({
   },
 
   backButton: {
+    padding: 0,
+  },
+
+  gearButton: {
     padding: 0,
   },
 
