@@ -89,27 +89,6 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
   const modeRef = useRef<DialMode>(mode);
   modeRef.current = mode;
 
-  // Track "acknowledged" errors - errors that existed while in a different mode
-  // This prevents carryover: if error was seen in wrong mode, don't flash when switching
-  const acknowledgedRepsError = useRef(false);
-  const acknowledgedWeightError = useRef(false);
-
-  // Synchronous error acknowledgment (runs during render, not in effect)
-  // If error exists but mode doesn't match, acknowledge it (mark as "seen in wrong mode")
-  if (hasRepsError && mode !== 'reps') {
-    acknowledgedRepsError.current = true;
-  }
-  if (hasWeightError && mode !== 'weight') {
-    acknowledgedWeightError.current = true;
-  }
-  // Clear acknowledgment when error is cleared (allows re-triggering)
-  if (!hasRepsError) {
-    acknowledgedRepsError.current = false;
-  }
-  if (!hasWeightError) {
-    acknowledgedWeightError.current = false;
-  }
-
   // ==========================================================================
   // EFFECTS - SYNC EXTERNAL CHANGES
   // ==========================================================================
@@ -158,15 +137,18 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
     }
   }, [onRepsErrorAnimationComplete, onWeightErrorAnimationComplete]);
 
-  // Handle dial error animation completion - acknowledge the error to prevent re-flash
+  // Handle dial error animation completion - clear ALL errors in context
+  // This prevents the inactive button from flashing after the dial finishes
   const handleDialErrorComplete = useCallback(() => {
-    // Mark as acknowledged so it won't flash again until cleared and re-triggered
-    if (modeRef.current === 'reps') {
-      acknowledgedRepsError.current = true;
-    } else {
-      acknowledgedWeightError.current = true;
+    // Clear both errors so inactive button doesn't flash after dial
+    // User must press LOG SET again to trigger new errors
+    if (onRepsErrorAnimationComplete) {
+      onRepsErrorAnimationComplete();
     }
-  }, []);
+    if (onWeightErrorAnimationComplete) {
+      onWeightErrorAnimationComplete();
+    }
+  }, [onRepsErrorAnimationComplete, onWeightErrorAnimationComplete]);
 
 
   // ==========================================================================
@@ -200,11 +182,11 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
 
   const getValueColor = mode === 'reps' ? getRepsColor : undefined;
 
-  // Dial error: show only if error exists for current mode AND wasn't acknowledged
-  // Acknowledged = error existed while in wrong mode (carryover prevention)
+  // Dial error: show if error exists for current mode
+  // Simple logic: if active dial has error, flash the dial
   const showDialError =
-    (mode === 'reps' && hasRepsError && !acknowledgedRepsError.current) ||
-    (mode === 'weight' && hasWeightError && !acknowledgedWeightError.current);
+    (mode === 'reps' && hasRepsError) ||
+    (mode === 'weight' && hasWeightError);
 
   // ==========================================================================
   // RENDER
@@ -222,7 +204,10 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
           <SegmentedControl
             options={[
               <View key="reps" style={styles.repsOption}>
-                <Text style={[styles.repsText, mode === 'reps' && styles.repsTextActive]}>REPS</Text>
+                <View style={styles.repsLabelStack}>
+                  <Text style={[styles.repsText, mode === 'reps' && styles.repsTextActive]}>REPS</Text>
+                  <Text style={styles.repsLabelSpacer}>(LBS)</Text>
+                </View>
                 <Text style={[styles.repsValue, {color: getRepsColor(displayReps)}]}>{displayReps}</Text>
               </View>,
               <View key="weight" style={styles.weightOption}>
@@ -235,7 +220,12 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
             ]}
             selectedIndex={mode === 'reps' ? 0 : 1}
             onSelect={(index) => setMode(index === 0 ? 'reps' : 'weight')}
-            errorStates={[hasRepsError, hasWeightError]}
+            errorStates={[
+              // REPS button: flash only if dial is NOT showing error AND reps has error AND not on reps mode
+              hasRepsError && mode !== 'reps' && !showDialError,
+              // WEIGHT button: flash only if dial is NOT showing error AND weight has error AND not on weight mode
+              hasWeightError && mode !== 'weight' && !showDialError
+            ]}
             onErrorAnimationComplete={handleButtonErrorComplete}
           />
         }
@@ -260,7 +250,13 @@ const styles = StyleSheet.create({
   repsOption: {
     flexDirection: 'row',
     alignItems: 'center',
+    alignSelf: 'stretch',
+    justifyContent: 'flex-end',
+    paddingRight: 16,
     gap: 8,
+  },
+  repsLabelStack: {
+    alignItems: 'center',
   },
   repsText: {
     fontSize: theme.typography.fontSize.m,
@@ -272,17 +268,30 @@ const styles = StyleSheet.create({
   repsTextActive: {
     color: theme.colors.textPrimary,
   },
+  repsLabelSpacer: {
+    fontSize: theme.typography.fontSize.m,
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: theme.typography.fontWeight.bold,
+    textTransform: 'uppercase',
+    marginTop: -4,
+    opacity: 0, // Invisible but takes same space as (LBS)
+  },
   repsValue: {
     fontSize: 32,
     lineHeight: 32,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
     includeFontPadding: false,
+    width: 58, // Fixed width for 3 digits (100) - value grows from left
+    textAlign: 'left',
     // Color is set dynamically based on getRepsColor
   },
   weightOption: {
     flexDirection: 'row',
     alignItems: 'center',
+    alignSelf: 'stretch',
+    justifyContent: 'flex-end',
+    paddingRight: 16,
     gap: 8,
   },
   weightLabelStack: {
@@ -305,6 +314,8 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.pureWhite,
     includeFontPadding: false,
+    width: 58, // Fixed width for 3 digits (999) - value grows from left
+    textAlign: 'left',
   },
   lbsText: {
     fontSize: theme.typography.fontSize.m,

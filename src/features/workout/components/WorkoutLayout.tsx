@@ -27,7 +27,6 @@ import {theme} from '@/theme';
 import {TopNavBar, Sidebar, BottomTabBar} from '@/components';
 import type {WorkoutType} from '@/components/WorkoutCard';
 import type {MainStackParamList, TabParamList} from '@/navigation/types';
-import {calculateWorkoutDuration} from '@/utils/durationCalculator';
 import {usePlan} from '@/features/plans/context/PlanContext';
 
 // ============================================================================
@@ -85,12 +84,7 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
   // Get selected plan from context
   const {selectedPlan} = usePlan();
 
-  // Calculate workout status for settings bar
-  const currentSetDisplay = currentSetIndex + 1;
-  const remainingSets = totalSets - currentSetIndex;
-  const remainingMinutes = remainingSets > 0
-    ? calculateWorkoutDuration({totalSets: remainingSets, restMinutesPerSet}).totalMinutes
-    : 0;
+  // Show workout-specific UI elements when in active workout
   const showWorkoutStatus = totalSets > 0;
   return (
     <>
@@ -137,32 +131,14 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
             )}
           </View>
 
-          {/* Green accent line - only shown when no settings bar */}
-          {!showWorkoutStatus && <View style={styles.greenAccentLine} />}
-
-          {/* Workout Settings Bar - only shown during active workout */}
-          {showWorkoutStatus && (
-            <View style={styles.workoutSettingsBar}>
-              {/* Centered SETS display */}
-              <View style={styles.statsGroupCentered}>
-                <Text style={styles.statusLabel}>SETS </Text>
-                <Text style={styles.statusValueLarge}>{remainingSets}</Text>
-              </View>
-
-              {/* Right-aligned MINS */}
-              <View style={styles.statsGroupRight}>
-                <Text style={styles.statusLabel}>MINS </Text>
-                <Text style={styles.statusValueLarge}>{remainingMinutes}</Text>
-              </View>
-            </View>
-          )}
+          {/* Green accent line */}
+          <View style={styles.greenAccentLine} />
         </View>
 
         {/* Dynamic Content Area - this is where transitions happen */}
         <View style={[
           styles.contentArea,
           {paddingTop: insets.top + theme.layout.topNav.height + 41}, // nav + title bar(40) + green line(1)
-          showWorkoutStatus && {paddingTop: insets.top + theme.layout.topNav.height + 40 + 31}, // nav + title bar + settings bar
         ]}>
           {children}
         </View>
@@ -233,52 +209,8 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   greenAccentLine: {
-    height: 1, // 1dp green line when no settings bar
+    height: 1, // 1dp green line
     backgroundColor: theme.colors.actionSuccess,
-  },
-
-  // === WORKOUT SETTINGS BAR ===
-  workoutSettingsBar: {
-    height: 31, // 4dp gap from text to green line
-    backgroundColor: theme.colors.pureBlack,
-    borderBottomWidth: theme.layout.border.thin,
-    borderBottomColor: theme.colors.actionSuccess, // Green scroll bar
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: theme.layout.topNav.paddingHorizontal, // Align with TopNavBar (16dp)
-  },
-  statusLabel: {
-    fontSize: theme.layout.exerciseCard.setInfoFontSize,
-    fontFamily: theme.typography.fontFamily.primary,
-    fontWeight: 'bold',
-    color: theme.colors.backgroundTertiary,
-    includeFontPadding: false,
-  },
-  statusValue: {
-    fontSize: theme.layout.exerciseCard.setInfoFontSize,
-    fontFamily: theme.typography.fontFamily.primary,
-    fontWeight: 'bold',
-    color: theme.colors.actionSuccess,
-    includeFontPadding: false,
-  },
-  statusValueLarge: {
-    fontSize: 32,
-    fontFamily: theme.typography.fontFamily.primary,
-    fontWeight: 'bold',
-    color: theme.colors.actionSuccess,
-    includeFontPadding: false,
-  },
-  statsGroupCentered: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    marginTop: -4, // Move up to 0dp from top
-  },
-  statsGroupRight: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginTop: -4, // Move up to 0dp from top
   },
 
   workoutTitleText: {

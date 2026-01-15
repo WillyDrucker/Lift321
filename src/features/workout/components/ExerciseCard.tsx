@@ -254,7 +254,7 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
       <BottomSheet
         visible={exerciseSelectorVisible}
         onClose={handleExerciseSelectorClose}
-        topOffset={64}
+        topOffset={50}
         maxHeightPercent={95}
       >
         {alternateExercises.map((exercise, index) => {

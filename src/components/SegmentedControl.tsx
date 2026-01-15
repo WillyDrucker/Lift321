@@ -160,7 +160,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: theme.colors.backgroundPrimary,
     borderRadius: theme.spacing.s,
-    marginBottom: theme.spacing.s,
   },
   segment: {
     flex: 1,

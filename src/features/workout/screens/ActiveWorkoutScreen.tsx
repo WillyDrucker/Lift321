@@ -20,11 +20,13 @@ import {theme} from '@/theme';
 import {styles} from './ActiveWorkoutScreen.styles';
 import type {RootStackScreenProps} from '@/navigation/types';
 import {getExercisesForWorkout, type SessionType} from '@/services/exerciseService';
+import {calculateWorkoutDuration} from '@/utils/durationCalculator';
 import {WorkoutLayout} from '@/features/workout/components/WorkoutLayout';
 import {ExerciseSetRow} from '@/features/workout/components/ExerciseSetRow';
 import {WorkoutActionCard} from '@/features/workout/components/WorkoutActionCard';
 import {ExerciseCard} from '@/features/workout/components/ExerciseCard';
 import {ToggleableDialControlCard} from '@/features/workout/components/ToggleableDialControlCard';
+import {ActiveWorkoutStatusCard} from '@/features/workout/components/ActiveWorkoutStatusCard';
 import {ActionButton} from '@/components';
 import {PencilIcon} from '@/components/icons';
 import {useActiveWorkout} from '@/features/workout/context/ActiveWorkoutContext';
@@ -186,6 +188,15 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
     };
   }, [activeSetKey, orderedSetKeys]);
 
+  // Calculate remaining sets and time for status card
+  const {remainingSets, remainingMinutes} = useMemo(() => {
+    const remaining = globalTotalSets - globalSetIndex;
+    const minutes = remaining > 0
+      ? calculateWorkoutDuration({totalSets: remaining, restMinutesPerSet: restMinutes}).totalMinutes
+      : 0;
+    return {remainingSets: remaining, remainingMinutes: minutes};
+  }, [globalSetIndex, globalTotalSets, restMinutes]);
+
   // ==========================================================================
   // EVENT HANDLERS
   // ==========================================================================
@@ -292,7 +303,13 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
 
-          {/* 1. Exercise Card (Collapsible) */}
+          {/* 1. Workout Status Card */}
+          <ActiveWorkoutStatusCard
+            remainingSets={remainingSets}
+            remainingMinutes={remainingMinutes}
+          />
+
+          {/* 2. Exercise Card (Collapsible) */}
           <ExerciseCard
             exerciseName={currentExerciseName}
             currentSet={currentSet}
