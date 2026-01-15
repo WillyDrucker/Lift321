@@ -45,6 +45,10 @@ const TickItem = memo<TickItemProps>(({ index, tickSpacing, valuePerTick }) => {
   const isMajor = tickValue % 10 === 0;
   const isMedium = tickValue % 5 === 0 && !isMajor;
 
+  // Calculate label offset to center it on the tick mark
+  // Label width is 30px, so we need to shift left by (tickSpacing/2 - 15)
+  const labelLeftOffset = (tickSpacing / 2) - 15;
+
   return (
     <View style={[dialStyles.tickContainer, { width: tickSpacing }]}>
       <View
@@ -53,8 +57,8 @@ const TickItem = memo<TickItemProps>(({ index, tickSpacing, valuePerTick }) => {
           isMajor ? dialStyles.majorTick : isMedium ? dialStyles.mediumTick : dialStyles.minorTick,
         ]}
       />
-      {isMajor && (
-        <Text style={dialStyles.tickLabel}>{tickValue}</Text>
+      {(isMajor || isMedium) && (
+        <Text style={[dialStyles.tickLabel, { left: labelLeftOffset }]}>{tickValue}</Text>
       )}
     </View>
   );

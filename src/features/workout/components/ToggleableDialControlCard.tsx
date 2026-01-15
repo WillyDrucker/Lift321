@@ -41,7 +41,7 @@ type ToggleableDialControlCardProps = {
 const REPS_CONFIG: DialConfig = {
   minValue: 0,
   maxValue: 30,
-  tickSpacing: 30,
+  tickSpacing: 15,
   valuePerTick: 1,
   buttonIncrement: 1,
   buttonIncrements: [1],

@@ -114,6 +114,7 @@ export const dialStyles = StyleSheet.create({
     height: DIAL_DIMENSIONS.mediumTickHeight,
     backgroundColor: theme.colors.textSecondary,
     opacity: 0.6,
+    transform: [{translateY: -4}],
   },
   majorTick: {
     height: DIAL_DIMENSIONS.majorTickHeight - 4,
