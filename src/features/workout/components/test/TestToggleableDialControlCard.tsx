@@ -1,19 +1,18 @@
 // ==========================================================================
-// TOGGLEABLE DIAL CONTROL CARD COMPONENT
+// TEST TOGGLEABLE DIAL CONTROL CARD COMPONENT
 //
-// Single full-width dial control that toggles between reps and weight modes.
-// Preserves both values independently and provides mode-specific configuration.
+// Modified toggleable dial for testing layout changes.
+// Uses TestDialControlCard with adjusted spacing.
 //
-// Dependencies: DialControlCard, theme tokens
-// Used by: ActiveWorkoutScreen
+// NOTE: This is a TEST file - will be deleted after testing.
 // ==========================================================================
 
 import React, {useState, useCallback, useEffect, useMemo, useRef} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {theme} from '@/theme';
-import {DialControlCard} from './DialControlCard';
+import {TestDialControlCard} from './TestDialControlCard';
 import {SegmentedControl} from '@/components';
-import type {DialConfig} from './DialControlCard.types';
+import type {DialConfig} from '../DialControlCard.types';
 
 // ============================================================================
 // TYPES
@@ -21,13 +20,12 @@ import type {DialConfig} from './DialControlCard.types';
 
 type DialMode = 'reps' | 'weight';
 
-type ToggleableDialControlCardProps = {
+type TestToggleableDialControlCardProps = {
   initialReps?: number;
   initialWeight?: number;
   targetReps?: number;
   onRepsChange: (reps: number) => void;
   onWeightChange: (weight: number) => void;
-  // Error handling props
   hasRepsError?: boolean;
   hasWeightError?: boolean;
   onRepsErrorAnimationComplete?: () => void;
@@ -35,7 +33,7 @@ type ToggleableDialControlCardProps = {
 };
 
 // ============================================================================
-// CONFIGURATION - Constants to prevent re-creation on every render
+// CONFIGURATION
 // ============================================================================
 
 const REPS_CONFIG: DialConfig = {
@@ -64,7 +62,7 @@ const WEIGHT_CONFIG: DialConfig = {
 // COMPONENT
 // ============================================================================
 
-export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps> = ({
+export const TestToggleableDialControlCard: React.FC<TestToggleableDialControlCardProps> = ({
   initialReps = 10,
   initialWeight = 0,
   targetReps = 10,
@@ -75,23 +73,14 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
   onRepsErrorAnimationComplete,
   onWeightErrorAnimationComplete,
 }) => {
-  // ==========================================================================
-  // STATE
-  // ==========================================================================
-
   const [mode, setMode] = useState<DialMode>('weight');
   const [localReps, setLocalReps] = useState(initialReps);
   const [localWeight, setLocalWeight] = useState(initialWeight);
-  const [displayReps, setDisplayReps] = useState(initialReps); // Real-time value during dragging
-  const [displayWeight, setDisplayWeight] = useState(initialWeight); // Real-time value during dragging
+  const [displayReps, setDisplayReps] = useState(initialReps);
+  const [displayWeight, setDisplayWeight] = useState(initialWeight);
 
-  // Ref to track current mode for callbacks (avoids stale closure issues)
   const modeRef = useRef<DialMode>(mode);
   modeRef.current = mode;
-
-  // ==========================================================================
-  // EFFECTS - SYNC EXTERNAL CHANGES
-  // ==========================================================================
 
   useEffect(() => {
     setLocalReps(initialReps);
@@ -102,10 +91,6 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
     setLocalWeight(initialWeight);
     setDisplayWeight(initialWeight);
   }, [initialWeight]);
-
-  // ==========================================================================
-  // HANDLERS
-  // ==========================================================================
 
   const handleRepsChange = useCallback((reps: number) => {
     setLocalReps(reps);
@@ -120,7 +105,6 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
   }, [onWeightChange]);
 
   const handleDisplayValueChange = useCallback((value: number) => {
-    // Use ref to get current mode (avoids stale closure during mode transitions)
     if (modeRef.current === 'reps') {
       setDisplayReps(value);
     } else {
@@ -128,7 +112,6 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
     }
   }, []);
 
-  // Handle button error animation completion - clear the error in context
   const handleButtonErrorComplete = useCallback((index: number) => {
     if (index === 0 && onRepsErrorAnimationComplete) {
       onRepsErrorAnimationComplete();
@@ -137,11 +120,7 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
     }
   }, [onRepsErrorAnimationComplete, onWeightErrorAnimationComplete]);
 
-  // Handle dial error animation completion - clear ALL errors in context
-  // This prevents the inactive button from flashing after the dial finishes
   const handleDialErrorComplete = useCallback(() => {
-    // Clear both errors so inactive button doesn't flash after dial
-    // User must press LOG SET again to trigger new errors
     if (onRepsErrorAnimationComplete) {
       onRepsErrorAnimationComplete();
     }
@@ -149,11 +128,6 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
       onWeightErrorAnimationComplete();
     }
   }, [onRepsErrorAnimationComplete, onWeightErrorAnimationComplete]);
-
-
-  // ==========================================================================
-  // COLOR FEEDBACK (REPS ONLY)
-  // ==========================================================================
 
   const getRepsColor = useCallback((reps: number) => {
     const diff = Math.abs(reps - targetReps);
@@ -163,10 +137,6 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
     if (diff <= 10) return theme.colors.actionWarning;
     return theme.colors.pureWhite;
   }, [targetReps]);
-
-  // ==========================================================================
-  // COMPUTED VALUES - MEMOIZED TO PREVENT UNNECESSARY RE-RENDERS
-  // ==========================================================================
 
   const activeConfig = useMemo(() =>
     mode === 'reps' ? REPS_CONFIG : WEIGHT_CONFIG,
@@ -182,19 +152,13 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
 
   const getValueColor = mode === 'reps' ? getRepsColor : undefined;
 
-  // Dial error: show if error exists for current mode
-  // Simple logic: if active dial has error, flash the dial
   const showDialError =
     (mode === 'reps' && hasRepsError) ||
     (mode === 'weight' && hasWeightError);
 
-  // ==========================================================================
-  // RENDER
-  // ==========================================================================
-
   return (
     <View style={styles.container}>
-      <DialControlCard
+      <TestDialControlCard
         key={mode}
         value={activeValue}
         onChange={handleChange}
@@ -221,9 +185,7 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
             selectedIndex={mode === 'reps' ? 0 : 1}
             onSelect={(index) => setMode(index === 0 ? 'reps' : 'weight')}
             errorStates={[
-              // REPS button: flash only if dial is NOT showing error AND reps has error AND not on reps mode
               hasRepsError && mode !== 'reps' && !showDialError,
-              // WEIGHT button: flash only if dial is NOT showing error AND weight has error AND not on weight mode
               hasWeightError && mode !== 'weight' && !showDialError
             ]}
             onErrorAnimationComplete={handleButtonErrorComplete}
@@ -245,7 +207,7 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
 
 const styles = StyleSheet.create({
   container: {
-    // No margin needed - buttons and DialControlCard have their own margins
+    // No extra margin - controlled by parent
   },
   repsOption: {
     flexDirection: 'row',
@@ -274,7 +236,7 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeight.bold,
     textTransform: 'uppercase',
     marginTop: -4,
-    opacity: 0, // Invisible but takes same space as (LBS)
+    opacity: 0,
   },
   repsValue: {
     fontSize: 32,
@@ -282,9 +244,8 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
     includeFontPadding: false,
-    width: 58, // Fixed width for 3 digits (100) - value grows from left
+    width: 58,
     textAlign: 'left',
-    // Color is set dynamically based on getRepsColor
   },
   weightOption: {
     flexDirection: 'row',
@@ -314,7 +275,7 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.pureWhite,
     includeFontPadding: false,
-    width: 58, // Fixed width for 3 digits (999) - value grows from left
+    width: 58,
     textAlign: 'left',
   },
   lbsText: {

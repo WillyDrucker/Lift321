@@ -10,6 +10,7 @@
 
 import React, {useState, useCallback, useMemo} from 'react';
 import {View, StyleSheet, Text, TouchableOpacity} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {theme} from '@/theme';
 import {BarbellIcon, DumbbellIcon, EZBarIcon, FixedBarbellIcon, FixedBarbellEZIcon, PinMachineIcon, CableMachineIcon, PlateLoadedIcon, SmithMachineIcon, ResistanceBandIcon, BodyweightIcon} from '@/components/icons';
 import {BottomSheet} from '@/components';
@@ -71,6 +72,13 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
   muscleGroup = 'Major1',
   day = 'Monday',
 }) => {
+  // Get safe area insets to calculate correct bottom sheet top offset
+  const insets = useSafeAreaInsets();
+
+  // Calculate topOffset to match WorkoutLayout navigation chrome:
+  // insets.top + topNav.height + titleBar(40) + greenLine(1)
+  const bottomSheetTopOffset = insets.top + theme.layout.topNav.height + 41;
+
   const [exerciseSelectorVisible, setExerciseSelectorVisible] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState(exerciseName);
   const [selectedColorCode, setSelectedColorCode] = useState<string>('cc1');
@@ -254,7 +262,7 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
       <BottomSheet
         visible={exerciseSelectorVisible}
         onClose={handleExerciseSelectorClose}
-        topOffset={50}
+        topOffset={bottomSheetTopOffset}
         maxHeightPercent={95}
       >
         {alternateExercises.map((exercise, index) => {

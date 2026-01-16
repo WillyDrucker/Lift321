@@ -9,7 +9,7 @@
 // Used by: WorkoutOverviewScreen, ActiveWorkoutScreen
 // ==========================================================================
 
-import React, {type ReactNode} from 'react';
+import React, {type ReactNode, useState, useCallback} from 'react';
 import {
   SafeAreaView,
   StatusBar,
@@ -49,9 +49,20 @@ type WorkoutLayoutProps = {
   sidebarVisible: boolean;
   onSidebarClose: () => void;
   onSidebarSelect: (option: 'profile' | 'settings' | 'help' | 'logout') => void;
-  onBackPress: () => void;
+  onBackPress?: () => void;
   onMenuPress: () => void;
   navigation: WorkoutLayoutNavigation;
+  navBarCenterContent?: ReactNode; // Optional center content for TopNavBar
+  navBarLeftContent?: ReactNode; // Optional custom left content for TopNavBar
+  hideNavGear?: boolean; // Hide the gear icon in the navigation bar
+  titleBarExtraHeight?: number; // Extra height to add to title bar
+  showTopGreenLine?: boolean; // Show green line at top of title bar
+  hidePlanImage?: boolean; // Hide the plan image (for custom rendering)
+  titleMaxWidth?: number; // Max width for title text (allows wrapping)
+  dynamicTitleHeight?: boolean; // Enable dynamic title bar height based on text wrapping
+  onTitleBarHeightChange?: (height: number) => void; // Callback when title bar height changes
+  wrappedTitle?: boolean; // Add extra height (32dp) when title wraps to second line
+  titleAnchorTop?: boolean; // Anchor title to top (for medium-length titles when MINS is pushed down)
 };
 
 // ============================================================================
@@ -77,12 +88,37 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
   onBackPress,
   onMenuPress,
   navigation,
+  navBarCenterContent,
+  navBarLeftContent,
+  hideNavGear = false,
+  titleBarExtraHeight = 0,
+  showTopGreenLine = false,
+  hidePlanImage = false,
+  titleMaxWidth,
+  dynamicTitleHeight = false,
+  onTitleBarHeightChange,
+  wrappedTitle = false,
+  titleAnchorTop = false,
 }) => {
   // Get safe area insets for dynamic positioning
   const insets = useSafeAreaInsets();
 
   // Get selected plan from context
   const {selectedPlan} = usePlan();
+
+  // Extra height for wrapped title (30dp for second line + top offset)
+  const wrappedTitleExtra = wrappedTitle ? 30 : 0;
+
+  // Track dynamic title bar height
+  const [measuredTitleHeight, setMeasuredTitleHeight] = useState(40 + titleBarExtraHeight + wrappedTitleExtra);
+
+  const handleTitleBarLayout = useCallback((event: { nativeEvent: { layout: { height: number } } }) => {
+    const height = event.nativeEvent.layout.height;
+    if (dynamicTitleHeight && height !== measuredTitleHeight) {
+      setMeasuredTitleHeight(height);
+      onTitleBarHeightChange?.(height);
+    }
+  }, [dynamicTitleHeight, measuredTitleHeight, onTitleBarHeightChange]);
 
   // Show workout-specific UI elements when in active workout
   const showWorkoutStatus = totalSets > 0;
@@ -95,19 +131,52 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
       />
       <SafeAreaView style={styles.container}>
         {/* Fixed Navigation Area */}
-        <View style={styles.navigationArea}>
+        <View style={[styles.navigationArea, wrappedTitle && {overflow: 'visible'}]}>
           <TopNavBar
             onMenuPress={onMenuPress}
             onBackPress={onBackPress}
-            onGearPress={showWorkoutStatus ? () => {} : undefined}
+            onGearPress={showWorkoutStatus && !hideNavGear ? () => {} : undefined}
+            centerContent={navBarCenterContent}
+            leftContent={navBarLeftContent}
           />
 
           {/* Workout Title Bar (body part name) */}
-          <View style={[styles.workoutTitleBar, {marginTop: insets.top + theme.layout.topNav.height}]}>
-            <Text style={styles.workoutTitleText}>{workoutType}</Text>
+          <View
+            style={[
+              styles.workoutTitleBar,
+              {
+                marginTop: insets.top + theme.layout.topNav.height,
+                ...(dynamicTitleHeight
+                  ? {minHeight: 40 + titleBarExtraHeight + wrappedTitleExtra, paddingBottom: 4}
+                  : {height: 40 + titleBarExtraHeight + wrappedTitleExtra}
+                ),
+                ...(wrappedTitle && {overflow: 'visible'}),
+              }
+            ]}
+            onLayout={dynamicTitleHeight ? handleTitleBarLayout : undefined}
+          >
+            {/* Green line at top of title bar (optional) */}
+            {showTopGreenLine && <View style={[styles.greenAccentLine, {position: 'absolute', top: 0, left: 0, right: 0}]} />}
+            {wrappedTitle ? (
+              <View style={{position: 'absolute', top: 23, left: theme.layout.topNav.paddingHorizontal, width: titleMaxWidth}}>
+                <Text style={[styles.workoutTitleText, {lineHeight: 30}]} numberOfLines={2}>{workoutType}</Text>
+              </View>
+            ) : titleAnchorTop ? (
+              <Text style={[
+                styles.workoutTitleText,
+                {position: 'absolute', top: 20, left: theme.layout.topNav.paddingHorizontal},
+                titleMaxWidth && {maxWidth: titleMaxWidth},
+              ]}>{workoutType}</Text>
+            ) : (
+              <Text style={[
+                styles.workoutTitleText,
+                titleBarExtraHeight > 0 && {position: 'absolute', bottom: -1, left: theme.layout.topNav.paddingHorizontal},
+                titleMaxWidth && {maxWidth: titleMaxWidth},
+              ]}>{workoutType}</Text>
+            )}
 
             {/* Plan Image - shown during active workout */}
-            {showWorkoutStatus && (
+            {showWorkoutStatus && !hidePlanImage && (
               <Image source={selectedPlan.image} style={styles.planImage} resizeMode="contain" />
             )}
 
@@ -138,7 +207,7 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
         {/* Dynamic Content Area - this is where transitions happen */}
         <View style={[
           styles.contentArea,
-          {paddingTop: insets.top + theme.layout.topNav.height + 41}, // nav + title bar(40) + green line(1)
+          {paddingTop: insets.top + theme.layout.topNav.height + (dynamicTitleHeight ? measuredTitleHeight : 40 + titleBarExtraHeight + wrappedTitleExtra) + 1}, // nav + title bar + green line(1)
         ]}>
           {children}
         </View>

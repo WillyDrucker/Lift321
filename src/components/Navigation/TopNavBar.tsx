@@ -20,12 +20,14 @@ export type TopNavBarProps = {
   onMenuPress: () => void;
   onBackPress?: () => void; // Optional back button
   onGearPress?: () => void; // Optional gear icon on right side
+  centerContent?: React.ReactNode; // Optional center content (e.g., title text)
+  leftContent?: React.ReactNode; // Optional custom left content (replaces back button)
 };
 
 // === COMPONENT ===
 
 export const TopNavBar: React.FC<TopNavBarProps> = React.memo(
-  ({onMenuPress, onBackPress, onGearPress}) => {
+  ({onMenuPress, onBackPress, onGearPress, centerContent, leftContent}) => {
     const insets = useSafeAreaInsets();
 
     return (
@@ -49,8 +51,10 @@ export const TopNavBar: React.FC<TopNavBarProps> = React.memo(
               />
             </Pressable>
 
-            {/* Back Button - Optional, 16dp from hamburger */}
-            {onBackPress && (
+            {/* Custom left content or Back Button */}
+            {leftContent ? (
+              <View style={styles.backButton}>{leftContent}</View>
+            ) : onBackPress ? (
               <Pressable
                 onPress={onBackPress}
                 style={({pressed}) => [
@@ -62,8 +66,15 @@ export const TopNavBar: React.FC<TopNavBarProps> = React.memo(
                   color={theme.colors.textPrimary}
                 />
               </Pressable>
-            )}
+            ) : null}
           </View>
+
+          {/* Center content (optional) */}
+          {centerContent && (
+            <View style={styles.centerContainer}>
+              {centerContent}
+            </View>
+          )}
 
           {/* Right side - Gear Icon (optional) */}
           {onGearPress && (
@@ -119,6 +130,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: theme.spacing.m, // Standard gap between navigation icons
+  },
+
+  centerContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    pointerEvents: 'none', // Allow taps to pass through to buttons
   },
 
   menuButton: {

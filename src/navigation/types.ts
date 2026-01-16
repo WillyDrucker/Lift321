@@ -61,6 +61,17 @@ export type MainStackParamList = {
     };
     day?: string;
   };
+  TestLayout: {
+    workoutType: WorkoutType;
+    sessionType: SessionType;
+    planFocus: 'strength' | 'balanced' | 'growth';
+    selectedEquipment: Set<string>;
+    weekProgress: {
+      current: number;
+      total: number;
+    };
+    day?: string;
+  };
   WorkoutList: undefined;
   WorkoutSession: {workoutId: string};
   PlanList: undefined;

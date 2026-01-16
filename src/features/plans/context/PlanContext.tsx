@@ -99,6 +99,16 @@ const PLANS: PlanData[] = [
   },
   // User Plans
   {
+    id: 'debbie-d',
+    name: 'Debbie D.',
+    displayName: 'DEBBIE D.',
+    displayPrefix: '',
+    displaySuffix: 'DEBBIE D.',
+    shortName: 'DEBBIE',
+    image: require('@/assets/images/plans/debbie-d-plan.png'),
+    category: 'user',
+  },
+  {
     id: 'jax-mercer',
     name: 'Jax Mercer',
     displayName: 'JAX MERCER',

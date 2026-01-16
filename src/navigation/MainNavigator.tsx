@@ -20,6 +20,7 @@ import {DevToolsScreen} from '@/features/main/screens/DevToolsScreen';
 import {BodyPartSelectorScreen} from '@/features/workout/screens/BodyPartSelectorScreen';
 import {WorkoutOverviewScreen} from '@/features/workout/screens/WorkoutOverviewScreen';
 import {ActiveWorkoutScreen} from '@/features/workout/screens/ActiveWorkoutScreen';
+import {TestLayoutScreen} from '@/features/workout/screens/TestLayoutScreen';
 import {ActiveWorkoutProvider} from '@/features/workout/context/ActiveWorkoutContext';
 import {PlanProvider} from '@/features/plans/context/PlanContext';
 import type {MainStackParamList} from './types';
@@ -65,6 +66,7 @@ export const MainNavigator: React.FC<MainNavigatorProps> = () => {
         <Stack.Screen name="BodyPartSelector" component={BodyPartSelectorScreen} />
         <Stack.Screen name="WorkoutOverview" component={WorkoutOverviewScreen} />
         <Stack.Screen name="ActiveWorkout" component={ActiveWorkoutScreen} />
+        <Stack.Screen name="TestLayout" component={TestLayoutScreen} />
         </Stack.Navigator>
       </ActiveWorkoutProvider>
     </PlanProvider>

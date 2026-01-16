@@ -378,6 +378,23 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
             </View>
           )}
 
+          {/* TEST LAYOUT Button - Navigate to experimental sandbox */}
+          <View style={styles.finishButtonContainer}>
+             <ActionButton
+                text="TEST LAYOUT"
+                onPress={() => navigation.navigate('TestLayout', {
+                  workoutType,
+                  sessionType,
+                  planFocus: route.params.planFocus,
+                  selectedEquipment: route.params.selectedEquipment,
+                  weekProgress: route.params.weekProgress,
+                  day: workoutDay,
+                })}
+                style={{backgroundColor: theme.colors.actionDanger}}
+                textStyle={styles.finishButtonText}
+            />
+          </View>
+
         </ScrollView>
     </WorkoutLayout>
   );
