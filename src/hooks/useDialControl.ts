@@ -202,7 +202,12 @@ export const useDialControl = (config: UseDialControlConfig): UseDialControlRetu
     const scrollX = event.nativeEvent.contentOffset.x;
     const currentValue = Math.round(scrollX / tickSpacing);
     const clampedValue = Math.max(minValue, Math.min(maxValue, currentValue));
-    setDisplayValue(clampedValue);
+
+    // Only update if value actually changed to prevent excessive re-renders
+    if (clampedValue !== currentValueRef.current) {
+      currentValueRef.current = clampedValue;
+      setDisplayValue(clampedValue);
+    }
   }, [tickSpacing, minValue, maxValue]);
 
   // === LAYOUT HANDLER ===
