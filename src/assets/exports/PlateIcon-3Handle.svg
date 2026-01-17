@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1000" height="1000" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 45lb Bumper Plate with 3 cut-out handles (120 degrees apart) -->
+
+  <!-- Outer ring -->
+  <circle
+    cx="500"
+    cy="500"
+    r="465"
+    stroke="#FFFFFF"
+    stroke-width="60"
+    fill="none"
+  />
+
+  <!-- Center hole (for barbell) -->
+  <circle
+    cx="500"
+    cy="500"
+    r="120"
+    stroke="#FFFFFF"
+    stroke-width="50"
+    fill="none"
+  />
+
+  <!-- Handle cutouts - 3 evenly spaced (120 degrees apart) -->
+  <!-- Top handle -->
+  <path
+    d="M430 160 L430 270 C430 295 460 320 500 320 C540 320 570 295 570 270 L570 160"
+    stroke="#FFFFFF"
+    stroke-width="40"
+    stroke-linecap="round"
+    fill="none"
+  />
+
+  <!-- Bottom-right handle (120 degrees) -->
+  <path
+    d="M734 687 L654 607 C636 589 600 594 575 632 C550 670 555 706 573 724 L653 804"
+    stroke="#FFFFFF"
+    stroke-width="40"
+    stroke-linecap="round"
+    fill="none"
+  />
+
+  <!-- Bottom-left handle (240 degrees) -->
+  <path
+    d="M266 687 L346 607 C364 589 400 594 425 632 C450 670 445 706 427 724 L347 804"
+    stroke="#FFFFFF"
+    stroke-width="40"
+    stroke-linecap="round"
+    fill="none"
+  />
+</svg>

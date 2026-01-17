@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1000" height="1000" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 12-Sided Hex Bumper Plate - flat side at top, small center hole -->
+
+  <!-- Outer 12-sided shape (dodecagon) - flat edge at top -->
+  <path
+    d="M370 30
+       L630 30
+       L836 134
+       L970 340
+       L970 660
+       L836 866
+       L630 970
+       L370 970
+       L164 866
+       L30 660
+       L30 340
+       L164 134
+       Z"
+    stroke="#FFFFFF"
+    stroke-width="55"
+    stroke-linejoin="round"
+    fill="none"
+  />
+
+  <!-- Center hole (for barbell) -->
+  <circle
+    cx="500"
+    cy="500"
+    r="60"
+    stroke="#FFFFFF"
+    stroke-width="35"
+    fill="none"
+  />
+</svg>

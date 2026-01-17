@@ -1,9 +1,8 @@
 // ==========================================================================
-// EXERCISE SET ROW COMPONENT (DISPLAY ONLY / EDIT MODE)
+// EXERCISE SET ROW COMPONENT
 //
-// Read-only row for a single exercise set.
+// Display-only row for a single exercise set.
 // Displays weight, reps, and completion status.
-// In Edit Mode, allows selection and deletion.
 //
 // Dependencies: theme tokens
 // Used by: ActiveWorkoutScreen
@@ -16,10 +15,8 @@ import {
   StyleSheet,
   Image,
   ImageSourcePropType,
-  TouchableOpacity,
 } from 'react-native';
 import {theme} from '@/theme';
-import {TrashIcon} from '@/components/icons';
 
 // ============================================================================
 // TYPES
@@ -35,14 +32,12 @@ type ExerciseSetRowProps = {
   setNumber: number;
   totalSets: number;
   targetReps: number;
-  exerciseName: string; // For logging/key purposes
-  exerciseImage?: ImageSourcePropType; // Optional image
+  exerciseName: string;
+  exerciseImage?: ImageSourcePropType;
   sessionType: 'standard' | 'express' | 'maintenance';
   initialData?: SetData;
-  onUpdate: (data: SetData) => void; // Kept for interface compatibility, but unused
-  isEditing?: boolean;
+  onUpdate: (data: SetData) => void;
   onPress?: () => void;
-  onDelete?: () => void;
   isActive?: boolean;
 };
 
@@ -53,19 +48,15 @@ type ExerciseSetRowProps = {
 export const ExerciseSetRow: React.FC<ExerciseSetRowProps> = ({
   setNumber,
   totalSets,
-  targetReps,
   exerciseName,
   exerciseImage,
   sessionType,
   initialData,
-  isEditing = false,
-  onPress,
-  onDelete,
   isActive = false,
 }) => {
-  // Use prop data or defaults
-  const weight = initialData?.weight || '';
-  const reps = initialData?.reps || targetReps.toString();
+  // Use prop data or defaults (0 for unlogged sets)
+  const weight = initialData?.weight || '0';
+  const reps = initialData?.reps || '0';
   const completed = initialData?.completed || false;
 
   // ==========================================================================
@@ -83,36 +74,31 @@ export const ExerciseSetRow: React.FC<ExerciseSetRowProps> = ({
 
   const sessionColor = getSessionColor();
 
-  const ContainerComponent = isEditing ? TouchableOpacity : View;
-
   return (
     <View style={styles.container}>
       <View style={[styles.horizontalConnector, isActive && {backgroundColor: theme.colors.actionSuccess}]} />
-      
-      <ContainerComponent
+
+      <View
         style={[
-          styles.row, 
-          completed && !isEditing && {backgroundColor: theme.colors.backgroundSecondary}, // Dim when completed (unless editing)
-          isEditing && completed && styles.rowEditing, // Only show editing outline if completed
+          styles.row,
+          completed && {backgroundColor: theme.colors.backgroundSecondary},
         ]}
-        onPress={isEditing ? onPress : undefined}
-        activeOpacity={0.7}
       >
         {/* Left: Image */}
         {exerciseImage && (
           <Image
             source={exerciseImage}
-            style={[styles.image, completed && !isEditing && {opacity: 0.5}]}
+            style={[styles.image, completed && {opacity: 0.5}]}
             resizeMode="cover"
           />
         )}
 
         {/* Middle: Info */}
         <View style={styles.infoContainer}>
-          <Text style={[styles.exerciseName, completed && !isEditing && {color: theme.colors.textSecondary}]}>
+          <Text style={[styles.exerciseName, completed && {color: theme.colors.textSecondary}]}>
             {exerciseName.toUpperCase()}
           </Text>
-          
+
           <View style={styles.setInfo}>
             <Text style={styles.label}>SET </Text>
             <Text style={[styles.highlight, {color: sessionColor}]}>{setNumber}</Text>
@@ -126,9 +112,9 @@ export const ExerciseSetRow: React.FC<ExerciseSetRowProps> = ({
             {/* Weight Display */}
             <View style={styles.valueWrapper}>
                 <Text style={styles.valueLabel}>LBS</Text>
-                <View style={[styles.valueBox, completed && !isEditing && styles.valueBoxCompleted]}>
-                    <Text style={[styles.valueText, completed && !isEditing && styles.valueTextCompleted]}>
-                        {weight || '0'}
+                <View style={[styles.valueBox, completed && styles.valueBoxCompleted]}>
+                    <Text style={[styles.valueText, completed && styles.valueTextCompleted]}>
+                        {weight}
                     </Text>
                 </View>
             </View>
@@ -136,30 +122,24 @@ export const ExerciseSetRow: React.FC<ExerciseSetRowProps> = ({
             {/* Reps Display */}
             <View style={styles.valueWrapper}>
                 <Text style={styles.valueLabel}>REPS</Text>
-                <View style={[styles.valueBox, completed && !isEditing && styles.valueBoxCompleted]}>
-                    <Text style={[styles.valueText, completed && !isEditing && styles.valueTextCompleted]}>
+                <View style={[styles.valueBox, completed && styles.valueBoxCompleted]}>
+                    <Text style={[styles.valueText, completed && styles.valueTextCompleted]}>
                         {reps}
                     </Text>
                 </View>
             </View>
-            
-            {/* Checkbox OR Delete Button */}
-            {isEditing ? (
-              <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
-                <TrashIcon width={20} height={20} />
-              </TouchableOpacity>
-            ) : (
-              <View style={styles.statusIndicator}>
-                {completed && (
-                  <>
-                    <View style={[StyleSheet.absoluteFill, {backgroundColor: sessionColor, borderRadius: 10}]} />
-                    <Text style={styles.checkmark}>✓</Text>
-                  </>
-                )}
-              </View>
-            )}
+
+            {/* Completion Indicator */}
+            <View style={styles.statusIndicator}>
+              {completed && (
+                <>
+                  <View style={[StyleSheet.absoluteFill, {backgroundColor: sessionColor, borderRadius: 10}]} />
+                  <Text style={styles.checkmark}>✓</Text>
+                </>
+              )}
+            </View>
         </View>
-      </ContainerComponent>
+      </View>
     </View>
   );
 };
@@ -188,13 +168,9 @@ const styles = StyleSheet.create({
     borderRadius: theme.spacing.s,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 2, 
+    paddingHorizontal: 2,
     borderWidth: 1,
     borderColor: theme.colors.backgroundSecondary,
-  },
-  rowEditing: {
-    borderColor: theme.colors.actionWarning, // Visual cue for edit mode interaction
-    backgroundColor: theme.colors.backgroundPrimary,
   },
   image: {
     width: 46,
@@ -276,11 +252,5 @@ const styles = StyleSheet.create({
     color: theme.colors.pureBlack,
     fontSize: 12,
     fontWeight: 'bold',
-  },
-  deleteButton: {
-    width: 30,
-    height: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });

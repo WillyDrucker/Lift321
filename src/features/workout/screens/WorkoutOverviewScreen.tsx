@@ -315,7 +315,6 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
   return (
     <WorkoutLayout
       workoutType={workoutType}
-      showLetsGoButton={true}
       onLetsGoPress={handleLetsGoPress}
       sidebarVisible={sidebarVisible}
       onSidebarClose={() => setSidebarVisible(false)}

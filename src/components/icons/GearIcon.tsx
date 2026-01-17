@@ -3,6 +3,7 @@
 //
 // Settings gear icon for workout settings bar.
 // SVG path creates a classic gear/cog shape.
+// Canvas: 1000x1000, no dead space.
 //
 // Dependencies: react-native-svg
 // Used by: WorkoutLayout
@@ -23,20 +24,22 @@ export const GearIcon: React.FC<GearIconProps> = ({
   color = '#FFFFFF',
 }) => {
   return (
-    <Svg width={width} height={height} viewBox="-1 0 25 24" fill="none">
-      <G transform="translate(-2, 0)">
+    <Svg width={width} height={height} viewBox="0 0 1000 1000" fill="none">
+      <G transform="rotate(90, 500, 500)">
+        {/* Center circle (settings hole) - 25% larger */}
         <Path
-          d="M12 15.5C13.933 15.5 15.5 13.933 15.5 12C15.5 10.067 13.933 8.5 12 8.5C10.067 8.5 8.5 10.067 8.5 12C8.5 13.933 10.067 15.5 12 15.5Z"
+          d="M500 693C610 693 700 603 700 500C700 397 610 307 500 307C390 307 300 397 300 500C300 603 390 693 500 693Z"
           stroke={color}
-          strokeWidth={1.5}
+          strokeWidth={67}
           strokeMiterlimit={10}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
+        {/* Outer gear shape */}
         <Path
-          d="M2 12.88V11.12C2 10.08 2.85 9.22 3.9 9.22C5.71 9.22 6.45 7.94 5.54 6.37C5.02 5.47 5.33 4.3 6.24 3.78L7.97 2.79C8.76 2.32 9.78 2.6 10.25 3.39L10.36 3.58C11.26 5.15 12.74 5.15 13.65 3.58L13.76 3.39C14.23 2.6 15.25 2.32 16.04 2.79L17.77 3.78C18.68 4.3 18.99 5.47 18.47 6.37C17.56 7.94 18.3 9.22 20.11 9.22C21.15 9.22 22.01 10.07 22.01 11.12V12.88C22.01 13.92 21.16 14.78 20.11 14.78C18.3 14.78 17.56 16.06 18.47 17.63C18.99 18.54 18.68 19.7 17.77 20.22L16.04 21.21C15.25 21.68 14.23 21.4 13.76 20.61L13.65 20.42C12.75 18.85 11.27 18.85 10.36 20.42L10.25 20.61C9.78 21.4 8.76 21.68 7.97 21.21L6.24 20.22C5.33 19.7 5.02 18.53 5.54 17.63C6.45 16.06 5.71 14.78 3.9 14.78C2.85 14.78 2 13.92 2 12.88Z"
+          d="M33 543V457C33 404 73 361 123 361C209 361 244 298 200 221C177 176 190 118 234 93L317 44C353 22 401 36 423 73L429 83C471 160 529 160 571 83L577 73C599 36 647 22 683 44L766 93C810 118 823 176 800 221C756 298 791 361 877 361C927 361 967 404 967 457V543C967 596 927 639 877 639C791 639 756 702 800 779C823 824 810 882 766 907L683 956C647 978 599 964 577 927L571 917C529 840 471 840 429 917L423 927C401 964 353 978 317 956L234 907C190 882 177 824 200 779C244 702 209 639 123 639C73 639 33 596 33 543Z"
           stroke={color}
-          strokeWidth={1.5}
+          strokeWidth={67}
           strokeMiterlimit={10}
           strokeLinecap="round"
           strokeLinejoin="round"

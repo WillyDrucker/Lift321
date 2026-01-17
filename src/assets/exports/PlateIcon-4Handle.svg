@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1000" height="1000" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 45lb Bumper Plate with 4 cut-out handles -->
+
+  <!-- Outer ring -->
+  <circle
+    cx="500"
+    cy="500"
+    r="465"
+    stroke="#FFFFFF"
+    stroke-width="60"
+    fill="none"
+  />
+
+  <!-- Center hole (for barbell) -->
+  <circle
+    cx="500"
+    cy="500"
+    r="120"
+    stroke="#FFFFFF"
+    stroke-width="50"
+    fill="none"
+  />
+
+  <!-- Handle cutouts - 4 evenly spaced (top, right, bottom, left) -->
+  <!-- Top handle -->
+  <path
+    d="M430 180 L430 280 C430 300 450 320 500 320 C550 320 570 300 570 280 L570 180"
+    stroke="#FFFFFF"
+    stroke-width="40"
+    stroke-linecap="round"
+    fill="none"
+  />
+
+  <!-- Right handle -->
+  <path
+    d="M820 430 L720 430 C700 430 680 450 680 500 C680 550 700 570 720 570 L820 570"
+    stroke="#FFFFFF"
+    stroke-width="40"
+    stroke-linecap="round"
+    fill="none"
+  />
+
+  <!-- Bottom handle -->
+  <path
+    d="M430 820 L430 720 C430 700 450 680 500 680 C550 680 570 700 570 720 L570 820"
+    stroke="#FFFFFF"
+    stroke-width="40"
+    stroke-linecap="round"
+    fill="none"
+  />
+
+  <!-- Left handle -->
+  <path
+    d="M180 430 L280 430 C300 430 320 450 320 500 C320 550 300 570 280 570 L180 570"
+    stroke="#FFFFFF"
+    stroke-width="40"
+    stroke-linecap="round"
+    fill="none"
+  />
+</svg>

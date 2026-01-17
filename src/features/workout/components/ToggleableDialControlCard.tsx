@@ -204,10 +204,7 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
           <SegmentedControl
             options={[
               <View key="reps" style={styles.repsOption}>
-                <View style={styles.repsLabelStack}>
-                  <Text style={[styles.repsText, mode === 'reps' && styles.repsTextActive]}>REPS</Text>
-                  <Text style={styles.repsLabelSpacer}>(LBS)</Text>
-                </View>
+                <Text style={[styles.repsText, mode === 'reps' && styles.repsTextActive]}>REPS</Text>
                 <Text style={[styles.repsValue, {color: getRepsColor(displayReps)}]}>{displayReps}</Text>
               </View>,
               <View key="weight" style={styles.weightOption}>
@@ -249,14 +246,11 @@ const styles = StyleSheet.create({
   },
   repsOption: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     alignSelf: 'stretch',
     justifyContent: 'flex-end',
     paddingRight: 16,
     gap: 8,
-  },
-  repsLabelStack: {
-    alignItems: 'center',
   },
   repsText: {
     fontSize: theme.typography.fontSize.m,
@@ -267,14 +261,6 @@ const styles = StyleSheet.create({
   },
   repsTextActive: {
     color: theme.colors.textPrimary,
-  },
-  repsLabelSpacer: {
-    fontSize: theme.typography.fontSize.m,
-    fontFamily: theme.typography.fontFamily.primary,
-    fontWeight: theme.typography.fontWeight.bold,
-    textTransform: 'uppercase',
-    marginTop: -4,
-    opacity: 0, // Invisible but takes same space as (LBS)
   },
   repsValue: {
     fontSize: 32,

@@ -30,6 +30,7 @@ export {ProfileIcon} from './ProfileIcon';
 export {PencilIcon} from './PencilIcon';
 export {TrashIcon} from './TrashIcon';
 export {GearIcon} from './GearIcon';
+export {PlateIconQuadGrip} from './PlateIconQuadGrip';
 
 // Equipment Icons
 export * from './equipment';

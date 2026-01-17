@@ -34,25 +34,13 @@ export const styles = StyleSheet.create({
   todaysWorkoutCard: {
     backgroundColor: theme.colors.backgroundPrimary,
     borderRadius: theme.spacing.s,
-    paddingHorizontal: theme.spacing.s,
-    paddingBottom: theme.spacing.s,
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
-  cardEditing: {
-    borderColor: theme.colors.actionWarning,
-  },
-  editButton: {
-    position: 'absolute',
-    right: 0,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
   },
   todaysWorkoutHeader: {
     position: 'relative',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 13,
-    marginBottom: 13,
+    marginTop: 16,
+    marginBottom: 16,
   },
   todaysWorkoutText: {
     fontSize: theme.typography.fontSize.xl,
@@ -61,16 +49,31 @@ export const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.backgroundTertiary,
     textTransform: 'uppercase',
-    textAlign: 'center',
     includeFontPadding: false,
   },
-  titleConnector: {
+  setsDisplay: {
     position: 'absolute',
-    left: 0,
-    top: 12,
-    width: 50,
-    height: 1,
-    backgroundColor: theme.colors.pureWhite,
+    top: -8, // 8dp from card top (16dp header margin - 8dp = 8dp from card top)
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: theme.spacing.xs,
+  },
+  setsLabel: {
+    fontSize: theme.typography.fontSize.m,
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.backgroundTertiary,
+    includeFontPadding: false,
+  },
+  setsValue: {
+    fontSize: 32,
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.actionSuccess,
+    includeFontPadding: false,
+    minWidth: 38, // Reserve space for 2 digits
+    textAlign: 'left',
   },
   exerciseTreeContainer: {
     position: 'relative',
@@ -78,7 +81,7 @@ export const styles = StyleSheet.create({
   verticalLine: {
     position: 'absolute',
     left: 0,
-    top: -25,
+    top: 25, // Start at center of first exercise row
     width: 1,
     backgroundColor: theme.colors.pureWhite,
   },

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1000" height="1000" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 12-Sided Hex Bumper Plate with 3 square handles -->
+
+  <!-- Outer 12-sided shape (dodecagon) - flat edge at top -->
+  <path
+    d="M370 30
+       L630 30
+       L836 134
+       L970 340
+       L970 660
+       L836 866
+       L630 970
+       L370 970
+       L164 866
+       L30 660
+       L30 340
+       L164 134
+       Z"
+    stroke="#FFFFFF"
+    stroke-width="55"
+    stroke-linejoin="round"
+    fill="none"
+  />
+
+  <!-- Top square handle (with gap from outer edge) -->
+  <rect
+    x="390"
+    y="130"
+    width="220"
+    height="120"
+    stroke="#FFFFFF"
+    stroke-width="40"
+    stroke-linejoin="round"
+    fill="none"
+  />
+
+  <!-- Bottom-left square handle (with gap from outer edge) -->
+  <rect
+    x="175"
+    y="665"
+    width="160"
+    height="120"
+    transform="rotate(-30, 255, 725)"
+    stroke="#FFFFFF"
+    stroke-width="40"
+    stroke-linejoin="round"
+    fill="none"
+  />
+
+  <!-- Bottom-right square handle (with gap from outer edge) -->
+  <rect
+    x="665"
+    y="665"
+    width="160"
+    height="120"
+    transform="rotate(30, 745, 725)"
+    stroke="#FFFFFF"
+    stroke-width="40"
+    stroke-linejoin="round"
+    fill="none"
+  />
+
+  <!-- Center hole (for barbell) -->
+  <circle
+    cx="500"
+    cy="500"
+    r="60"
+    stroke="#FFFFFF"
+    stroke-width="35"
+    fill="none"
+  />
+</svg>

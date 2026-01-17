@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1000" height="1000" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Quad-Grip Olympic Weight Plate with 4 oval grip holes, smaller center hole -->
+
+  <!-- Outer ring -->
+  <circle
+    cx="500"
+    cy="500"
+    r="465"
+    stroke="#FFFFFF"
+    stroke-width="60"
+    fill="none"
+  />
+
+  <!-- Center hole (for barbell) -->
+  <circle
+    cx="500"
+    cy="500"
+    r="60"
+    stroke="#FFFFFF"
+    stroke-width="35"
+    fill="none"
+  />
+
+  <!-- Grip hole cutouts - 4 oval slots near outer ring, tangential orientation -->
+  <!-- Top grip hole (horizontal) -->
+  <ellipse
+    cx="500"
+    cy="120"
+    rx="135"
+    ry="53"
+    stroke="#FFFFFF"
+    stroke-width="60"
+    fill="none"
+  />
+
+  <!-- Right grip hole (vertical) -->
+  <ellipse
+    cx="880"
+    cy="500"
+    rx="135"
+    ry="53"
+    transform="rotate(90, 880, 500)"
+    stroke="#FFFFFF"
+    stroke-width="60"
+    fill="none"
+  />
+
+  <!-- Bottom grip hole (horizontal) -->
+  <ellipse
+    cx="500"
+    cy="880"
+    rx="135"
+    ry="53"
+    stroke="#FFFFFF"
+    stroke-width="60"
+    fill="none"
+  />
+
+  <!-- Left grip hole (vertical) -->
+  <ellipse
+    cx="120"
+    cy="500"
+    rx="135"
+    ry="53"
+    transform="rotate(90, 120, 500)"
+    stroke="#FFFFFF"
+    stroke-width="60"
+    fill="none"
+  />
+</svg>

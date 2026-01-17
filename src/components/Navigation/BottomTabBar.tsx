@@ -126,6 +126,7 @@ const styles = StyleSheet.create({
     paddingBottom: theme.layout.bottomNav.paddingBottom,
     borderTopWidth: theme.layout.border.thin,
     borderTopColor: theme.colors.navActive,
+    zIndex: 20, // Above content area to ensure touch handling
   },
 
   tabButton: {

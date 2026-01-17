@@ -14,7 +14,6 @@ import {
   ScrollView,
   Text,
   View,
-  TouchableOpacity,
 } from 'react-native';
 import {theme} from '@/theme';
 import {styles} from './ActiveWorkoutScreen.styles';
@@ -26,9 +25,7 @@ import {ExerciseSetRow} from '@/features/workout/components/ExerciseSetRow';
 import {WorkoutActionCard} from '@/features/workout/components/WorkoutActionCard';
 import {ExerciseCard} from '@/features/workout/components/ExerciseCard';
 import {ToggleableDialControlCard} from '@/features/workout/components/ToggleableDialControlCard';
-import {ActiveWorkoutStatusCard} from '@/features/workout/components/ActiveWorkoutStatusCard';
 import {ActionButton} from '@/components';
-import {PencilIcon} from '@/components/icons';
 import {useActiveWorkout} from '@/features/workout/context/ActiveWorkoutContext';
 
 // ============================================================================
@@ -67,7 +64,6 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
     endRest,
     setGlobalWeight,
     setGlobalReps,
-    deleteSet,
     selectSet,
     endWorkout,
     clearWeightError,
@@ -75,7 +71,6 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
   } = useActiveWorkout();
 
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
 
   // Use config from context (pre-initialized before navigation)
   // Falls back to route params only for edge cases (direct navigation, deep links)
@@ -117,12 +112,11 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
   }, [workoutData]);
 
   const verticalLineHeight = useMemo(() => {
-    const START_OFFSET = 25;
     const SET_HEIGHT = 50;
     const SET_MARGIN = 5;
     const GROUP_SPACER = 32;
 
-    let totalHeight = START_OFFSET;
+    let totalHeight = 0;
     let exerciseCount = 0;
 
     workoutData.exercises.forEach((exercise) => {
@@ -137,9 +131,9 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
       exerciseCount++;
     });
 
+    // Remove last margin and adjust to end at center of last row
     totalHeight -= SET_MARGIN;
     totalHeight -= (SET_HEIGHT / 2);
-    totalHeight += (SET_MARGIN / 2);
 
     return totalHeight;
   }, [workoutData.exercises]);
@@ -175,7 +169,7 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
     return {currentSet: setNumber, totalSets: total, currentMuscleGroup: muscleGroup};
   }, [activeSetKey, workoutData.exercises]);
 
-  // Calculate global set index (0-based) and total sets for status bar
+  // Calculate global set index and total sets for progress tracking
   const {globalSetIndex, globalTotalSets} = useMemo(() => {
     const total = orderedSetKeys.length;
     if (!activeSetKey) {
@@ -188,7 +182,7 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
     };
   }, [activeSetKey, orderedSetKeys]);
 
-  // Calculate remaining sets and time for status card
+  // Calculate remaining sets (Today's Workout header) and minutes (title bar)
   const {remainingSets, remainingMinutes} = useMemo(() => {
     const remaining = globalTotalSets - globalSetIndex;
     const minutes = remaining > 0
@@ -237,7 +231,7 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
 
       sets.push(
         <View key={key} style={[styles.setWrapper, isActive && styles.activeSetWrapper]}>
-            {isActive && !isEditing && <View style={styles.activeIndicator} />}
+            {isActive && <View style={styles.activeIndicator} />}
             <ExerciseSetRow
             setNumber={setNumber}
             totalSets={totalSets}
@@ -245,11 +239,9 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
             exerciseName={exerciseName}
             exerciseImage={getExerciseImage(exerciseName)}
             sessionType={sessionType}
-            initialData={workoutState[key]}
-            isEditing={isEditing}
+            initialData={workoutState[key] || {weight: '0', reps: '0', completed: false}}
             onPress={() => selectSet(key)}
-            onDelete={() => deleteSet(key)}
-            onUpdate={(data) => updateSet(key, data)} // Still needed for interface
+            onUpdate={(data) => updateSet(key, data)}
             />
         </View>
       );
@@ -287,7 +279,6 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
   return (
     <WorkoutLayout
       workoutType={workoutType}
-      showLetsGoButton={false}
       currentSetIndex={globalSetIndex}
       totalSets={globalTotalSets}
       restMinutesPerSet={restMinutes}
@@ -303,13 +294,7 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
 
-          {/* 1. Workout Status Card */}
-          <ActiveWorkoutStatusCard
-            remainingSets={remainingSets}
-            remainingMinutes={remainingMinutes}
-          />
-
-          {/* 2. Exercise Card (Collapsible) */}
+          {/* 1. Exercise Card (Collapsible) */}
           <ExerciseCard
             exerciseName={currentExerciseName}
             currentSet={currentSet}
@@ -343,21 +328,13 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
           />
 
           {/* 5. Today's Workout (Exercise List) */}
-          <View style={[styles.todaysWorkoutCard, isEditing && styles.cardEditing]}>
+          <View style={styles.todaysWorkoutCard}>
             <View style={styles.todaysWorkoutHeader}>
               <Text style={styles.todaysWorkoutText}>TODAY'S WORKOUT</Text>
-              <View style={styles.titleConnector} />
-              <TouchableOpacity
-                onPress={() => setIsEditing(!isEditing)}
-                style={styles.editButton}
-                hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
-              >
-                <PencilIcon
-                    width={28}
-                    height={28}
-                    color={isEditing ? theme.colors.actionWarning : theme.colors.textSecondary}
-                />
-              </TouchableOpacity>
+              <View style={styles.setsDisplay}>
+                <Text style={styles.setsLabel}>SETS</Text>
+                <Text style={styles.setsValue}>{remainingSets}</Text>
+              </View>
             </View>
 
             <View style={styles.exerciseTreeContainer}>
@@ -377,23 +354,6 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
               />
             </View>
           )}
-
-          {/* TEST LAYOUT Button - Navigate to experimental sandbox */}
-          <View style={styles.finishButtonContainer}>
-             <ActionButton
-                text="TEST LAYOUT"
-                onPress={() => navigation.navigate('TestLayout', {
-                  workoutType,
-                  sessionType,
-                  planFocus: route.params.planFocus,
-                  selectedEquipment: route.params.selectedEquipment,
-                  weekProgress: route.params.weekProgress,
-                  day: workoutDay,
-                })}
-                style={{backgroundColor: theme.colors.actionDanger}}
-                textStyle={styles.finishButtonText}
-            />
-          </View>
 
         </ScrollView>
     </WorkoutLayout>

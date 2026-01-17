@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1000" height="1000" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Tri-Grip Olympic Weight Plate with 3 oval grip holes near outer ring -->
+
+  <!-- Outer ring -->
+  <circle
+    cx="500"
+    cy="500"
+    r="465"
+    stroke="#FFFFFF"
+    stroke-width="60"
+    fill="none"
+  />
+
+  <!-- Center hole (for barbell) -->
+  <circle
+    cx="500"
+    cy="500"
+    r="90"
+    stroke="#FFFFFF"
+    stroke-width="40"
+    fill="none"
+  />
+
+  <!-- Grip hole cutouts - 3 oval slots near outer ring, tangential orientation -->
+  <!-- Top grip hole (horizontal, near top of ring) -->
+  <ellipse
+    cx="500"
+    cy="120"
+    rx="150"
+    ry="60"
+    stroke="#FFFFFF"
+    stroke-width="60"
+    fill="none"
+  />
+
+  <!-- Bottom-right grip hole (tangential to ring curve) -->
+  <ellipse
+    cx="830"
+    cy="690"
+    rx="150"
+    ry="60"
+    transform="rotate(60, 830, 690)"
+    stroke="#FFFFFF"
+    stroke-width="60"
+    fill="none"
+  />
+
+  <!-- Bottom-left grip hole (tangential to ring curve) -->
+  <ellipse
+    cx="170"
+    cy="690"
+    rx="150"
+    ry="60"
+    transform="rotate(-60, 170, 690)"
+    stroke="#FFFFFF"
+    stroke-width="60"
+    fill="none"
+  />
+</svg>

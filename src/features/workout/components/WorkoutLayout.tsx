@@ -16,8 +16,9 @@ import {
   StyleSheet,
   Text,
   View,
-  TouchableOpacity,
   Image,
+  TouchableOpacity,
+  useWindowDimensions,
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import type {CompositeNavigationProp} from '@react-navigation/native';
@@ -28,6 +29,7 @@ import {TopNavBar, Sidebar, BottomTabBar} from '@/components';
 import type {WorkoutType} from '@/components/WorkoutCard';
 import type {MainStackParamList, TabParamList} from '@/navigation/types';
 import {usePlan} from '@/features/plans/context/PlanContext';
+import {calculateWorkoutDuration} from '@/utils/durationCalculator';
 
 // ============================================================================
 // TYPES
@@ -41,8 +43,7 @@ type WorkoutLayoutNavigation = CompositeNavigationProp<
 type WorkoutLayoutProps = {
   workoutType: WorkoutType;
   children: ReactNode;
-  showLetsGoButton?: boolean;
-  onLetsGoPress?: () => void;
+  onLetsGoPress?: () => void; // Callback for LET'S GO button (WorkoutOverview only)
   currentSetIndex?: number;
   totalSets?: number;
   restMinutesPerSet?: number; // Dynamic rest time based on plan focus
@@ -57,7 +58,6 @@ type WorkoutLayoutProps = {
   hideNavGear?: boolean; // Hide the gear icon in the navigation bar
   titleBarExtraHeight?: number; // Extra height to add to title bar
   showTopGreenLine?: boolean; // Show green line at top of title bar
-  hidePlanImage?: boolean; // Hide the plan image (for custom rendering)
   titleMaxWidth?: number; // Max width for title text (allows wrapping)
   dynamicTitleHeight?: boolean; // Enable dynamic title bar height based on text wrapping
   onTitleBarHeightChange?: (height: number) => void; // Callback when title bar height changes
@@ -77,7 +77,6 @@ type WorkoutLayoutProps = {
 export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
   workoutType,
   children,
-  showLetsGoButton = false,
   onLetsGoPress,
   currentSetIndex = 0,
   totalSets = 0,
@@ -93,7 +92,6 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
   hideNavGear = false,
   titleBarExtraHeight = 0,
   showTopGreenLine = false,
-  hidePlanImage = false,
   titleMaxWidth,
   dynamicTitleHeight = false,
   onTitleBarHeightChange,
@@ -102,26 +100,64 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
 }) => {
   // Get safe area insets for dynamic positioning
   const insets = useSafeAreaInsets();
+  const {width: screenWidth} = useWindowDimensions();
 
   // Get selected plan from context
   const {selectedPlan} = usePlan();
 
-  // Extra height for wrapped title (30dp for second line + top offset)
-  const wrappedTitleExtra = wrappedTitle ? 30 : 0;
+  // Track title bar height dynamically
+  const [measuredTitleHeight, setMeasuredTitleHeight] = useState(44); // Initial estimate
+  const [titleIsWrapped, setTitleIsWrapped] = useState(false); // Track if title spans multiple lines
+  const [measuredMinsWidth, setMeasuredMinsWidth] = useState(86); // Dynamic MINS display width
+  const [measuredMinsHeight, setMeasuredMinsHeight] = useState(32); // Dynamic MINS display height
 
-  // Track dynamic title bar height
-  const [measuredTitleHeight, setMeasuredTitleHeight] = useState(40 + titleBarExtraHeight + wrappedTitleExtra);
-
-  const handleTitleBarLayout = useCallback((event: { nativeEvent: { layout: { height: number } } }) => {
+  // Measure title text container height (determines title bar height)
+  const handleTitleTextContainerLayout = useCallback((event: { nativeEvent: { layout: { height: number } } }) => {
     const height = event.nativeEvent.layout.height;
-    if (dynamicTitleHeight && height !== measuredTitleHeight) {
+    if (height !== measuredTitleHeight) {
       setMeasuredTitleHeight(height);
       onTitleBarHeightChange?.(height);
     }
-  }, [dynamicTitleHeight, measuredTitleHeight, onTitleBarHeightChange]);
+  }, [measuredTitleHeight, onTitleBarHeightChange]);
+
+  // Detect if title text wraps to multiple lines
+  // Once wrapped, stays wrapped (sticky) to prevent oscillation when width changes
+  const handleTitleTextLayout = useCallback((event: { nativeEvent: { lines: Array<unknown> } }) => {
+    const lineCount = event.nativeEvent.lines.length;
+    if (lineCount > 1 && !titleIsWrapped) {
+      setTitleIsWrapped(true);
+    }
+  }, [titleIsWrapped]);
+
+  // Measure MINS display dimensions dynamically
+  const handleMinsLayout = useCallback((event: { nativeEvent: { layout: { width: number; height: number } } }) => {
+    const {width, height} = event.nativeEvent.layout;
+    if (width !== measuredMinsWidth) {
+      setMeasuredMinsWidth(width);
+    }
+    if (height !== measuredMinsHeight) {
+      setMeasuredMinsHeight(height);
+    }
+  }, [measuredMinsWidth, measuredMinsHeight]);
 
   // Show workout-specific UI elements when in active workout
   const showWorkoutStatus = totalSets > 0;
+
+  // Calculate max width for title text
+  // Always leave room for MINS + 8dp gap (MINS may be top-right or bottom-right)
+  const horizontalPadding = theme.layout.topNav.paddingHorizontal * 2;
+  const gapFromMins = 8; // 8dp gap from MINS
+
+  // Title width leaves room for dynamically measured MINS width
+  const calculatedTitleMaxWidth = showWorkoutStatus
+    ? screenWidth - horizontalPadding - measuredMinsWidth - gapFromMins
+    : screenWidth - horizontalPadding;
+
+  // Calculate remaining minutes for status display
+  const remainingSets = totalSets - currentSetIndex;
+  const remainingMinutes = remainingSets > 0
+    ? calculateWorkoutDuration({totalSets: remainingSets, restMinutesPerSet}).totalMinutes
+    : 0;
   return (
     <>
       <StatusBar
@@ -140,74 +176,88 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
             leftContent={navBarLeftContent}
           />
 
-          {/* Workout Title Bar (body part name) */}
+          {/* Workout Title Bar (body part name) - Height based on title text container */}
           <View
             style={[
               styles.workoutTitleBar,
               {
                 marginTop: insets.top + theme.layout.topNav.height,
-                ...(dynamicTitleHeight
-                  ? {minHeight: 40 + titleBarExtraHeight + wrappedTitleExtra, paddingBottom: 4}
-                  : {height: 40 + titleBarExtraHeight + wrappedTitleExtra}
-                ),
-                ...(wrappedTitle && {overflow: 'visible'}),
+                paddingTop: 44 - theme.layout.topNav.height, // Align with bottom of plan image
               }
             ]}
-            onLayout={dynamicTitleHeight ? handleTitleBarLayout : undefined}
           >
             {/* Green line at top of title bar (optional) */}
             {showTopGreenLine && <View style={[styles.greenAccentLine, {position: 'absolute', top: 0, left: 0, right: 0}]} />}
-            {wrappedTitle ? (
-              <View style={{position: 'absolute', top: 23, left: theme.layout.topNav.paddingHorizontal, width: titleMaxWidth}}>
-                <Text style={[styles.workoutTitleText, {lineHeight: 30}]} numberOfLines={2}>{workoutType}</Text>
-              </View>
-            ) : titleAnchorTop ? (
-              <Text style={[
-                styles.workoutTitleText,
-                {position: 'absolute', top: 20, left: theme.layout.topNav.paddingHorizontal},
-                titleMaxWidth && {maxWidth: titleMaxWidth},
-              ]}>{workoutType}</Text>
-            ) : (
-              <Text style={[
-                styles.workoutTitleText,
-                titleBarExtraHeight > 0 && {position: 'absolute', bottom: -1, left: theme.layout.topNav.paddingHorizontal},
-                titleMaxWidth && {maxWidth: titleMaxWidth},
-              ]}>{workoutType}</Text>
-            )}
 
-            {/* Plan Image - shown during active workout */}
-            {showWorkoutStatus && !hidePlanImage && (
-              <Image source={selectedPlan.image} style={styles.planImage} resizeMode="contain" />
-            )}
+            {/* Title Text Container - determines title bar height */}
+            <View
+              style={{maxWidth: calculatedTitleMaxWidth, paddingVertical: 2}}
+              onLayout={handleTitleTextContainerLayout}
+            >
+              <Text
+                style={[styles.workoutTitleText, {lineHeight: 30}]}
+                numberOfLines={2}
+                ellipsizeMode="tail"
+                onTextLayout={handleTitleTextLayout}
+              >
+{workoutType.toUpperCase()}
+              </Text>
+            </View>
 
-            {/* Conditional Let's Go Button */}
-            {showLetsGoButton && onLetsGoPress && (
-              <View style={styles.letsGoButtonContainer}>
-                {/* Shadow Layer 3 - Darkest, furthest */}
-                <View style={[styles.letsGoButtonShadow, styles.shadowLayer3]} />
-                {/* Shadow Layer 2 - Medium darkness */}
-                <View style={[styles.letsGoButtonShadow, styles.shadowLayer2]} />
-                {/* Shadow Layer 1 - Lightest, closest */}
-                <View style={[styles.letsGoButtonShadow, styles.shadowLayer1]} />
-                {/* Actual Button */}
-                <TouchableOpacity
-                  style={styles.letsGoButton}
-                  onPress={onLetsGoPress}
-                  activeOpacity={0.7}>
-                  <Text style={styles.letsGoButtonText}>LET'S GO!</Text>
-                </TouchableOpacity>
-              </View>
-            )}
           </View>
 
           {/* Green accent line */}
           <View style={styles.greenAccentLine} />
         </View>
 
+        {/* Plan Image - Independent floating element, centered on screen (future: link to plans overview) */}
+        <View
+          style={[styles.planImageContainer, {top: insets.top + 4}]}
+          pointerEvents="box-none"
+        >
+          <Image
+            source={selectedPlan.image}
+            style={styles.planImage}
+            resizeMode="contain"
+          />
+        </View>
+
+        {/* MINS Display - Independent floating element, locked to title bottom border */}
+        {showWorkoutStatus && (
+          <View
+            style={[
+              styles.minsContainer,
+              {
+                top: insets.top + 44 + measuredTitleHeight - measuredMinsHeight // Always bottom-aligned with title bar
+              }
+            ]}
+            onLayout={handleMinsLayout}
+          >
+            <Text style={styles.minsLabel}>MINS</Text>
+            <Text style={styles.minsValue}>{remainingMinutes}</Text>
+          </View>
+        )}
+
+        {/* LET'S GO Button - Independent floating element, shown on WorkoutOverview only */}
+        {onLetsGoPress && (
+          <TouchableOpacity
+            style={[
+              styles.letsGoButton,
+              {
+                top: insets.top + 44 + measuredTitleHeight - 32, // Bottom of button 4dp above title bar border (28 height + 4 gap)
+              }
+            ]}
+            onPress={onLetsGoPress}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.letsGoButtonText}>LET'S GO!</Text>
+          </TouchableOpacity>
+        )}
+
         {/* Dynamic Content Area - this is where transitions happen */}
         <View style={[
           styles.contentArea,
-          {paddingTop: insets.top + theme.layout.topNav.height + (dynamicTitleHeight ? measuredTitleHeight : 40 + titleBarExtraHeight + wrappedTitleExtra) + 1}, // nav + title bar + green line(1)
+          {paddingTop: insets.top + 44 + measuredTitleHeight + 1}, // insets + title bar paddingTop offset (44) + title text height + green line(1)
         ]}>
           {children}
         </View>
@@ -268,11 +318,10 @@ const styles = StyleSheet.create({
 
   // === WORKOUT TITLE BAR ===
   workoutTitleBar: {
-    // marginTop is set dynamically via insets.top + nav height
-    height: 40, // 40dp container (4dp + 32dp image + 4dp)
+    // marginTop, paddingTop, paddingBottom set dynamically
     backgroundColor: theme.colors.pureBlack,
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start', // Top-align content
     justifyContent: 'space-between',
     paddingHorizontal: theme.layout.topNav.paddingHorizontal, // Align with TopNavBar (16dp)
     zIndex: 1,
@@ -293,63 +342,59 @@ const styles = StyleSheet.create({
     textShadowOffset: {width: 0, height: 2}, // Drop shadow
     textShadowRadius: 4, // Shadow blur
   },
+  planImageContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 15, // Above navigation area (10) but below children overlays
+  },
   planImage: {
-    height: 36, // 0dp from top, 4dp from bottom in 40dp title bar
-    width: 108, // 3:1 aspect ratio (36 * 3 = 108)
-    alignSelf: 'flex-start', // Position at top of title bar
+    height: 40, // Full height of title bar
+    width: 120, // 3:1 aspect ratio (40 * 3 = 120)
+  },
+
+  // === MINS DISPLAY ===
+  minsContainer: {
+    position: 'absolute',
+    right: theme.layout.topNav.paddingHorizontal, // 16dp from right edge
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    zIndex: 15, // Same as plan image
+  },
+  minsLabel: {
+    fontSize: theme.typography.fontSize.m,
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.backgroundTertiary,
+    includeFontPadding: false,
+  },
+  minsValue: {
+    fontSize: 32,
+    fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.actionSuccess,
+    includeFontPadding: false,
   },
 
   // === LET'S GO BUTTON ===
-  letsGoButtonContainer: {
-    width: 100,
-    height: 32,
-  },
-
-  letsGoButtonShadow: {
-    position: 'absolute',
-    width: 100,
-    height: 32,
-    backgroundColor: theme.colors.shadowBlack,
-    borderRadius: 8,
-  },
-
   letsGoButton: {
     position: 'absolute',
-    bottom: 0,
-    right: 0,
-    width: 100,
-    height: 32,
+    right: 16, // 16dp from right edge
+    height: 28,
+    paddingHorizontal: 6,
     backgroundColor: theme.colors.actionSuccess,
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 15,
   },
-
   letsGoButtonText: {
     fontSize: theme.typography.fontSize.l,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.pureBlack,
-    textTransform: 'uppercase',
-  },
-
-  // Shadow layers for drop shadow effect
-  shadowLayer3: {
-    bottom: -6, // Furthest shadow layer
-    right: 0,
-    opacity: 0.15,
-  },
-
-  shadowLayer2: {
-    bottom: -4, // Middle shadow layer
-    right: 0,
-    opacity: 0.25,
-  },
-
-  shadowLayer1: {
-    bottom: -2, // Closest shadow layer
-    right: 0,
-    opacity: 0.4,
   },
 
   // === CONTENT AREA ===
@@ -357,5 +402,6 @@ const styles = StyleSheet.create({
     flex: 1,
     // paddingTop is set dynamically via insets
     paddingBottom: theme.layout.bottomNav.height, // Clear bottom tab bar (accounts for safe area in BottomTabBar component)
+    zIndex: 1, // Below navigationArea (10) and BottomTabBar (20)
   },
 });

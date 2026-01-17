@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1000" height="1000" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 1000x1000 gear rotated 90 degrees, center circle 25% larger -->
+
+  <g transform="rotate(90, 500, 500)">
+    <!-- Center circle (settings hole) - 25% larger -->
+    <path
+      d="M500 693C610 693 700 603 700 500C700 397 610 307 500 307C390 307 300 397 300 500C300 603 390 693 500 693Z"
+      stroke="#FFFFFF"
+      stroke-width="67"
+      stroke-miterlimit="10"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      fill="none"
+    />
+    <!-- Outer gear shape -->
+    <path
+      d="M33 543V457C33 404 73 361 123 361C209 361 244 298 200 221C177 176 190 118 234 93L317 44C353 22 401 36 423 73L429 83C471 160 529 160 571 83L577 73C599 36 647 22 683 44L766 93C810 118 823 176 800 221C756 298 791 361 877 361C927 361 967 404 967 457V543C967 596 927 639 877 639C791 639 756 702 800 779C823 824 810 882 766 907L683 956C647 978 599 964 577 927L571 917C529 840 471 840 429 917L423 927C401 964 353 978 317 956L234 907C190 882 177 824 200 779C244 702 209 639 123 639C73 639 33 596 33 543Z"
+      stroke="#FFFFFF"
+      stroke-width="67"
+      stroke-miterlimit="10"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      fill="none"
+    />
+  </g>
+</svg>

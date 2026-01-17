@@ -12,7 +12,7 @@ import React from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {theme} from '@/theme';
-import {HamburgerRegularThin, LeftChevron, GearIcon} from '@/components/icons';
+import {HamburgerRegularThin, LeftChevron, PlateIconQuadGrip} from '@/components/icons';
 
 // === TYPES ===
 
@@ -84,9 +84,8 @@ export const TopNavBar: React.FC<TopNavBarProps> = React.memo(
                 styles.gearButton,
                 pressed && styles.pressed,
               ]}>
-              <GearIcon
-                width={theme.layout.topNav.menuIconSize}
-                height={theme.layout.topNav.menuIconSize}
+              <PlateIconQuadGrip
+                size={theme.layout.topNav.menuIconSize - 2}
                 color={theme.colors.textSecondary}
               />
             </Pressable>
@@ -153,6 +152,7 @@ const styles = StyleSheet.create({
 
   gearButton: {
     padding: 0,
+    marginTop: 4, // Align with plan image
   },
 
   pressed: {

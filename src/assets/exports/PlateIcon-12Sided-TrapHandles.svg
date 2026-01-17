@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1000" height="1000" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 12-Sided Hex Bumper Plate with 4 trapezoid handles -->
+
+  <!-- Outer 12-sided shape (dodecagon) - flat edge at top -->
+  <path
+    d="M370 30
+       L630 30
+       L836 134
+       L970 340
+       L970 660
+       L836 866
+       L630 970
+       L370 970
+       L164 866
+       L30 660
+       L30 340
+       L164 134
+       Z"
+    stroke="#FFFFFF"
+    stroke-width="55"
+    stroke-linejoin="round"
+    fill="none"
+  />
+
+  <!-- Top trapezoid handle (flush with outer edge) -->
+  <path
+    d="M380 30 L620 30 L560 180 L440 180 Z"
+    stroke="#FFFFFF"
+    stroke-width="40"
+    stroke-linejoin="round"
+    fill="none"
+  />
+
+  <!-- Right trapezoid handle (flush with outer edge) -->
+  <path
+    d="M970 380 L970 620 L820 560 L820 440 Z"
+    stroke="#FFFFFF"
+    stroke-width="40"
+    stroke-linejoin="round"
+    fill="none"
+  />
+
+  <!-- Bottom trapezoid handle (flush with outer edge) -->
+  <path
+    d="M620 970 L380 970 L440 820 L560 820 Z"
+    stroke="#FFFFFF"
+    stroke-width="40"
+    stroke-linejoin="round"
+    fill="none"
+  />
+
+  <!-- Left trapezoid handle (flush with outer edge) -->
+  <path
+    d="M30 620 L30 380 L180 440 L180 560 Z"
+    stroke="#FFFFFF"
+    stroke-width="40"
+    stroke-linejoin="round"
+    fill="none"
+  />
+
+  <!-- Center hole (for barbell) -->
+  <circle
+    cx="500"
+    cy="500"
+    r="60"
+    stroke="#FFFFFF"
+    stroke-width="35"
+    fill="none"
+  />
+</svg>

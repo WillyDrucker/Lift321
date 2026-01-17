@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1000" height="1000" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Quad-Grip Olympic Weight Plate with 4 oval grip holes and 6-tooth center gear -->
+
+  <!-- Outer ring -->
+  <circle
+    cx="500"
+    cy="500"
+    r="465"
+    stroke="#FFFFFF"
+    stroke-width="60"
+    fill="none"
+  />
+
+  <!-- Small 6-tooth gear around center -->
+  <path
+    d="M480 370 L520 370 L520 420 L555 440 L580 395 L620 425 L580 465 L620 485 L620 515 L580 535 L620 575 L580 605 L555 560 L520 580 L520 630 L480 630 L480 580 L445 560 L420 605 L380 575 L420 535 L380 515 L380 485 L420 465 L380 425 L420 395 L445 440 L480 420 Z"
+    stroke="#FFFFFF"
+    stroke-width="30"
+    stroke-linejoin="round"
+    fill="none"
+  />
+
+  <!-- Center hole (for barbell) -->
+  <circle
+    cx="500"
+    cy="500"
+    r="40"
+    stroke="#FFFFFF"
+    stroke-width="22"
+    fill="none"
+  />
+
+  <!-- Grip hole cutouts - 4 oval slots near outer ring, tangential orientation -->
+  <!-- Top grip hole (horizontal) -->
+  <ellipse
+    cx="500"
+    cy="120"
+    rx="135"
+    ry="53"
+    stroke="#FFFFFF"
+    stroke-width="60"
+    fill="none"
+  />
+
+  <!-- Right grip hole (vertical) -->
+  <ellipse
+    cx="880"
+    cy="500"
+    rx="135"
+    ry="53"
+    transform="rotate(90, 880, 500)"
+    stroke="#FFFFFF"
+    stroke-width="60"
+    fill="none"
+  />
+
+  <!-- Bottom grip hole (horizontal) -->
+  <ellipse
+    cx="500"
+    cy="880"
+    rx="135"
+    ry="53"
+    stroke="#FFFFFF"
+    stroke-width="60"
+    fill="none"
+  />
+
+  <!-- Left grip hole (vertical) -->
+  <ellipse
+    cx="120"
+    cy="500"
+    rx="135"
+    ry="53"
+    transform="rotate(90, 120, 500)"
+    stroke="#FFFFFF"
+    stroke-width="60"
+    fill="none"
+  />
+</svg>
