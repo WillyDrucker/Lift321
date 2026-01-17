@@ -78,22 +78,23 @@ export const WorkoutActionCard: React.FC<WorkoutActionCardProps> = ({
     }
   }, [isResting]);
 
-  // Start pulsing animation only for first LOG SET to guide new users
-  useEffect(() => {
-    if (!isResting && !isComplete && !hasLoggedFirstSet.current) {
-      subtitlePulse.value = 0;
-      subtitlePulse.value = withDelay(
-        theme.layout.actionCard.pulseDelay,
-        withRepeat(
-          withTiming(1, {duration: theme.layout.actionCard.pulseDuration}),
-          -1,
-          true
-        )
-      );
-    } else {
-      subtitlePulse.value = withTiming(0, {duration: theme.layout.animation.duration});
-    }
-  }, [isResting, isComplete]);
+  // Pulsing animation disabled for performance testing
+  // TODO: Re-enable once performance issue is resolved
+  // useEffect(() => {
+  //   if (!isResting && !isComplete && !hasLoggedFirstSet.current) {
+  //     subtitlePulse.value = 0;
+  //     subtitlePulse.value = withDelay(
+  //       theme.layout.actionCard.pulseDelay,
+  //       withRepeat(
+  //         withTiming(1, {duration: theme.layout.actionCard.pulseDuration}),
+  //         -1,
+  //         true
+  //       )
+  //     );
+  //   } else {
+  //     subtitlePulse.value = withTiming(0, {duration: theme.layout.animation.duration});
+  //   }
+  // }, [isResting, isComplete]);
 
   // Store onEndRest in a ref to avoid stale closures
   const onEndRestRef = useRef(onEndRest);

@@ -36,6 +36,7 @@ export {SegmentedControl} from './SegmentedControl';
 // === LAYOUT ===
 export {AppLayout} from './AppLayout';
 export {DefaultScreenLayout} from './Layout/DefaultScreenLayout';
+export {WorkoutHeader} from './WorkoutHeader';
 
 // === ERROR HANDLING ===
 export {ErrorBoundary} from './ErrorBoundary';

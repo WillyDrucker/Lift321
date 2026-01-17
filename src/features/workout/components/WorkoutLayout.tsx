@@ -16,19 +16,16 @@ import {
   StyleSheet,
   Text,
   View,
-  Image,
   TouchableOpacity,
-  useWindowDimensions,
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import type {CompositeNavigationProp} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {theme} from '@/theme';
-import {TopNavBar, Sidebar, BottomTabBar} from '@/components';
+import {TopNavBar, Sidebar, BottomTabBar, WorkoutHeader} from '@/components';
 import type {WorkoutType} from '@/components/WorkoutCard';
 import type {MainStackParamList, TabParamList} from '@/navigation/types';
-import {usePlan} from '@/features/plans/context/PlanContext';
 import {calculateWorkoutDuration} from '@/utils/durationCalculator';
 
 // ============================================================================
@@ -100,34 +97,20 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
 }) => {
   // Get safe area insets for dynamic positioning
   const insets = useSafeAreaInsets();
-  const {width: screenWidth} = useWindowDimensions();
 
-  // Get selected plan from context
-  const {selectedPlan} = usePlan();
+  // Track title bar height dynamically (reported by WorkoutHeader)
+  const [measuredTitleHeight, setMeasuredTitleHeight] = useState(44);
+  const [measuredMinsWidth, setMeasuredMinsWidth] = useState(86);
+  const [measuredMinsHeight, setMeasuredMinsHeight] = useState(32);
+  const [measuredLetsGoWidth, setMeasuredLetsGoWidth] = useState(90);
 
-  // Track title bar height dynamically
-  const [measuredTitleHeight, setMeasuredTitleHeight] = useState(44); // Initial estimate
-  const [titleIsWrapped, setTitleIsWrapped] = useState(false); // Track if title spans multiple lines
-  const [measuredMinsWidth, setMeasuredMinsWidth] = useState(86); // Dynamic MINS display width
-  const [measuredMinsHeight, setMeasuredMinsHeight] = useState(32); // Dynamic MINS display height
-
-  // Measure title text container height (determines title bar height)
-  const handleTitleTextContainerLayout = useCallback((event: { nativeEvent: { layout: { height: number } } }) => {
-    const height = event.nativeEvent.layout.height;
+  // Handle title height change from WorkoutHeader
+  const handleTitleHeightChange = useCallback((height: number) => {
     if (height !== measuredTitleHeight) {
       setMeasuredTitleHeight(height);
       onTitleBarHeightChange?.(height);
     }
   }, [measuredTitleHeight, onTitleBarHeightChange]);
-
-  // Detect if title text wraps to multiple lines
-  // Once wrapped, stays wrapped (sticky) to prevent oscillation when width changes
-  const handleTitleTextLayout = useCallback((event: { nativeEvent: { lines: Array<unknown> } }) => {
-    const lineCount = event.nativeEvent.lines.length;
-    if (lineCount > 1 && !titleIsWrapped) {
-      setTitleIsWrapped(true);
-    }
-  }, [titleIsWrapped]);
 
   // Measure MINS display dimensions dynamically
   const handleMinsLayout = useCallback((event: { nativeEvent: { layout: { width: number; height: number } } }) => {
@@ -140,18 +123,24 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
     }
   }, [measuredMinsWidth, measuredMinsHeight]);
 
+  // Measure LET'S GO button width dynamically
+  const handleLetsGoLayout = useCallback((event: { nativeEvent: { layout: { width: number } } }) => {
+    const {width} = event.nativeEvent.layout;
+    if (width !== measuredLetsGoWidth) {
+      setMeasuredLetsGoWidth(width);
+    }
+  }, [measuredLetsGoWidth]);
+
   // Show workout-specific UI elements when in active workout
   const showWorkoutStatus = totalSets > 0;
 
-  // Calculate max width for title text
-  // Always leave room for MINS + 8dp gap (MINS may be top-right or bottom-right)
-  const horizontalPadding = theme.layout.topNav.paddingHorizontal * 2;
-  const gapFromMins = 8; // 8dp gap from MINS
-
-  // Title width leaves room for dynamically measured MINS width
-  const calculatedTitleMaxWidth = showWorkoutStatus
-    ? screenWidth - horizontalPadding - measuredMinsWidth - gapFromMins
-    : screenWidth - horizontalPadding;
+  // Determine right element width for title wrap calculation
+  // Priority: LET'S GO button (WorkoutOverview) > MINS (ActiveWorkout) > none
+  const rightElementWidth = onLetsGoPress
+    ? measuredLetsGoWidth
+    : showWorkoutStatus
+      ? measuredMinsWidth
+      : 0;
 
   // Calculate remaining minutes for status display
   const remainingSets = totalSets - currentSetIndex;
@@ -166,61 +155,22 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
         translucent={false}
       />
       <SafeAreaView style={styles.container}>
-        {/* Fixed Navigation Area */}
-        <View style={[styles.navigationArea, wrappedTitle && {overflow: 'visible'}]}>
-          <TopNavBar
-            onMenuPress={onMenuPress}
-            onBackPress={onBackPress}
-            onGearPress={showWorkoutStatus && !hideNavGear ? () => {} : undefined}
-            centerContent={navBarCenterContent}
-            leftContent={navBarLeftContent}
-          />
-
-          {/* Workout Title Bar (body part name) - Height based on title text container */}
-          <View
-            style={[
-              styles.workoutTitleBar,
-              {
-                marginTop: insets.top + theme.layout.topNav.height,
-                paddingTop: 44 - theme.layout.topNav.height, // Align with bottom of plan image
-              }
-            ]}
-          >
-            {/* Green line at top of title bar (optional) */}
-            {showTopGreenLine && <View style={[styles.greenAccentLine, {position: 'absolute', top: 0, left: 0, right: 0}]} />}
-
-            {/* Title Text Container - determines title bar height */}
-            <View
-              style={{maxWidth: calculatedTitleMaxWidth, paddingVertical: 2}}
-              onLayout={handleTitleTextContainerLayout}
-            >
-              <Text
-                style={[styles.workoutTitleText, {lineHeight: 30}]}
-                numberOfLines={2}
-                ellipsizeMode="tail"
-                onTextLayout={handleTitleTextLayout}
-              >
-{workoutType.toUpperCase()}
-              </Text>
-            </View>
-
-          </View>
-
-          {/* Green accent line */}
-          <View style={styles.greenAccentLine} />
-        </View>
-
-        {/* Plan Image - Independent floating element, centered on screen (future: link to plans overview) */}
-        <View
-          style={[styles.planImageContainer, {top: insets.top + 4}]}
-          pointerEvents="box-none"
-        >
-          <Image
-            source={selectedPlan.image}
-            style={styles.planImage}
-            resizeMode="contain"
-          />
-        </View>
+        {/* Global Workout Header (includes TopNavBar, title bar, plan image) */}
+        <WorkoutHeader
+          title={workoutType}
+          rightElementWidth={rightElementWidth}
+          onTitleHeightChange={handleTitleHeightChange}
+          showTopGreenLine={showTopGreenLine}
+          topNavBar={
+            <TopNavBar
+              onMenuPress={onMenuPress}
+              onBackPress={onBackPress}
+              onGearPress={showWorkoutStatus && !hideNavGear ? () => {} : undefined}
+              centerContent={navBarCenterContent}
+              leftContent={navBarLeftContent}
+            />
+          }
+        />
 
         {/* MINS Display - Independent floating element, locked to title bottom border */}
         {showWorkoutStatus && (
@@ -248,6 +198,7 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
               }
             ]}
             onPress={onLetsGoPress}
+            onLayout={handleLetsGoLayout}
             activeOpacity={0.7}
           >
             <Text style={styles.letsGoButtonText}>LET'S GO!</Text>
@@ -307,53 +258,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.pureBlack,
   },
 
-  navigationArea: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 10,
-    backgroundColor: theme.colors.pureBlack,
-  },
-
-  // === WORKOUT TITLE BAR ===
-  workoutTitleBar: {
-    // marginTop, paddingTop, paddingBottom set dynamically
-    backgroundColor: theme.colors.pureBlack,
-    flexDirection: 'row',
-    alignItems: 'flex-start', // Top-align content
-    justifyContent: 'space-between',
-    paddingHorizontal: theme.layout.topNav.paddingHorizontal, // Align with TopNavBar (16dp)
-    zIndex: 1,
-  },
-  greenAccentLine: {
-    height: 1, // 1dp green line
-    backgroundColor: theme.colors.actionSuccess,
-  },
-
-  workoutTitleText: {
-    fontSize: 36, // Large workout title
-    fontFamily: theme.typography.fontFamily.workoutCard,
-    color: theme.colors.actionSuccess,
-    textTransform: 'uppercase',
-    includeFontPadding: false,
-    transform: [{translateY: 2}], // Compensate for font metrics to visually center
-    textShadowColor: theme.colors.shadowBlack,
-    textShadowOffset: {width: 0, height: 2}, // Drop shadow
-    textShadowRadius: 4, // Shadow blur
-  },
-  planImageContainer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    zIndex: 15, // Above navigation area (10) but below children overlays
-  },
-  planImage: {
-    height: 40, // Full height of title bar
-    width: 120, // 3:1 aspect ratio (40 * 3 = 120)
-  },
-
   // === MINS DISPLAY ===
   minsContainer: {
     position: 'absolute',
@@ -372,6 +276,7 @@ const styles = StyleSheet.create({
   },
   minsValue: {
     fontSize: 32,
+    lineHeight: 30,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.actionSuccess,

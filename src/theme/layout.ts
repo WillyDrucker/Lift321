@@ -128,7 +128,7 @@ export const layout = {
     paddingHorizontal: 16, // Left/right padding for icon spacing
     searchIconSize: 18, // Info/help icon size
     menuIconSize: 24, // Hamburger menu icon size
-    backIconSize: 28, // Back button icon size (minimalist, globally consistent)
+    backIconSize: 20, // Back button icon size (minimalist, globally consistent)
     borderWidth: 0, // No border
   },
 

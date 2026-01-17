@@ -68,6 +68,7 @@ export const styles = StyleSheet.create({
   },
   setsValue: {
     fontSize: 32,
+    lineHeight: 30,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.actionSuccess,

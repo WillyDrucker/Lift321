@@ -212,7 +212,10 @@ export const ToggleableDialControlCard: React.FC<ToggleableDialControlCardProps>
                   <Text style={[styles.weightText, mode === 'weight' && styles.weightTextActive]}>WEIGHT</Text>
                   <Text style={[styles.lbsText, mode === 'weight' && styles.lbsTextActive]}>(LBS)</Text>
                 </View>
-                <Text style={styles.weightValue}>{displayWeight}</Text>
+                <Text style={[
+                  styles.weightValue,
+                  displayWeight >= 1000 && {fontSize: 24, lineHeight: 24}
+                ]}>{displayWeight}</Text>
               </View>
             ]}
             selectedIndex={mode === 'reps' ? 0 : 1}
@@ -258,13 +261,14 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.textSecondary,
     textTransform: 'uppercase',
+    includeFontPadding: false,
   },
   repsTextActive: {
     color: theme.colors.textPrimary,
   },
   repsValue: {
     fontSize: 32,
-    lineHeight: 32,
+    lineHeight: 30,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
     includeFontPadding: false,
@@ -289,13 +293,14 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.textSecondary,
     textTransform: 'uppercase',
+    includeFontPadding: false,
   },
   weightTextActive: {
     color: theme.colors.textPrimary,
   },
   weightValue: {
     fontSize: 32,
-    lineHeight: 32,
+    lineHeight: 30,
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.pureWhite,
@@ -309,6 +314,7 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.textSecondary,
     textTransform: 'uppercase',
+    includeFontPadding: false,
     marginTop: -4,
   },
   lbsTextActive: {

@@ -12,7 +12,7 @@ import React from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {theme} from '@/theme';
-import {HamburgerRegularThin, LeftChevron, PlateIconQuadGrip} from '@/components/icons';
+import {HamburgerRegularThin, ChevronRegular, PlateIconQuadGrip} from '@/components/icons';
 
 // === TYPES ===
 
@@ -61,7 +61,7 @@ export const TopNavBar: React.FC<TopNavBarProps> = React.memo(
                   styles.backButton,
                   pressed && styles.pressed,
                 ]}>
-                <LeftChevron
+                <ChevronRegular
                   size={theme.layout.topNav.backIconSize}
                   color={theme.colors.textPrimary}
                 />
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   leftButtonsContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: theme.spacing.m, // Standard gap between navigation icons
+    gap: 20, // Gap between hamburger and back chevron
   },
 
   centerContainer: {
@@ -148,6 +148,7 @@ const styles = StyleSheet.create({
 
   backButton: {
     padding: 0,
+    marginTop: 2, // 2dp from top of navigation bar
   },
 
   gearButton: {
