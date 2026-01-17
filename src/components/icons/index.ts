@@ -9,6 +9,10 @@
 
 export {LeftChevron} from './LeftChevron';
 export {RightChevron} from './RightChevron';
+export {ChevronGymTrek} from './ChevronGymTrek';
+export {ChevronGymTrekAlt} from './ChevronGymTrekAlt';
+export {ChevronRegular} from './ChevronRegular';
+export {ChevronRegularThin} from './ChevronRegularThin';
 export {EyeOpen} from './EyeOpen';
 export {EyeClosed} from './EyeClosed';
 export {HamburgerIcon} from './HamburgerIcon';
