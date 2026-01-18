@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     justifyContent: 'flex-end',
     paddingRight: 16,
-    gap: 8,
+    gap: theme.spacing.controlButtonGap,
   },
   repsText: {
     fontSize: theme.typography.fontSize.m,
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     justifyContent: 'flex-end',
     paddingRight: 16,
-    gap: 8,
+    gap: theme.spacing.controlButtonGap,
   },
   weightLabelStack: {
     alignItems: 'center',

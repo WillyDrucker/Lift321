@@ -43,6 +43,7 @@ export const spacing = {
   buttonPaddingHorizontal: 24, // Horizontal padding inside buttons
   inputPadding: 16, // Internal padding for input fields
   inputMarginSmall: 5, // Small margin for form inputs (horizontal/vertical tight spacing)
+  controlButtonGap: 8, // Gap between label and value in control buttons (REPS/WEIGHT)
 } as const;
 
 export type SpacingToken = keyof typeof spacing;

@@ -369,6 +369,7 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
               <TouchableOpacity
                 style={[
                   styles.workoutPlanFocusSelector,
+                  styles.workoutPlanFocusSelectorFirst,
                   selectedPlanFocus === 'strength' && styles.workoutPlanFocusSelected,
                 ]}
                 onPress={() => setSelectedPlanFocus('strength')}
@@ -379,6 +380,7 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
               <TouchableOpacity
                 style={[
                   styles.workoutPlanFocusSelector,
+                  styles.workoutPlanFocusSelectorMiddle,
                   selectedPlanFocus === 'balanced' && styles.workoutPlanFocusSelected,
                 ]}
                 onPress={() => setSelectedPlanFocus('balanced')}
@@ -389,6 +391,7 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
               <TouchableOpacity
                 style={[
                   styles.workoutPlanFocusSelector,
+                  styles.workoutPlanFocusSelectorLast,
                   selectedPlanFocus === 'growth' && styles.workoutPlanFocusSelected,
                 ]}
                 onPress={() => setSelectedPlanFocus('growth')}
@@ -420,6 +423,7 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
               <TouchableOpacity
                 style={[
                   styles.workoutSessionTypeSelector,
+                  styles.workoutSessionTypeSelectorFirst,
                   selectedSession === 'standard' && styles.workoutSessionTypeSelected,
                 ]}
                 onPress={() => setSelectedSession('standard')}
@@ -430,6 +434,7 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
               <TouchableOpacity
                 style={[
                   styles.workoutSessionTypeSelector,
+                  styles.workoutSessionTypeSelectorMiddle,
                   selectedSession === 'express' && styles.workoutSessionTypeSelected,
                 ]}
                 onPress={() => setSelectedSession('express')}
@@ -440,6 +445,7 @@ export const WorkoutOverviewScreen: React.FC<WorkoutOverviewProps> = ({
               <TouchableOpacity
                 style={[
                   styles.workoutSessionTypeSelector,
+                  styles.workoutSessionTypeSelectorLast,
                   selectedSession === 'maintenance' && styles.workoutSessionTypeSelected,
                 ]}
                 onPress={() => setSelectedSession('maintenance')}

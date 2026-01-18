@@ -83,27 +83,26 @@ const DialControlCardComponent: React.FC<DialControlCardProps> = ({
   hasError = false,
   onErrorAnimationComplete,
 }) => {
-  // === ERROR ANIMATION ===
-  const errorFlash = useSharedValue(0);
+  // === ERROR ANIMATION (SHAKE) ===
+  const shakeOffset = useSharedValue(0);
 
   useEffect(() => {
     if (hasError && onErrorAnimationComplete) {
-      // 3 flashes: on-off-on-off-on-off (start visible, end hidden)
-      errorFlash.value = withSequence(
-        withTiming(1, {duration: 0}), // Start immediately visible
-        withTiming(0, {duration: ERROR_FLASH_DURATION}),
-        withTiming(1, {duration: ERROR_FLASH_DURATION}),
-        withTiming(0, {duration: ERROR_FLASH_DURATION}),
-        withTiming(1, {duration: ERROR_FLASH_DURATION}),
-        withTiming(0, {duration: ERROR_FLASH_DURATION}, () => {
+      // Quick shake: left-right-left-right-center
+      shakeOffset.value = withSequence(
+        withTiming(-8, {duration: 50}),
+        withTiming(8, {duration: 50}),
+        withTiming(-6, {duration: 50}),
+        withTiming(6, {duration: 50}),
+        withTiming(0, {duration: 50}, () => {
           runOnJS(onErrorAnimationComplete)();
         }),
       );
     }
   }, [hasError, onErrorAnimationComplete]);
 
-  const errorOverlayStyle = useAnimatedStyle(() => ({
-    opacity: errorFlash.value * 0.6,
+  const shakeAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{translateX: shakeOffset.value}],
   }));
 
   // === HOOKS ===
@@ -203,8 +202,8 @@ const DialControlCardComponent: React.FC<DialControlCardProps> = ({
         </View>
       )}
 
-      {/* Controls with integrated gauge */}
-      <View style={dialStyles.controlsContainer}>
+      {/* Controls with integrated gauge - wrapped for shake animation */}
+      <ReAnimated.View style={[dialStyles.controlsContainer, shakeAnimatedStyle]}>
         {/* Decrement Buttons - hidden if hideButtons */}
         {!hideButtons && (
           <View style={dialStyles.buttonGroup}>
@@ -226,12 +225,6 @@ const DialControlCardComponent: React.FC<DialControlCardProps> = ({
           style={[dialStyles.gaugeContainer, hideButtons && {marginHorizontal: 0}]}
           onLayout={handleGaugeLayout}
         >
-          {/* Error Flash Overlay */}
-          <ReAnimated.View
-            style={[dialStyles.errorOverlay, errorOverlayStyle]}
-            pointerEvents="none"
-          />
-
           {/* Scrollable Tick Track */}
           <FlatList
             ref={scrollViewRef as any}
@@ -300,7 +293,7 @@ const DialControlCardComponent: React.FC<DialControlCardProps> = ({
             ))}
           </View>
         )}
-      </View>
+      </ReAnimated.View>
     </View>
   );
 };

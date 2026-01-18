@@ -14,6 +14,7 @@ import {
   ScrollView,
   Text,
   View,
+  TouchableOpacity,
 } from 'react-native';
 import {theme} from '@/theme';
 import {styles} from './ActiveWorkoutScreen.styles';
@@ -26,7 +27,22 @@ import {WorkoutActionCard} from '@/features/workout/components/WorkoutActionCard
 import {ExerciseCard} from '@/features/workout/components/ExerciseCard';
 import {ToggleableDialControlCard} from '@/features/workout/components/ToggleableDialControlCard';
 import {ActionButton} from '@/components';
+import {LayersIcon} from '@/components/icons';
 import {useActiveWorkout} from '@/features/workout/context/ActiveWorkoutContext';
+
+// ============================================================================
+// HELPERS
+// ============================================================================
+
+// Calculate reps color based on distance from target (same logic as ToggleableDialControlCard)
+const getRepsColor = (reps: number, targetReps: number): string => {
+  const diff = Math.abs(reps - targetReps);
+  if (diff <= 2) return theme.colors.actionSuccess;
+  if (diff <= 4) return theme.colors.sessionExpress;
+  if (diff <= 6) return theme.colors.sessionMaintenance;
+  if (diff <= 10) return theme.colors.actionWarning;
+  return theme.colors.pureWhite;
+};
 
 // ============================================================================
 // TYPES
@@ -71,6 +87,18 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
   } = useActiveWorkout();
 
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
+  const [isCompactView, setIsCompactView] = useState<boolean>(false);
+
+  // Track exercise name and color overrides when user selects alternate exercises
+  const [exerciseOverrides, setExerciseOverrides] = useState<Record<string, { name: string; color: string }>>({});
+
+  // Handle exercise change from ExerciseCard
+  const handleExerciseChange = useCallback((originalName: string, newName: string, color: string) => {
+    setExerciseOverrides(prev => ({
+      ...prev,
+      [originalName]: { name: newName, color },
+    }));
+  }, []);
 
   // Use config from context (pre-initialized before navigation)
   // Falls back to route params only for edge cases (direct navigation, deep links)
@@ -112,7 +140,7 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
   }, [workoutData]);
 
   const verticalLineHeight = useMemo(() => {
-    const SET_HEIGHT = 50;
+    const SET_HEIGHT = 48;
     const SET_MARGIN = 5;
     const GROUP_SPACER = 32;
 
@@ -131,9 +159,12 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
       exerciseCount++;
     });
 
-    // Remove last margin and adjust to end at center of last row
+    // Remove last margin and adjust for line positioning:
+    // - Line starts at center of first row (top: 24 in styles)
+    // - Line should end at center of last row
+    // - So we subtract full SET_HEIGHT (half for start offset, half for end offset)
     totalHeight -= SET_MARGIN;
-    totalHeight -= (SET_HEIGHT / 2);
+    totalHeight -= SET_HEIGHT;
 
     return totalHeight;
   }, [workoutData.exercises]);
@@ -168,6 +199,21 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
 
     return {currentSet: setNumber, totalSets: total, currentMuscleGroup: muscleGroup};
   }, [activeSetKey, workoutData.exercises]);
+
+  // Check if current exercise has any logged sets (locks exercise selection)
+  const hasLoggedSets = useMemo(() => {
+    if (!currentExerciseName || currentExerciseName === 'WORKOUT COMPLETE' || currentExerciseName === 'WORKOUT') {
+      return false;
+    }
+    // Check if any set for this exercise is completed
+    for (let i = 1; i <= totalSets; i++) {
+      const key = `${currentExerciseName}-${i}`;
+      if (workoutState[key]?.completed) {
+        return true;
+      }
+    }
+    return false;
+  }, [currentExerciseName, totalSets, workoutState]);
 
   // Calculate global set index and total sets for progress tracking
   const {globalSetIndex, globalTotalSets} = useMemo(() => {
@@ -224,24 +270,38 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
     totalSets: number,
   ) => {
     const sets: JSX.Element[] = [];
+    // Use overridden name and color if exercise was changed, otherwise use defaults
+    const override = exerciseOverrides[exerciseName];
+    const displayName = override?.name || exerciseName;
+    const displayColor = override?.color || theme.colors.actionSuccess;
 
     for (let setNumber = 1; setNumber <= totalSets; setNumber++) {
       const key = `${exerciseName}-${setNumber}`;
       const isActive = key === activeSetKey;
+      const setData = workoutState[key];
+      const isCompleted = setData?.completed || false;
+
+      // Calculate colors for logged sets
+      const loggedReps = parseInt(setData?.reps || '0', 10);
+      const repsColor = isCompleted ? getRepsColor(loggedReps, targetReps) : theme.colors.pureWhite;
+      const lbsColor = theme.colors.pureWhite; // Weight always white
 
       sets.push(
         <View key={key} style={[styles.setWrapper, isActive && styles.activeSetWrapper]}>
-            {isActive && <View style={styles.activeIndicator} />}
             <ExerciseSetRow
             setNumber={setNumber}
             totalSets={totalSets}
-            targetReps={10}
-            exerciseName={exerciseName}
-            exerciseImage={getExerciseImage(exerciseName)}
+            targetReps={targetReps}
+            exerciseName={displayName}
+            exerciseImage={getExerciseImage(displayName)}
             sessionType={sessionType}
-            initialData={workoutState[key] || {weight: '0', reps: '0', completed: false}}
+            initialData={setData || {weight: '0', reps: '0', completed: false}}
             onPress={() => selectSet(key)}
             onUpdate={(data) => updateSet(key, data)}
+            isActive={isActive}
+            exerciseNameColor={displayColor}
+            repsColor={repsColor}
+            lbsColor={lbsColor}
             />
         </View>
       );
@@ -294,41 +354,63 @@ export const ActiveWorkoutScreen: React.FC<ActiveWorkoutProps> = ({
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
 
-          {/* 1. Exercise Card (Collapsible) */}
-          <ExerciseCard
-            exerciseName={currentExerciseName}
-            currentSet={currentSet}
-            totalSets={totalSets}
-            bodyPart={workoutType}
-            muscleGroup={currentMuscleGroup}
-            day={workoutDay}
-          />
+          {/* 1. Exercise Card - Hidden in compact view */}
+          {!isCompactView && (
+            <ExerciseCard
+              exerciseName={currentExerciseName}
+              currentSet={currentSet}
+              totalSets={totalSets}
+              bodyPart={workoutType}
+              muscleGroup={currentMuscleGroup}
+              day={workoutDay}
+              sessionType={sessionType}
+              onExerciseChange={handleExerciseChange}
+              hasLoggedSets={hasLoggedSets}
+            />
+          )}
 
-          {/* 2. Toggleable Dial Control - Switch between Reps and Weight */}
-          <ToggleableDialControlCard
-            initialReps={currentGlobalReps}
-            initialWeight={currentGlobalWeight}
-            targetReps={targetReps}
-            onRepsChange={setGlobalReps}
-            onWeightChange={setGlobalWeight}
-            hasRepsError={hasRepsError}
-            hasWeightError={hasWeightError}
-            onRepsErrorAnimationComplete={clearRepsError}
-            onWeightErrorAnimationComplete={clearWeightError}
-          />
+          {/* 2. Toggleable Dial Control - Hidden in compact view */}
+          {!isCompactView && (
+            <ToggleableDialControlCard
+              initialReps={currentGlobalReps}
+              initialWeight={currentGlobalWeight}
+              targetReps={targetReps}
+              onRepsChange={setGlobalReps}
+              onWeightChange={setGlobalWeight}
+              hasRepsError={hasRepsError}
+              hasWeightError={hasWeightError}
+              onRepsErrorAnimationComplete={clearRepsError}
+              onWeightErrorAnimationComplete={clearWeightError}
+            />
+          )}
 
-          {/* 4. Action Card (Log Set / Rest Timer / Finish) */}
-          <WorkoutActionCard
-            isResting={isResting}
-            isComplete={isWorkoutComplete}
-            restDuration={restMinutes}
-            onLogSet={logSet}
-            onEndRest={endRest}
-            onFinish={handleFinishWorkout}
-          />
+          {/* 4. Action Card - Hidden in compact view */}
+          {!isCompactView && (
+            <WorkoutActionCard
+              isResting={isResting}
+              isComplete={isWorkoutComplete}
+              restDuration={restMinutes}
+              onLogSet={logSet}
+              onEndRest={endRest}
+              onFinish={handleFinishWorkout}
+            />
+          )}
 
           {/* 5. Today's Workout (Exercise List) */}
           <View style={styles.todaysWorkoutCard}>
+            {/* View Mode Toggle */}
+            <TouchableOpacity
+              style={styles.viewModeToggle}
+              onPress={() => setIsCompactView(!isCompactView)}
+              activeOpacity={0.7}
+            >
+              <LayersIcon
+                size={32}
+                color={theme.colors.backgroundTertiary}
+                variant={isCompactView ? 'single' : 'stacked'}
+              />
+            </TouchableOpacity>
+
             <View style={styles.todaysWorkoutHeader}>
               <Text style={styles.todaysWorkoutText}>TODAY'S WORKOUT</Text>
               <View style={styles.setsDisplay}>

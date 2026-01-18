@@ -8,13 +8,59 @@
 // Used by: ActiveWorkoutScreen
 // ==========================================================================
 
-import React, {useState, useCallback, useMemo} from 'react';
+import React, {useState, useCallback, useMemo, useImperativeHandle, forwardRef, useRef} from 'react';
 import {View, StyleSheet, Text, TouchableOpacity} from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {theme} from '@/theme';
 import {BarbellIcon, DumbbellIcon, EZBarIcon, FixedBarbellIcon, FixedBarbellEZIcon, PinMachineIcon, CableMachineIcon, PlateLoadedIcon, SmithMachineIcon, ResistanceBandIcon, BodyweightIcon} from '@/components/icons';
 import {BottomSheet} from '@/components';
 import exercisesData from '@/data/exercises.json';
+
+// ============================================================================
+// SHAKEABLE VIEW - Isolated component to avoid hook order issues
+// ============================================================================
+
+type ShakeableViewProps = {
+  children: React.ReactNode;
+};
+
+type ShakeableViewRef = {
+  shake: () => void;
+};
+
+const ShakeableView = forwardRef<ShakeableViewRef, ShakeableViewProps>(
+  ({children}, ref) => {
+    const shakeOffset = useSharedValue(0);
+
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [{translateX: shakeOffset.value}],
+    }));
+
+    useImperativeHandle(ref, () => ({
+      shake: () => {
+        shakeOffset.value = withSequence(
+          withTiming(-8, {duration: 50}),
+          withTiming(8, {duration: 50}),
+          withTiming(-6, {duration: 50}),
+          withTiming(6, {duration: 50}),
+          withTiming(0, {duration: 50}),
+        );
+      },
+    }));
+
+    return (
+      <Animated.View style={[{width: '100%'}, animatedStyle]}>
+        {children}
+      </Animated.View>
+    );
+  }
+);
 
 // ============================================================================
 // CONSTANTS
@@ -51,6 +97,8 @@ type Exercise = {
 // TYPES
 // ============================================================================
 
+type SessionType = 'Standard' | 'Express' | 'Maintenance';
+
 type ExerciseCardProps = {
   exerciseName?: string;
   currentSet?: number;
@@ -58,6 +106,9 @@ type ExerciseCardProps = {
   bodyPart?: string;
   muscleGroup?: string;
   day?: string;
+  sessionType?: SessionType;
+  onExerciseChange?: (originalName: string, newName: string, color: string) => void;
+  hasLoggedSets?: boolean; // True if any sets logged for this exercise (locks exercise selection)
 };
 
 // ============================================================================
@@ -71,13 +122,26 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
   bodyPart = 'Chest',
   muscleGroup = 'Major1',
   day = 'Monday',
+  sessionType = 'Standard',
+  onExerciseChange,
+  hasLoggedSets = false,
 }) => {
+  // Get session color based on session type
+  const getSessionColor = () => {
+    switch (sessionType) {
+      case 'Standard': return theme.colors.sessionStandard;
+      case 'Express': return theme.colors.sessionExpress;
+      case 'Maintenance': return theme.colors.sessionMaintenance;
+      default: return theme.colors.sessionStandard;
+    }
+  };
+  const sessionColor = getSessionColor();
   // Get safe area insets to calculate correct bottom sheet top offset
   const insets = useSafeAreaInsets();
 
-  // Calculate topOffset to match WorkoutLayout navigation chrome:
-  // insets.top + topNav.height + titleBar(40) + greenLine(1)
-  const bottomSheetTopOffset = insets.top + theme.layout.topNav.height + 41;
+  // Calculate topOffset to position sheet below the plan image
+  // Plan image: top at insets.top + 4, height 40dp, so bottom at insets.top + 44
+  const bottomSheetTopOffset = insets.top + 44;
 
   const [exerciseSelectorVisible, setExerciseSelectorVisible] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState(exerciseName);
@@ -87,6 +151,9 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
     equipmentWeight: '',
     equipmentSetup: '',
   });
+
+  // Ref for shake animation
+  const shakeRef = useRef<ShakeableViewRef>(null);
 
   // Filter and sort exercises for the current body part and muscle group
   const alternateExercises = useMemo(() => {
@@ -207,7 +274,10 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
       equipmentSetup: exercise.equipmentSetup,
     });
     setExerciseSelectorVisible(false);
-  }, []);
+    // Notify parent of exercise change with color
+    const newColor = COLOR_CODE_MAP[exercise.colorCode] || theme.colors.actionSuccess;
+    onExerciseChange?.(exerciseName, exercise.name, newColor);
+  }, [exerciseName, onExerciseChange]);
 
   const textColor = COLOR_CODE_MAP[selectedColorCode] || theme.colors.actionSuccess;
 
@@ -215,45 +285,50 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerContent}>
-          {/* Main info box with icon */}
-          <TouchableOpacity
-            onPress={handleExerciseNamePress}
-            activeOpacity={0.7}
-            style={styles.exerciseInfoBox}
-          >
-            {/* Exercise Name - Centered */}
-            <Text style={[styles.exerciseName, {color: textColor}]}>
-              {selectedExercise.toUpperCase()}
-            </Text>
+          {/* Main info box with icon - wrapped in ShakeableView for shake animation */}
+          <ShakeableView ref={shakeRef}>
+            <TouchableOpacity
+              onPress={hasLoggedSets ? () => shakeRef.current?.shake() : handleExerciseNamePress}
+              activeOpacity={hasLoggedSets ? 1 : 0.7}
+              style={[
+                styles.exerciseInfoBox,
+                hasLoggedSets ? styles.exerciseInfoBoxLocked : styles.exerciseInfoBoxTappable,
+              ]}
+            >
+              {/* Exercise Name - Centered */}
+              <Text style={[styles.exerciseName, {color: textColor}]}>
+                {selectedExercise.toUpperCase()}
+              </Text>
 
-            {/* Details with Icon */}
-            <View style={styles.detailsWithIcon}>
-              {/* Equipment Icon - Centered on middle line */}
-              <View style={styles.iconAbsolute}>
-                {getEquipmentIcon()}
-              </View>
+              {/* Details with Icon */}
+              <View style={styles.detailsWithIcon}>
+                {/* Equipment Icon - Centered on middle line */}
+                <View style={styles.iconAbsolute}>
+                  {getEquipmentIcon()}
+                </View>
 
-              {/* Equipment Details - Centered */}
-              <View style={styles.detailsCentered}>
-                <Text style={[styles.exerciseDetailLine, {color: textColor}]}>
-                  {selectedEquipment.equipmentSetup.toUpperCase()}
-                </Text>
-                <Text style={[styles.exerciseDetailLine, {color: textColor}]}>
-                  {selectedEquipment.equipmentWeight.toUpperCase()}
-                </Text>
-                <Text style={[styles.exerciseDetailLineLast, {color: textColor}]}>
-                  {selectedEquipment.equipmentUse.toUpperCase()}
-                </Text>
+                {/* Equipment Details - Centered */}
+                <View style={styles.detailsCentered}>
+                  <Text style={[styles.exerciseDetailLine, {color: textColor}]}>
+                    {selectedEquipment.equipmentSetup.toUpperCase()}
+                  </Text>
+                  <Text style={[styles.exerciseDetailLine, {color: textColor}]}>
+                    {selectedEquipment.equipmentWeight.toUpperCase()}
+                  </Text>
+                  <Text style={[styles.exerciseDetailLineLast, {color: textColor}]}>
+                    {selectedEquipment.equipmentUse.toUpperCase()}
+                  </Text>
               </View>
             </View>
           </TouchableOpacity>
+          </ShakeableView>
         </View>
         <View style={styles.setInfoContainer}>
           <Text style={styles.setInfo}>
             <Text style={styles.setInfoLabel}>CURRENT SET </Text>
-            {currentSet}
+            <Text style={{color: sessionColor}}>{currentSet}</Text>
             <Text style={styles.setInfoLabel}> OF </Text>
-            {totalSets}
+            <Text style={{color: sessionColor}}>{totalSets}</Text>
           </Text>
         </View>
       </View>
@@ -379,7 +454,9 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   header: {
-    padding: 8,
+    paddingTop: 8,
+    paddingHorizontal: 8,
+    paddingBottom: 8,
   },
   headerContent: {
     alignItems: 'center',
@@ -395,6 +472,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     width: '100%',
+  },
+  exerciseInfoBoxTappable: {
+    // Default black background
+  },
+  exerciseInfoBoxLocked: {
+    // Same black background, shake animation indicates locked state
   },
   exerciseName: {
     fontSize: 32,

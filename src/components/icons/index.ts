@@ -35,6 +35,8 @@ export {PencilIcon} from './PencilIcon';
 export {TrashIcon} from './TrashIcon';
 export {GearIcon} from './GearIcon';
 export {PlateIconQuadGrip} from './PlateIconQuadGrip';
+export {CheckmarkRegular} from './CheckmarkRegular';
+export {LayersIcon} from './LayersIcon';
 
 // Equipment Icons
 export * from './equipment';

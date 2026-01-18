@@ -3,7 +3,7 @@
 //
 // iOS-style segmented control for switching between options.
 // Two equal-width touchable segments with active/inactive states.
-// Supports error flash animation on individual segments.
+// Supports shake animation on individual segments for errors.
 //
 // Dependencies: theme tokens, react-native-reanimated
 // Used by: ToggleableDialControlCard, other components needing mode selection
@@ -22,12 +22,6 @@ import Animated, {
 import {theme} from '@/theme';
 
 // ============================================================================
-// CONSTANTS
-// ============================================================================
-
-const ERROR_FLASH_DURATION = 200; // 200ms per flash transition
-
-// ============================================================================
 // TYPES
 // ============================================================================
 
@@ -40,54 +34,64 @@ type SegmentedControlProps = {
 };
 
 // ============================================================================
-// ERROR OVERLAY COMPONENT
+// SHAKEABLE SEGMENT COMPONENT
 // ============================================================================
 
-type ErrorOverlayProps = {
+type ShakeableSegmentProps = {
+  children: ReactNode;
   hasError: boolean;
   onAnimationComplete: () => void;
+  isSelected: boolean;
   isFirst: boolean;
   isLast: boolean;
+  onPress: () => void;
 };
 
-const ErrorOverlay: React.FC<ErrorOverlayProps> = ({
+const ShakeableSegment: React.FC<ShakeableSegmentProps> = ({
+  children,
   hasError,
   onAnimationComplete,
+  isSelected,
   isFirst,
   isLast,
+  onPress,
 }) => {
-  const errorFlash = useSharedValue(0);
+  const shakeOffset = useSharedValue(0);
 
   useEffect(() => {
     if (hasError) {
-      // 3 flashes: on-off-on-off-on-off (start visible, end hidden)
-      errorFlash.value = withSequence(
-        withTiming(1, {duration: 0}), // Start immediately visible
-        withTiming(0, {duration: ERROR_FLASH_DURATION}),
-        withTiming(1, {duration: ERROR_FLASH_DURATION}),
-        withTiming(0, {duration: ERROR_FLASH_DURATION}),
-        withTiming(1, {duration: ERROR_FLASH_DURATION}),
-        withTiming(0, {duration: ERROR_FLASH_DURATION}, () => {
+      // Quick shake: left-right-left-right-center
+      shakeOffset.value = withSequence(
+        withTiming(-8, {duration: 50}),
+        withTiming(8, {duration: 50}),
+        withTiming(-6, {duration: 50}),
+        withTiming(6, {duration: 50}),
+        withTiming(0, {duration: 50}, () => {
           runOnJS(onAnimationComplete)();
         }),
       );
     }
-  }, [hasError, onAnimationComplete, errorFlash]);
+  }, [hasError, onAnimationComplete, shakeOffset]);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    opacity: errorFlash.value * 0.6,
+    transform: [{translateX: shakeOffset.value}],
   }));
 
   return (
-    <Animated.View
-      style={[
-        styles.errorOverlay,
-        isFirst && styles.errorOverlayFirst,
-        isLast && styles.errorOverlayLast,
-        animatedStyle,
-      ]}
-      pointerEvents="none"
-    />
+    <Animated.View style={[styles.segmentWrapper, animatedStyle]}>
+      <TouchableOpacity
+        style={[
+          styles.segment,
+          isSelected && styles.segmentActive,
+          isFirst && styles.segmentFirst,
+          isLast && styles.segmentLast,
+        ]}
+        onPress={onPress}
+        activeOpacity={1}
+      >
+        {children}
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
@@ -112,26 +116,15 @@ const SegmentedControlComponent: React.FC<SegmentedControlProps> = ({
         const isLast = index === options.length - 1;
 
         return (
-          <TouchableOpacity
+          <ShakeableSegment
             key={index}
-            style={[
-              styles.segment,
-              isSelected && styles.segmentActive,
-              isFirst && styles.segmentFirst,
-              isLast && styles.segmentLast,
-            ]}
+            hasError={hasError}
+            onAnimationComplete={() => onErrorAnimationComplete?.(index)}
+            isSelected={isSelected}
+            isFirst={isFirst}
+            isLast={isLast}
             onPress={() => onSelect(index)}
-            activeOpacity={1}
           >
-            {/* Error Flash Overlay - always rendered to prevent unmount during animation */}
-            {onErrorAnimationComplete && (
-              <ErrorOverlay
-                hasError={hasError}
-                onAnimationComplete={() => onErrorAnimationComplete(index)}
-                isFirst={isFirst}
-                isLast={isLast}
-              />
-            )}
             {isString ? (
               <Text
                 style={[
@@ -144,7 +137,7 @@ const SegmentedControlComponent: React.FC<SegmentedControlProps> = ({
             ) : (
               option
             )}
-          </TouchableOpacity>
+          </ShakeableSegment>
         );
       })}
     </View>
@@ -160,6 +153,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: theme.colors.backgroundPrimary,
     borderRadius: theme.spacing.s,
+  },
+  segmentWrapper: {
+    flex: 1,
   },
   segment: {
     flex: 1,
@@ -192,23 +188,6 @@ const styles = StyleSheet.create({
   },
   segmentTextActive: {
     color: theme.colors.textPrimary,
-  },
-  errorOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: theme.colors.actionDanger,
-    zIndex: 10,
-  },
-  errorOverlayFirst: {
-    borderTopLeftRadius: theme.spacing.s,
-    borderBottomLeftRadius: theme.spacing.s,
-  },
-  errorOverlayLast: {
-    borderTopRightRadius: theme.spacing.s,
-    borderBottomRightRadius: theme.spacing.s,
   },
 });
 

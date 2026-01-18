@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
     right: theme.layout.topNav.paddingHorizontal, // 16dp from right edge
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 8,
+    gap: theme.spacing.xs, // 4dp - matches SETS spacing
     zIndex: 15, // Same as plan image
   },
   minsLabel: {

@@ -62,6 +62,16 @@ type ActiveWorkoutContextType = {
 };
 
 // ============================================================================
+// HELPERS
+// ============================================================================
+
+// Extract exercise name from set key (e.g., "Bench Press-2" -> "Bench Press")
+const getExerciseNameFromKey = (setKey: string): string => {
+  const parts = setKey.split('-');
+  return parts.slice(0, -1).join('-');
+};
+
+// ============================================================================
 // CONTEXT
 // ============================================================================
 
@@ -161,7 +171,7 @@ export const ActiveWorkoutProvider: React.FC<{children: ReactNode}> = ({children
 
     setWorkoutState(prev => {
         const oldData = prev[key];
-        
+
         // Trigger automation only if this was the ACTIVE set completing
         if (newData.completed && !oldData?.completed && key === activeSetKey) {
             const currentIndex = keys.indexOf(key);
@@ -177,6 +187,13 @@ export const ActiveWorkoutProvider: React.FC<{children: ReactNode}> = ({children
                 setIsResting(true);
                 const nextKey = keys[currentIndex + 1];
                 setActiveSetKey(nextKey);
+
+                // Check if moving to a different exercise - reset weight if so
+                const currentExercise = getExerciseNameFromKey(key);
+                const nextExercise = getExerciseNameFromKey(nextKey);
+                if (currentExercise !== nextExercise) {
+                    setCurrentGlobalWeight(0);
+                }
             }
         }
         return {
@@ -249,29 +266,13 @@ export const ActiveWorkoutProvider: React.FC<{children: ReactNode}> = ({children
 
   const setGlobalWeight = useCallback((weight: number) => {
       setCurrentGlobalWeight(weight);
-      if (activeSetKey) {
-          setWorkoutState(prev => ({
-              ...prev,
-              [activeSetKey]: {
-                  ...(prev[activeSetKey] || { reps: currentGlobalReps.toString(), completed: false }), 
-                  weight: weight.toString()
-              }
-          }));
-      }
-  }, [activeSetKey, currentGlobalReps]);
+      // workoutState is only updated when logSet is called
+  }, []);
 
   const setGlobalReps = useCallback((reps: number) => {
       setCurrentGlobalReps(reps);
-      if (activeSetKey) {
-          setWorkoutState(prev => ({
-              ...prev,
-              [activeSetKey]: {
-                  ...(prev[activeSetKey] || { weight: currentGlobalWeight.toString(), completed: false }), 
-                  reps: reps.toString()
-              }
-          }));
-      }
-  }, [activeSetKey, currentGlobalReps]);
+      // workoutState is only updated when logSet is called
+  }, []);
 
   // Sync global controls when active set changes
   // We need this Effect here in the provider

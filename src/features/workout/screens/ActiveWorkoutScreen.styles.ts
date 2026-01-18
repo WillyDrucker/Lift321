@@ -32,15 +32,22 @@ export const styles = StyleSheet.create({
     marginBottom: theme.spacing.s, // 8dp below the row
   },
   todaysWorkoutCard: {
+    position: 'relative',
     backgroundColor: theme.colors.backgroundPrimary,
     borderRadius: theme.spacing.s,
     paddingHorizontal: 16,
     paddingBottom: 16,
   },
+  viewModeToggle: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    width: 32,
+    height: 32,
+    zIndex: 1,
+  },
   todaysWorkoutHeader: {
     position: 'relative',
-    marginTop: 16,
-    marginBottom: 16,
   },
   todaysWorkoutText: {
     fontSize: theme.typography.fontSize.xl,
@@ -49,12 +56,15 @@ export const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.backgroundTertiary,
     textTransform: 'uppercase',
+    textAlign: 'center',
     includeFontPadding: false,
+    marginTop: 38, // 0dp below SETS value bottom
+    marginBottom: 8, // 8dp above first exercise entry
   },
   setsDisplay: {
     position: 'absolute',
-    top: -8, // 8dp from card top (16dp header margin - 8dp = 8dp from card top)
-    right: 0,
+    top: 8, // 8dp from card top
+    right: -8, // 8dp from right edge of card (offset into 16dp padding)
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: theme.spacing.xs,
@@ -81,8 +91,8 @@ export const styles = StyleSheet.create({
   },
   verticalLine: {
     position: 'absolute',
-    left: 0,
-    top: 25, // Start at center of first exercise row
+    left: -8, // 8dp from left edge of card (16dp padding - 8dp = 8dp from card edge)
+    top: 24, // Start at center of first exercise row (48dp / 2)
     width: 1,
     backgroundColor: theme.colors.pureWhite,
   },
@@ -97,16 +107,6 @@ export const styles = StyleSheet.create({
   },
   activeSetWrapper: {
     // Could add visual emphasis here if needed
-  },
-  activeIndicator: {
-    position: 'absolute',
-    left: -8,
-    top: 10,
-    bottom: 10,
-    width: 4,
-    backgroundColor: theme.colors.actionSuccess,
-    borderRadius: 2,
-    zIndex: 10,
   },
   finishButtonContainer: {
     marginTop: theme.spacing.s, // 8dp from above card

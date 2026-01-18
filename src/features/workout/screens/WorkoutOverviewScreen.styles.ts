@@ -50,7 +50,7 @@ export const styles = StyleSheet.create({
   },
 
   workoutPlanNameSelector: {
-    height: 50,
+    height: 48,
     backgroundColor: theme.colors.pureBlack,
     justifyContent: 'center',
     alignItems: 'center',
@@ -111,18 +111,36 @@ export const styles = StyleSheet.create({
 
   workoutPlanFocusContainer: {
     flexDirection: 'row',
-    gap: 1,
+    gap: 1, // 1dp gap between buttons
   },
 
   workoutPlanFocusSelector: {
     flex: 1,
-    height: 50,
+    height: 48,
     backgroundColor: theme.colors.backgroundTertiary,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: theme.spacing.s,
     borderWidth: theme.layout.border.thin,
-    borderColor: 'transparent',
+    borderColor: theme.colors.borderDefault,
+  },
+
+  // Position-specific border radius styles
+  workoutPlanFocusSelectorFirst: {
+    borderTopLeftRadius: theme.spacing.s,
+    borderBottomLeftRadius: theme.spacing.s,
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0,
+  },
+
+  workoutPlanFocusSelectorMiddle: {
+    borderRadius: 0,
+  },
+
+  workoutPlanFocusSelectorLast: {
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
+    borderTopRightRadius: theme.spacing.s,
+    borderBottomRightRadius: theme.spacing.s,
   },
 
   workoutPlanFocusSelected: {
@@ -162,7 +180,7 @@ export const styles = StyleSheet.create({
   },
 
   workoutSessionDurationSelector: {
-    height: 50,
+    height: 48,
     backgroundColor: theme.colors.pureBlack,
     justifyContent: 'center',
     alignItems: 'center',
@@ -194,13 +212,31 @@ export const styles = StyleSheet.create({
 
   workoutSessionTypeSelector: {
     flex: 1,
-    height: 50,
+    height: 48,
     backgroundColor: theme.colors.backgroundTertiary,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: theme.spacing.s,
     borderWidth: theme.layout.border.thin,
-    borderColor: 'transparent',
+    borderColor: theme.colors.borderDefault,
+  },
+
+  // Position-specific border radius styles
+  workoutSessionTypeSelectorFirst: {
+    borderTopLeftRadius: theme.spacing.s,
+    borderBottomLeftRadius: theme.spacing.s,
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0,
+  },
+
+  workoutSessionTypeSelectorMiddle: {
+    borderRadius: 0,
+  },
+
+  workoutSessionTypeSelectorLast: {
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
+    borderTopRightRadius: theme.spacing.s,
+    borderBottomRightRadius: theme.spacing.s,
   },
 
   workoutSessionTypeSelected: {
@@ -249,7 +285,7 @@ export const styles = StyleSheet.create({
 
   workoutEquipmentTypeSelector: {
     flex: 1,
-    height: 50,
+    height: 48,
     backgroundColor: theme.colors.backgroundTertiary,
     justifyContent: 'center',
     alignItems: 'center',
@@ -348,7 +384,7 @@ export const styles = StyleSheet.create({
   },
 
   exerciseRow: {
-    height: 50,
+    height: 48,
     backgroundColor: theme.colors.pureBlack,
     borderRadius: theme.spacing.s,
     flexDirection: 'row',
