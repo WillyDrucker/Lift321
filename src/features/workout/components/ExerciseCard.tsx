@@ -2,9 +2,9 @@
 // EXERCISE CARD COMPONENT
 //
 // Displays current exercise info with equipment icon.
-// Allows selecting alternate exercises via bottom sheet.
+// Allows selecting alternate exercises via global bottom sheet portal.
 //
-// Dependencies: theme tokens, BottomSheet
+// Dependencies: theme tokens, BottomSheetContext
 // Used by: ActiveWorkoutScreen
 // ==========================================================================
 
@@ -13,7 +13,7 @@ import {View, StyleSheet, Text, TouchableOpacity} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {theme} from '@/theme';
 import {BarbellIcon, DumbbellIcon, EZBarIcon, FixedBarbellIcon, FixedBarbellEZIcon, PinMachineIcon, CableMachineIcon, PlateLoadedIcon, SmithMachineIcon, ResistanceBandIcon, BodyweightIcon} from '@/components/icons';
-import {BottomSheet} from '@/components';
+import {useBottomSheet} from '@/contexts';
 import exercisesData from '@/data/exercises.json';
 
 // ============================================================================
@@ -79,7 +79,9 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
   // insets.top + topNav.height + titleBar(40) + greenLine(1)
   const bottomSheetTopOffset = insets.top + theme.layout.topNav.height + 41;
 
-  const [exerciseSelectorVisible, setExerciseSelectorVisible] = useState(false);
+  // Global bottom sheet hook
+  const {showBottomSheet, hideBottomSheet} = useBottomSheet();
+
   const [selectedExercise, setSelectedExercise] = useState(exerciseName);
   const [selectedColorCode, setSelectedColorCode] = useState<string>('cc1');
   const [selectedEquipment, setSelectedEquipment] = useState({
@@ -181,14 +183,6 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
     return null;
   }, [selectedEquipment, selectedExercise, selectedColorCode]);
 
-  const handleExerciseNamePress = useCallback(() => {
-    setExerciseSelectorVisible(true);
-  }, []);
-
-  const handleExerciseSelectorClose = useCallback(() => {
-    setExerciseSelectorVisible(false);
-  }, []);
-
   const handleExerciseSelect = useCallback((exercise: {
     id: string;
     name: string;
@@ -206,65 +200,13 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
       equipmentWeight: exercise.equipmentWeight,
       equipmentSetup: exercise.equipmentSetup,
     });
-    setExerciseSelectorVisible(false);
-  }, []);
+    hideBottomSheet();
+  }, [hideBottomSheet]);
 
-  const textColor = COLOR_CODE_MAP[selectedColorCode] || theme.colors.actionSuccess;
-
-  return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          {/* Main info box with icon */}
-          <TouchableOpacity
-            onPress={handleExerciseNamePress}
-            activeOpacity={0.7}
-            style={styles.exerciseInfoBox}
-          >
-            {/* Exercise Name - Centered */}
-            <Text style={[styles.exerciseName, {color: textColor}]}>
-              {selectedExercise.toUpperCase()}
-            </Text>
-
-            {/* Details with Icon */}
-            <View style={styles.detailsWithIcon}>
-              {/* Equipment Icon - Centered on middle line */}
-              <View style={styles.iconAbsolute}>
-                {getEquipmentIcon()}
-              </View>
-
-              {/* Equipment Details - Centered */}
-              <View style={styles.detailsCentered}>
-                <Text style={[styles.exerciseDetailLine, {color: textColor}]}>
-                  {selectedEquipment.equipmentSetup.toUpperCase()}
-                </Text>
-                <Text style={[styles.exerciseDetailLine, {color: textColor}]}>
-                  {selectedEquipment.equipmentWeight.toUpperCase()}
-                </Text>
-                <Text style={[styles.exerciseDetailLineLast, {color: textColor}]}>
-                  {selectedEquipment.equipmentUse.toUpperCase()}
-                </Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.setInfoContainer}>
-          <Text style={styles.setInfo}>
-            <Text style={styles.setInfoLabel}>CURRENT SET </Text>
-            {currentSet}
-            <Text style={styles.setInfoLabel}> OF </Text>
-            {totalSets}
-          </Text>
-        </View>
-      </View>
-
-      {/* Exercise Selector Bottom Sheet */}
-      <BottomSheet
-        visible={exerciseSelectorVisible}
-        onClose={handleExerciseSelectorClose}
-        topOffset={bottomSheetTopOffset}
-        maxHeightPercent={95}
-      >
+  // Render exercise list for bottom sheet content
+  const renderExerciseList = useCallback(() => {
+    return (
+      <>
         {alternateExercises.map((exercise, index) => {
           const isRedNote = exercise.colorCode === 'red';
           const rowTextColor = COLOR_CODE_MAP[exercise.colorCode] || theme.colors.textPrimary;
@@ -360,7 +302,66 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
             </TouchableOpacity>
           );
         })}
-      </BottomSheet>
+      </>
+    );
+  }, [alternateExercises, handleExerciseSelect]);
+
+  const handleExerciseNamePress = useCallback(() => {
+    showBottomSheet({
+      content: renderExerciseList(),
+      topOffset: bottomSheetTopOffset,
+      maxHeightPercent: 95,
+    });
+  }, [showBottomSheet, renderExerciseList, bottomSheetTopOffset]);
+
+  const textColor = COLOR_CODE_MAP[selectedColorCode] || theme.colors.actionSuccess;
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
+          {/* Main info box with icon */}
+          <TouchableOpacity
+            onPress={handleExerciseNamePress}
+            activeOpacity={0.7}
+            style={styles.exerciseInfoBox}
+          >
+            {/* Exercise Name - Centered */}
+            <Text style={[styles.exerciseName, {color: textColor}]}>
+              {selectedExercise.toUpperCase()}
+            </Text>
+
+            {/* Details with Icon */}
+            <View style={styles.detailsWithIcon}>
+              {/* Equipment Icon - Centered on middle line */}
+              <View style={styles.iconAbsolute}>
+                {getEquipmentIcon()}
+              </View>
+
+              {/* Equipment Details - Centered */}
+              <View style={styles.detailsCentered}>
+                <Text style={[styles.exerciseDetailLine, {color: textColor}]}>
+                  {selectedEquipment.equipmentSetup.toUpperCase()}
+                </Text>
+                <Text style={[styles.exerciseDetailLine, {color: textColor}]}>
+                  {selectedEquipment.equipmentWeight.toUpperCase()}
+                </Text>
+                <Text style={[styles.exerciseDetailLineLast, {color: textColor}]}>
+                  {selectedEquipment.equipmentUse.toUpperCase()}
+                </Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.setInfoContainer}>
+          <Text style={styles.setInfo}>
+            <Text style={styles.setInfoLabel}>CURRENT SET </Text>
+            {currentSet}
+            <Text style={styles.setInfoLabel}> OF </Text>
+            {totalSets}
+          </Text>
+        </View>
+      </View>
     </View>
   );
 };
