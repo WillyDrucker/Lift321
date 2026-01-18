@@ -14,8 +14,8 @@
 
 import React, {useCallback, useEffect, useState} from 'react';
 import {
+  BackHandler,
   Image,
-  Modal,
   Pressable,
   StyleSheet,
   Text,
@@ -71,6 +71,7 @@ const SidebarComponent: React.FC<SidebarProps> = ({
   // === STATE ===
   const [userEmail, setUserEmail] = useState<string>('');
   const [shouldRender, setShouldRender] = useState(false);
+  const [overlayActive, setOverlayActive] = useState(false);
 
   // Get reactive window dimensions for rotation support
   const {width: screenWidth} = useWindowDimensions();
@@ -109,6 +110,8 @@ const SidebarComponent: React.FC<SidebarProps> = ({
         swipeVelocity > theme.layout.sidebar.swipeVelocityThreshold * 1000; // Convert to px/s
 
       if (shouldClose) {
+        // Immediately disable touch blocking when closing starts
+        runOnJS(setOverlayActive)(false);
         // Animate closed
         translateX.value = withSpring(-sidebarWidth, SPRING_CONFIG);
         overlayOpacity.value = withSpring(0, SPRING_CONFIG, (finished) => {
@@ -140,10 +143,14 @@ const SidebarComponent: React.FC<SidebarProps> = ({
     if (visible) {
       // Show immediately
       setShouldRender(true);
+      // Enable touch blocking when opening
+      setOverlayActive(true);
       // Animate in
       translateX.value = withSpring(0, SPRING_CONFIG);
       overlayOpacity.value = withSpring(1, SPRING_CONFIG);
     } else {
+      // Disable touch blocking immediately when closing starts
+      setOverlayActive(false);
       // Animate out
       translateX.value = withSpring(-sidebarWidth, SPRING_CONFIG);
       overlayOpacity.value = withSpring(0, SPRING_CONFIG, (finished) => {
@@ -185,6 +192,20 @@ const SidebarComponent: React.FC<SidebarProps> = ({
     return () => clearTimeout(fetchTimer);
   }, [visible, userEmail]);
 
+  // Handle Android back button
+  useEffect(() => {
+    if (!visible || !shouldRender) {
+      return;
+    }
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      onClose();
+      return true; // Prevent default back behavior
+    });
+
+    return () => backHandler.remove();
+  }, [visible, shouldRender, onClose]);
+
   // === EVENT HANDLERS ===
   const handleSelect = useCallback(
     (option: MenuOption) => {
@@ -195,6 +216,8 @@ const SidebarComponent: React.FC<SidebarProps> = ({
   );
 
   const handleOverlayPress = useCallback(() => {
+    // Immediately disable touch blocking when closing starts
+    setOverlayActive(false);
     onClose();
   }, [onClose]);
 
@@ -204,15 +227,16 @@ const SidebarComponent: React.FC<SidebarProps> = ({
   }
 
   return (
-    <Modal
-      visible={shouldRender}
-      transparent={true}
-      animationType="none"
-      statusBarTranslucent={true}
-      onRequestClose={onClose}>
+    <View
+      style={[StyleSheet.absoluteFillObject, styles.overlayContainer]}
+      pointerEvents={overlayActive ? 'auto' : 'none'}>
       <GestureHandlerRootView style={styles.container}>
         {/* Backdrop overlay - tap to close */}
-        <Pressable style={StyleSheet.absoluteFill} onPress={handleOverlayPress}>
+        {/* pointerEvents controlled by overlayActive state - disables immediately when closing */}
+        <Pressable
+          style={StyleSheet.absoluteFill}
+          onPress={handleOverlayPress}
+          pointerEvents={overlayActive ? 'auto' : 'none'}>
           <Animated.View style={[styles.overlay, overlayAnimatedStyle]} />
         </Pressable>
 
@@ -294,7 +318,7 @@ const SidebarComponent: React.FC<SidebarProps> = ({
           </View>
         </Animated.View>
       </GestureHandlerRootView>
-    </Modal>
+    </View>
   );
 };
 
