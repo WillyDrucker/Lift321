@@ -14,7 +14,7 @@
 
 import React, {useCallback, useEffect, useState, ReactNode} from 'react';
 import {
-  BackHandler,
+  Modal,
   Pressable,
   StyleSheet,
   Text,
@@ -160,11 +160,7 @@ const BottomSheetComponent: React.FC<BottomSheetProps> = ({
       }, theme.layout.bottomSheet.animationDelay);
       return () => clearTimeout(timer);
     } else {
-      // Animate out before unmounting
-      translateY.value = withSpring(
-        sheetHeight || theme.layout.bottomSheet.fallbackHeight,
-        SPRING_CONFIG
-      );
+      translateY.value = withSpring(sheetHeight || theme.layout.bottomSheet.fallbackHeight, SPRING_CONFIG);
       overlayOpacity.value = withSpring(0, SPRING_CONFIG, (finished) => {
         if (finished) {
           runOnJS(setShouldRender)(false);
@@ -179,20 +175,6 @@ const BottomSheetComponent: React.FC<BottomSheetProps> = ({
       translateY.value = withSpring(0, SPRING_CONFIG); // Visible position
     }
   }, [sheetHeight, visible, shouldRender, contentHeight]);
-
-  // Handle Android back button
-  useEffect(() => {
-    if (!visible || !shouldRender) {
-      return;
-    }
-
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-      onClose();
-      return true;
-    });
-
-    return () => backHandler.remove();
-  }, [visible, shouldRender, onClose]);
 
   // === EVENT HANDLERS ===
   const handleOverlayPress = useCallback(() => {
@@ -210,73 +192,72 @@ const BottomSheetComponent: React.FC<BottomSheetProps> = ({
   }
 
   return (
-    <>
-      {shouldRender && (
-        <View
-          style={[StyleSheet.absoluteFillObject, styles.overlayContainer]}
-          pointerEvents={visible ? 'auto' : 'none'}
+    <Modal
+      visible={shouldRender}
+      transparent={true}
+      animationType="none"
+      statusBarTranslucent={true}
+      onRequestClose={onClose}
+    >
+      <GestureHandlerRootView style={styles.container}>
+        {/* Backdrop overlay - tap anywhere to close (covers full screen) */}
+        <Pressable
+          style={StyleSheet.absoluteFill}
+          onPress={handleOverlayPress}
         >
-          <GestureHandlerRootView style={styles.container}>
-            {/* Backdrop overlay - tap anywhere to close (covers full screen) */}
-            <Pressable
-              style={StyleSheet.absoluteFill}
-              onPress={handleOverlayPress}
-            >
-              <Animated.View style={[styles.overlay, overlayAnimatedStyle]} />
-            </Pressable>
+          <Animated.View style={[styles.overlay, overlayAnimatedStyle]} />
+        </Pressable>
 
-            {/* Clipping container - between header and tab bar */}
-            <View style={[styles.sheetClipContainer, {bottom: bottomOffset, top: topOffset}]}>
-              {/* Bottom sheet - animates within clipped area */}
-              <Animated.View
-                style={[
-                  styles.sheet,
-                  {height: sheetHeight},
-                  sheetAnimatedStyle,
-                ]}>
-              {/* Drag Handle - gesture detector only on handle */}
-              <GestureDetector gesture={panGesture}>
-                <Animated.View style={styles.handleContainer}>
-                  <View style={styles.handle} />
-                </Animated.View>
-              </GestureDetector>
+        {/* Clipping container - between header and tab bar */}
+        <View style={[styles.sheetClipContainer, {bottom: bottomOffset, top: topOffset}]}>
+          {/* Bottom sheet - animates within clipped area */}
+          <Animated.View
+            style={[
+              styles.sheet,
+              {height: sheetHeight},
+              sheetAnimatedStyle,
+            ]}>
+          {/* Drag Handle - gesture detector only on handle */}
+          <GestureDetector gesture={panGesture}>
+            <Animated.View style={styles.handleContainer}>
+              <View style={styles.handle} />
+            </Animated.View>
+          </GestureDetector>
 
-              {/* Close Button (X) - upper right */}
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={onClose}
-                hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
-              >
-                <View style={styles.closeIconContainer}>
-                  <View style={[styles.closeLine, styles.closeLineLeft]} />
-                  <View style={[styles.closeLine, styles.closeLineRight]} />
-                </View>
-              </TouchableOpacity>
-
-              {/* Optional Title Header */}
-              {title && (
-                <View style={styles.headerContainer}>
-                  <Text style={styles.headerTitle}>{title}</Text>
-                </View>
-              )}
-
-              {/* Content Area - Always use ScrollView for consistent behavior */}
-              <ScrollView
-                style={styles.scrollContent}
-                contentContainerStyle={styles.scrollContentContainer}
-                showsVerticalScrollIndicator={true}
-                bounces={false}
-              >
-                <View onLayout={handleContentLayout}>
-                  {children}
-                </View>
-              </ScrollView>
-              </Animated.View>
+          {/* Close Button (X) - upper right */}
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={onClose}
+            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+          >
+            <View style={styles.closeIconContainer}>
+              <View style={[styles.closeLine, styles.closeLineLeft]} />
+              <View style={[styles.closeLine, styles.closeLineRight]} />
             </View>
-          </GestureHandlerRootView>
+          </TouchableOpacity>
+
+          {/* Optional Title Header */}
+          {title && (
+            <View style={styles.headerContainer}>
+              <Text style={styles.headerTitle}>{title}</Text>
+            </View>
+          )}
+
+          {/* Content Area - Always use ScrollView for consistent behavior */}
+          <ScrollView
+            style={styles.scrollContent}
+            contentContainerStyle={styles.scrollContentContainer}
+            showsVerticalScrollIndicator={true}
+            bounces={false}
+          >
+            <View onLayout={handleContentLayout}>
+              {children}
+            </View>
+          </ScrollView>
+          </Animated.View>
         </View>
-      )}
-    </>
+      </GestureHandlerRootView>
+    </Modal>
   );
 };
 
@@ -287,9 +268,6 @@ const BottomSheetComponent: React.FC<BottomSheetProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  overlayContainer: {
-    zIndex: 1000, // Above all content
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
