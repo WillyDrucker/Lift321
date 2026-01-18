@@ -125,7 +125,8 @@ const SidebarComponent: React.FC<SidebarProps> = ({
         overlayOpacity.value = withSpring(1, SPRING_CONFIG);
       }
     })
-    .activeOffsetX([-10, 10]); // Require 10px movement to activate
+    .activeOffsetX([-10, 10]) // Require 10px movement to activate gesture
+    .failOffsetY([-10, 10]); // Cancel if vertical scroll detected (prevents conflict with scrolling)
 
   // === ANIMATED STYLES ===
   const sidebarAnimatedStyle = useAnimatedStyle(() => ({
@@ -240,21 +241,20 @@ const SidebarComponent: React.FC<SidebarProps> = ({
           <Animated.View style={[styles.overlay, overlayAnimatedStyle]} />
         </Pressable>
 
-        {/* Sidebar drawer */}
-        <Animated.View
-          style={[
-            styles.sidebar,
-            {width: sidebarWidth},
-            sidebarAnimatedStyle,
-          ]}>
-          {/* Drag Handle - Right edge with gesture zone for swipe-to-close */}
-          <GestureDetector gesture={panGesture}>
-            <Animated.View style={styles.dragHandleArea}>
+        {/* Sidebar drawer - entire sidebar is draggable */}
+        <GestureDetector gesture={panGesture}>
+          <Animated.View
+            style={[
+              styles.sidebar,
+              {width: sidebarWidth},
+              sidebarAnimatedStyle,
+            ]}>
+            {/* Drag Handle - Visual indicator on right edge */}
+            <View style={styles.dragHandleArea}>
               <View style={styles.dragHandleBar} />
-            </Animated.View>
-          </GestureDetector>
+            </View>
 
-          {/* Header Section */}
+            {/* Header Section */}
           <View style={styles.header}>
             {/* Logo */}
             <Image
@@ -316,7 +316,8 @@ const SidebarComponent: React.FC<SidebarProps> = ({
               <Text style={styles.versionText}>v{packageJson.version}</Text>
             </Pressable>
           </View>
-        </Animated.View>
+          </Animated.View>
+        </GestureDetector>
       </GestureHandlerRootView>
     </View>
   );
