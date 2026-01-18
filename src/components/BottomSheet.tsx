@@ -1,21 +1,23 @@
 // ==========================================================================
 // BOTTOM SHEET COMPONENT
 //
-// Reusable modal bottom sheet with swipe-to-dismiss gesture.
+// Reusable bottom sheet with swipe-to-dismiss gesture and touch-through.
 // Slides up from bottom with dark overlay backdrop.
-// Template for all dropdown/selection menus in the app.
+// Rendered at app root via BottomSheetPortal for absolute positioning.
+//
+// ARCHITECTURE: Uses absolute positioning instead of Modal to enable
+// touch pass-through during close animations (pointerEvents control).
 //
 // PERFORMANCE: Uses react-native-reanimated (UI thread) and
 // react-native-gesture-handler (native gestures) for smooth 60fps.
 //
 // Dependencies: theme tokens, Reanimated 3, Gesture Handler 2
-// Used by: ExerciseCard exercise selector, future selection menus
+// Used by: BottomSheetPortal (via BottomSheetContext)
 // ==========================================================================
 
 import React, {useCallback, useEffect, useState, ReactNode} from 'react';
 import {
   BackHandler,
-  Modal,
   Pressable,
   StyleSheet,
   Text,
@@ -77,8 +79,9 @@ const BottomSheetComponent: React.FC<BottomSheetProps> = ({
   topOffset = theme.layout.topNav.topSpacing + theme.layout.topNav.height, // Default to below top nav
 }) => {
   // === STATE ===
-  const [isModalVisible, setIsModalVisible] = useState(false); // Modal open state (blocks touches)
+  const [shouldRender, setShouldRender] = useState(false);
   const [contentHeight, setContentHeight] = useState(0);
+  const [overlayActive, setOverlayActive] = useState(false);
 
   // Get reactive window dimensions
   const {height: screenHeight} = useWindowDimensions();
@@ -124,8 +127,15 @@ const BottomSheetComponent: React.FC<BottomSheetProps> = ({
         swipeVelocity > theme.layout.bottomSheet.swipeVelocityThreshold;
 
       if (shouldClose) {
-        // Close with animation - onClose triggers the effect which handles animation
-        runOnJS(onClose)();
+        // Immediately disable touch blocking when closing starts
+        runOnJS(setOverlayActive)(false);
+        // Animate closed (push down)
+        translateY.value = withSpring(sheetHeight, SPRING_CONFIG);
+        overlayOpacity.value = withSpring(0, SPRING_CONFIG, (finished) => {
+          if (finished) {
+            runOnJS(onClose)();
+          }
+        });
       } else {
         // Snap back to open (translateY = 0)
         translateY.value = withSpring(0, SPRING_CONFIG);
@@ -145,46 +155,55 @@ const BottomSheetComponent: React.FC<BottomSheetProps> = ({
 
   // === HOOKS ===
 
-  // Handle visibility changes with entrance animation (instant close for responsiveness)
+  // Handle visibility changes with entrance animation
   useEffect(() => {
     if (visible) {
-      // OPENING: Show Modal and animate in
-      setIsModalVisible(true);
+      setShouldRender(true);
+      // Enable touch blocking when opening
+      setOverlayActive(true);
       translateY.value = sheetHeight || theme.layout.bottomSheet.fallbackHeight;
       const timer = setTimeout(() => {
         translateY.value = withSpring(0, SPRING_CONFIG);
         overlayOpacity.value = withSpring(1, SPRING_CONFIG);
-      }, theme.layout.bottomSheet.animationDelay);
+      }, 16);
       return () => clearTimeout(timer);
-    } else if (isModalVisible) {
-      // CLOSING: Instant close for immediate touch responsiveness
-      setIsModalVisible(false);
+    } else {
+      // Disable touch blocking immediately when closing starts
+      setOverlayActive(false);
+      translateY.value = withSpring(sheetHeight || theme.layout.bottomSheet.fallbackHeight, SPRING_CONFIG);
+      overlayOpacity.value = withSpring(0, SPRING_CONFIG, (finished) => {
+        if (finished) {
+          runOnJS(setShouldRender)(false);
+        }
+      });
     }
   }, [visible, sheetHeight]);
 
   // Update animation when sheet height changes (content measured)
   useEffect(() => {
-    if (visible && isModalVisible && contentHeight > 0) {
+    if (visible && shouldRender && contentHeight > 0) {
       translateY.value = withSpring(0, SPRING_CONFIG); // Visible position
     }
-  }, [sheetHeight, visible, isModalVisible, contentHeight]);
+  }, [sheetHeight, visible, shouldRender, contentHeight]);
 
   // Handle Android back button
   useEffect(() => {
-    if (!visible || !isModalVisible) {
+    if (!visible || !shouldRender) {
       return;
     }
 
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
       onClose();
-      return true;
+      return true; // Prevent default back behavior
     });
 
     return () => backHandler.remove();
-  }, [visible, isModalVisible, onClose]);
+  }, [visible, shouldRender, onClose]);
 
   // === EVENT HANDLERS ===
   const handleOverlayPress = useCallback(() => {
+    // Immediately disable touch blocking when closing starts
+    setOverlayActive(false);
     onClose();
   }, [onClose]);
 
@@ -194,24 +213,21 @@ const BottomSheetComponent: React.FC<BottomSheetProps> = ({
   }, []);
 
   // === RENDER ===
-  if (!isModalVisible) {
+  if (!shouldRender) {
     return null;
   }
 
   return (
-    <Modal
-      visible={true}
-      transparent={true}
-      animationType="none"
-      statusBarTranslucent={true}
-      onRequestClose={onClose}
-    >
+    <View
+      style={[StyleSheet.absoluteFillObject, styles.overlayContainer]}
+      pointerEvents={overlayActive ? 'auto' : 'none'}>
       <GestureHandlerRootView style={styles.container}>
         {/* Backdrop overlay - tap anywhere to close (covers full screen) */}
+        {/* pointerEvents controlled by overlayActive state - disables immediately when closing */}
         <Pressable
           style={StyleSheet.absoluteFill}
           onPress={handleOverlayPress}
-        >
+          pointerEvents={overlayActive ? 'auto' : 'none'}>
           <Animated.View style={[styles.overlay, overlayAnimatedStyle]} />
         </Pressable>
 
@@ -264,7 +280,7 @@ const BottomSheetComponent: React.FC<BottomSheetProps> = ({
           </Animated.View>
         </View>
       </GestureHandlerRootView>
-    </Modal>
+    </View>
   );
 };
 
@@ -273,6 +289,9 @@ const BottomSheetComponent: React.FC<BottomSheetProps> = ({
 // ============================================================================
 
 const styles = StyleSheet.create({
+  overlayContainer: {
+    zIndex: 1000, // Above all content, below navigation modals
+  },
   container: {
     flex: 1,
   },

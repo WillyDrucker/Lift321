@@ -25,6 +25,7 @@ import {AuthNavigator} from '@/navigation/AuthNavigator';
 import {MainNavigator} from '@/navigation/MainNavigator';
 import {isAuthenticated, AUTH_CHANGE_EVENT, initializeOverride} from '@/services';
 import {theme} from '@/theme';
+import {BottomSheetProvider} from '@/contexts';
 
 // === TYPES ===
 
@@ -103,9 +104,11 @@ const App: React.FC<AppProps> = () => {
   return (
     <GestureHandlerRootView style={styles.flex}>
       <SafeAreaProvider>
-        <NavigationContainer ref={navigationRef}>
-          {isAuth ? <MainNavigator /> : <AuthNavigator />}
-        </NavigationContainer>
+        <BottomSheetProvider>
+          <NavigationContainer ref={navigationRef}>
+            {isAuth ? <MainNavigator /> : <AuthNavigator />}
+          </NavigationContainer>
+        </BottomSheetProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

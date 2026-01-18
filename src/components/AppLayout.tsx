@@ -22,6 +22,7 @@ import {TopNavBar} from './Navigation/TopNavBar';
 import {WeekCalendar} from './Navigation/WeekCalendar';
 import {PlanProgressBar} from './Navigation/PlanProgressBar';
 import {Sidebar} from './Sidebar';
+import {BottomSheetPortal} from './BottomSheetPortal';
 import {disableGuestMode, signOut} from '@/services';
 
 // ============================================================================
@@ -191,6 +192,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         onClose={handleSidebarClose}
         onSelect={handleSidebarSelect}
       />
+
+      {/* Global Bottom Sheet Portal */}
+      <BottomSheetPortal />
     </>
   );
 };

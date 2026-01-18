@@ -12,6 +12,10 @@ import {StyleSheet} from 'react-native';
 import {theme} from '@/theme';
 
 export const styles = StyleSheet.create({
+  overlayContainer: {
+    zIndex: 1000, // Above all content, below navigation modals
+  },
+
   container: {
     flex: 1,
     position: 'absolute',

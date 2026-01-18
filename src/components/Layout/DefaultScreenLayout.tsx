@@ -11,7 +11,7 @@
 import React, {type ReactNode} from 'react';
 import {Pressable, SafeAreaView, StatusBar, StyleSheet, Text, View} from 'react-native';
 import {theme} from '@/theme';
-import {LeftChevron} from '@/components';
+import {LeftChevron, BottomSheetPortal} from '@/components';
 
 // === TYPES ===
 
@@ -69,6 +69,9 @@ export const DefaultScreenLayout: React.FC<DefaultScreenLayoutProps> = ({
         {/* Screen Content */}
         <View style={styles.content}>{children}</View>
       </SafeAreaView>
+
+      {/* Global Bottom Sheet Portal */}
+      <BottomSheetPortal />
     </>
   );
 };

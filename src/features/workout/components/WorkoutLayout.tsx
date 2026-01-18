@@ -23,7 +23,7 @@ import type {CompositeNavigationProp} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {theme} from '@/theme';
-import {TopNavBar, Sidebar, BottomTabBar, WorkoutHeader} from '@/components';
+import {TopNavBar, Sidebar, BottomTabBar, WorkoutHeader, BottomSheetPortal} from '@/components';
 import type {WorkoutType} from '@/components/WorkoutCard';
 import type {MainStackParamList, TabParamList} from '@/navigation/types';
 import {calculateWorkoutDuration} from '@/utils/durationCalculator';
@@ -244,6 +244,9 @@ export const WorkoutLayout: React.FC<WorkoutLayoutProps> = ({
         onClose={onSidebarClose}
         onSelect={onSidebarSelect}
       />
+
+      {/* Global Bottom Sheet Portal */}
+      <BottomSheetPortal />
     </>
   );
 };
